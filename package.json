@@ -1,0 +1,13 @@
+{
+  "name": "skynote",
+  "version": "1.0.0",
+  "description": "Application SaaS éducative avec IA pour transformer les cours en fiches de révision",
+  "main": "index.html",
+  "scripts": {
+    "start": "open index.html",
+    "dev": "live-server"
+  },
+  "keywords": ["education", "ai", "saas", "revision", "students"],
+  "author": "Skynote Team",
+  "license": "MIT"
+}
