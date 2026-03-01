@@ -1,0 +1,16 @@
+{
+  "name": "Skynote",
+  "short_name": "Skynote",
+  "description": "Révise plus vite, Réussis mieux avec les Sky Coins",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8FAFF",
+  "theme_color": "#2563EB",
+  "icons": [
+    {
+      "src": "/assets/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
