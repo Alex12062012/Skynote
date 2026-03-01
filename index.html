@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skynote - Révise plus vite, Réussis mieux ✨</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ========== DESIGN SYSTEM BASE ========== */
+        :root {
+            --color-bg: #F8FAFF;
+            --color-surface: #FFFFFF;
+            --color-surface-secondary: #F1F5FF;
+            --color-primary: #2563EB;
+            --color-primary-hover: #1D4ED8;
+            --color-primary-light: #DBEAFE;
+            --color-primary-ultra-light: #EFF6FF;
+            --color-text-primary: #0F172A;
+            --color-text-secondary: #475569;
+            --color-text-tertiary: #64748B;
+            --color-text-disabled: #94A3B8;
+            --color-border: #E2E8F0;
+            --color-border-medium: #CBD5E1;
+            --color-border-strong: #94A3B8;
+            --color-success: #059669;
+            --color-success-light: #D1FAE5;
+            --color-warning: #D97706;
+            --color-warning-light: #FEF3C7;
+            --color-error: #DC2626;
+            --color-error-light: #FEE2E2;
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --radius-full: 9999px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        [data-theme="dark"] {
+            --color-bg: #0A0E1A;
+            --color-surface: #1A1F2E;
+            --color-surface-secondary: #1E2430;
+            --color-primary: #60A5FA;
+            --color-primary-hover: #93C5FD;
+            --color-primary-light: #1E3A5F;
+            --color-primary-ultra-light: #152A42;
+            --color-text-primary: #F1F5F9;
+            --color-text-secondary: #CBD5E1;
+            --color-text-tertiary: #94A3B8;
+            --color-text-disabled: #64748B;
+            --color-border: #2A3441;
+            --color-border-medium: #374151;
+            --color-border-strong: #4B5563;
+            --color-success: #10B981;
+            --color-success-light: #064E3B;
+            --color-warning: #F59E0B;
+            --color-warning-light: #78350F;
+            --color-error: #EF4444;
+            --color-error-light: #7F1D1D;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--color-text-primary);
+            background-color: var(--color-bg);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Inter Tight', 'Inter', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 2rem; font-weight: 600; }
+        h3 { font-size: 1.5rem; font-weight: 600; }
+        h4 { font-size: 1.125rem; font-weight: 600; }
+        
+        @media (max-width: 640px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.75rem; }
+            h3 { font-size: 1.375rem; }
+            h4 { font-size: 1.0625rem; }
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            font-size: 0.875rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            border-radius: var(--radius-md);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+            white-space: nowrap;
+            user-select: none;
+        }
+        
+        .btn:active { transform: scale(0.96); }
+        
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--color-primary-hover);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--color-primary);
+            border: 1.5px solid var(--color-primary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--color-primary-ultra-light);
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            background-color: var(--color-surface-secondary);
+            border: 1.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--color-text-primary);
+            transition: all var(--transition-fast);
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        
+        .card {
+            background-color: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            border: 1px solid var(--color-border);
+            transition: all var(--transition-normal);
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .text-secondary { color: var(--color-text-secondary); }
+        .text-small { font-size: 0.75rem; }
+        .font-semibold { font-weight: 600; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes coinFloat {
+            0%, 100% { transform: perspective(500px) rotateX(15deg) rotateY(20deg) translateY(0); }
+            50% { transform: perspective(500px) rotateX(15deg) rotateY(380deg) translateY(-10px); }
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--color-bg);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loading.show { display: flex; }
+        
+        #app { display: none; animation: fadeIn 0.5s ease-out; }
+        #app.show { display: block; }
+        
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s ease-out; }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading show" id="loading">
+        <div style="text-align: center;">
+            <svg width="80" height="80" viewBox="0 0 100 100" style="animation: coinFloat 2s ease-in-out infinite;">
+                <defs>
+                    <radialGradient id="coinGradient" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" style="stop-color:#93C5FD;stop-opacity:1" />
+                        <stop offset="70%" style="stop-color:#2563EB;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+                    </radialGradient>
+                </defs>
+                <circle cx="50" cy="50" r="40" fill="url(#coinGradient)" />
+                <g transform="translate(50, 50)">
+                    <ellipse cx="0" cy="5" rx="18" ry="12" fill="#FFFFFF" opacity="0.95" />
+                    <ellipse cx="-8" cy="-5" rx="12" ry="8" fill="#FFFFFF" opacity="0.95" />
+                    <ellipse cx="8" cy="-3" rx="8" ry="6" fill="#FFFFFF" opacity="0.95" />
+                </g>
+            </svg>
+            <p style="margin-top: 1rem; color: var(--color-text-secondary);">Chargement de Skynote...</p>
+        </div>
+    </div>
+    
+    <!-- Main App -->
+    <div id="app">
+        <!-- Landing Page -->
+        <div class="page active" id="landing">
+            <nav style="position: fixed; top: 0; left: 0; right: 0; height: 80px; background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--color-border); z-index: 100;">
+                <div style="max-width: 1200px; margin: 0 auto; height: 100%; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <svg width="40" height="40" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="url(#coinGradient)" />
+                            <g transform="translate(50, 50)">
+                                <ellipse cx="0" cy="5" rx="18" ry="12" fill="#FFFFFF" />
+                                <ellipse cx="-8" cy="-5" rx="12" ry="8" fill="#FFFFFF" />
+                                <ellipse cx="8" cy="-3" rx="8" ry="6" fill="#FFFFFF" />
+                            </g>
+                        </svg>
+                        <h1 style="font-size: 1.5rem;"><span style="color: var(--color-primary);">SKY</span>note</h1>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-secondary" onclick="showPage('login')">Connexion</button>
+                        <button class="btn btn-primary" onclick="showPage('register')">Commencer</button>
+                    </div>
+                </div>
+            </nav>
+            
+            <section style="padding: 160px 2rem 4rem; text-align: center; max-width: 800px; margin: 0 auto;">
+                <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem;">
+                    Révise <span style="background: linear-gradient(135deg, var(--color-primary) 0%, #60A5FA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">plus vite</span>,<br>
+                    Réussis <span style="background: linear-gradient(135deg, var(--color-primary) 0%, #60A5FA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">mieux</span> ✨
+                </h1>
+                <p style="font-size: 1.25rem; color: var(--color-text-secondary); margin-bottom: 2rem;">
+                    Transforme tes cours en fiches de révision intelligentes et QCM personnalisés grâce à l'IA. Gagne des Sky Coins à chaque progrès !
+                </p>
+                <button class="btn btn-primary" style="font-size: 1.125rem; padding: 1rem 2rem;" onclick="showPage('register')">
+                    Créer mon compte gratuitement →
+                </button>
+                
+                <div style="margin-top: 6rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                    <div class="card">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">📤</div>
+                        <h3>Upload intelligent</h3>
+                        <p class="text-secondary">PDF, photo, audio ou texte - l'IA analyse tout !</p>
+                    </div>
+                    <div class="card">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">🎯</div>
+                        <h3>QCM personnalisés</h3>
+                        <p class="text-secondary">Des questions adaptées à ton niveau et tes besoins</p>
+                    </div>
+                    <div class="card">
+                        <div style="font-size: 2rem; margin-bottom: 1rem;">💰</div>
+                        <h3>Sky Coins</h3>
+                        <p class="text-secondary">Gagne des récompenses à chaque révision</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Login Page -->
+        <div class="page" id="login">
+            <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+                <div class="card" style="width: 100%; max-width: 400px;">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <svg width="60" height="60" viewBox="0 0 100 100" style="margin-bottom: 1rem;">
+                            <circle cx="50" cy="50" r="40" fill="url(#coinGradient)" />
+                            <g transform="translate(50, 50)">
+                                <ellipse cx="0" cy="5" rx="18" ry="12" fill="#FFFFFF" />
+                                <ellipse cx="-8" cy="-5" rx="12" ry="8" fill="#FFFFFF" />
+                                <ellipse cx="8" cy="-3" rx="8" ry="6" fill="#FFFFFF" />
+                            </g>
+                        </svg>
+                        <h2>Content de te revoir !</h2>
+                        <p class="text-secondary">Continue ton apprentissage</p>
+                    </div>
+                    
+                    <form onsubmit="login(event)">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
+                            <input type="email" class="input-field" placeholder="john@example.com" required>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Mot de passe</label>
+                            <input type="password" class="input-field" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Se connecter</button>
+                    </form>
+                    
+                    <p style="text-align: center; color: var(--color-text-secondary);">
+                        Pas encore de compte ? 
+                        <a href="#" onclick="showPage('register')" style="color: var(--color-primary); text-decoration: none; font-weight: 500;">Inscris-toi</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Register Page -->
+        <div class="page" id="register">
+            <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+                <div class="card" style="width: 100%; max-width: 400px;">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <h2>Créer ton compte</h2>
+                        <p class="text-secondary">Rejoins Skynote et commence à réviser intelligemment</p>
+                    </div>
+                    
+                    <form onsubmit="register(event)">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Nom complet</label>
+                            <input type="text" class="input-field" placeholder="John Doe" required>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email</label>
+                            <input type="email" class="input-field" placeholder="john@example.com" required>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Mot de passe</label>
+                            <input type="password" class="input-field" placeholder="••••••••" required>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Niveau scolaire</label>
+                            <select class="input-field" required>
+                                <option value="">Sélectionne ton niveau</option>
+                                <option>6ème</option>
+                                <option>5ème</option>
+                                <option>4ème</option>
+                                <option>3ème</option>
+                                <option>2nde</option>
+                                <option>1ère</option>
+                                <option>Terminale</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">Créer mon compte</button>
+                    </form>
+                    
+                    <div style="padding: 1rem; background: var(--color-success-light); border-radius: var(--radius-md); text-align: center; margin-bottom: 1rem;">
+                        <p style="font-weight: 600; color: var(--color-success);">🎉 100 Sky Coins offerts à l'inscription !</p>
+                    </div>
+                    
+                    <p style="text-align: center; color: var(--color-text-secondary);">
+                        Déjà un compte ? 
+                        <a href="#" onclick="showPage('login')" style="color: var(--color-primary); text-decoration: none; font-weight: 500;">Connecte-toi</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Page -->
+        <div class="page" id="dashboard">
+            <div style="display: flex; height: 100vh;">
+                <!-- Sidebar -->
+                <aside style="width: 280px; background: var(--color-surface); border-right: 1px solid var(--color-border); padding: 2rem 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem;">
+                        <svg width="32" height="32" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="url(#coinGradient)" />
+                            <g transform="translate(50, 50)">
+                                <ellipse cx="0" cy="5" rx="18" ry="12" fill="#FFFFFF" />
+                                <ellipse cx="-8" cy="-5" rx="12" ry="8" fill="#FFFFFF" />
+                                <ellipse cx="8" cy="-3" rx="8" ry="6" fill="#FFFFFF" />
+                            </g>
+                        </svg>
+                        <h2 style="font-size: 1.25rem;"><span style="color: var(--color-primary);">SKY</span>note</h2>
+                    </div>
+                    
+                    <nav>
+                        <a href="#" class="nav-item active" onclick="showDashboard()">🏠 Dashboard</a>
+                        <a href="#" class="nav-item" onclick="showCourses()">📚 Mes cours</a>
+                        <a href="#" class="nav-item" onclick="showQCM()">❓ QCM</a>
+                        <a href="#" class="nav-item" onclick="showObjectives()">🎯 Objectifs</a>
+                        <a href="#" class="nav-item" onclick="showProfile()">👤 Mon profil</a>
+                        <a href="#" class="nav-item" onclick="logout()" style="color: var(--color-error); margin-top: 2rem;">🚪 Déconnexion</a>
+                    </nav>
+                </aside>
+                
+                <!-- Main Content -->
+                <main style="flex: 1; overflow-y: auto; padding: 2rem;">
+                    <div id="dashboardContent">
+                        <h1 style="margin-bottom: 1rem;">Bonjour ! 👋</h1>
+                        <p class="text-secondary" style="margin-bottom: 2rem;">Continue ta progression aujourd'hui</p>
+                        
+                        <!-- Stats -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                            <div class="card">
+                                <h3 style="color: var(--color-primary); margin-bottom: 0.5rem;">256</h3>
+                                <p class="text-small text-secondary">Sky Coins</p>
+                            </div>
+                            <div class="card">
+                                <h3 style="color: var(--color-success); margin-bottom: 0.5rem;">87%</h3>
+                                <p class="text-small text-secondary">Taux de réussite</p>
+                            </div>
+                            <div class="card">
+                                <h3 style="color: var(--color-warning); margin-bottom: 0.5rem;">5 jours</h3>
+                                <p class="text-small text-secondary">Série en cours</p>
+                            </div>
+                            <div class="card">
+                                <h3 style="margin-bottom: 0.5rem;">12</h3>
+                                <p class="text-small text-secondary">Cours actifs</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div style="background: linear-gradient(135deg, var(--color-primary) 0%, #60A5FA 100%); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 2rem; color: white;">
+                            <h3 style="margin-bottom: 1rem;">Actions rapides</h3>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <button class="btn" style="background: rgba(255,255,255,0.2); color: white;" onclick="showUpload()">
+                                    + Nouveau cours
+                                </button>
+                                <button class="btn" style="background: rgba(255,255,255,0.2); color: white;" onclick="startQCM()">
+                                    Commencer un QCM
+                                </button>
+                                <button class="btn" style="background: rgba(255,255,255,0.2); color: white;" onclick="showObjectives()">
+                                    Voir mes objectifs
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Courses -->
+                        <h3 style="margin-bottom: 1rem;">Cours récents</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+                            <div class="card" style="cursor: pointer;" onclick="openCourse('math')">
+                                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100px; margin: -1.5rem -1.5rem 1rem; border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 1rem; display: flex; align-items: flex-end;">
+                                    <span style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: var(--radius-md); font-size: 0.75rem; color: white;">Mathématiques</span>
+                                </div>
+                                <h4>Les fonctions exponentielles</h4>
+                                <p class="text-small text-secondary">75% complété</p>
+                                <div style="height: 6px; background: var(--color-surface-secondary); border-radius: var(--radius-full); margin-top: 1rem;">
+                                    <div style="width: 75%; height: 100%; background: var(--color-primary); border-radius: var(--radius-full);"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="card" style="cursor: pointer;">
+                                <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); height: 100px; margin: -1.5rem -1.5rem 1rem; border-radius: var(--radius-lg) var(--radius-lg) 0 0; padding: 1rem; display: flex; align-items: flex-end;">
+                                    <span style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: var(--radius-md); font-size: 0.75rem; color: white;">Français</span>
+                                </div>
+                                <h4>L'argumentation</h4>
+                                <p class="text-small text-secondary">45% complété</p>
+                                <div style="height: 6px; background: var(--color-surface-secondary); border-radius: var(--radius-full); margin-top: 1rem;">
+                                    <div style="width: 45%; height: 100%; background: var(--color-primary); border-radius: var(--radius-full);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            margin-bottom: 0.25rem;
+            transition: all var(--transition-fast);
+        }
+        
+        .nav-item:hover {
+            background: var(--color-surface-secondary);
+            color: var(--color-text-primary);
+        }
+        
+        .nav-item.active {
+            background: var(--color-primary-ultra-light);
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+        
+        [data-theme="dark"] body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 20% 30%, white, transparent),
+                radial-gradient(1px 1px at 40% 70%, white, transparent),
+                radial-gradient(1.5px 1.5px at 50% 50%, white, transparent);
+            background-size: 200% 200%;
+            z-index: -1;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+    </style>
+    
+    
