@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Send, MessageCircle, X, Lock, Brain, AlertTriangle, Crown } from 'lucide-react'
+import { Send, MessageCircle, X, Brain, AlertTriangle, Crown, Sparkles } from 'lucide-react'
 import { NovaCoin } from '@/components/ui/NovaCoin'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import type { ChatQuota } from '@/lib/chat-quota'
 
 type MessageType = 'text' | 'quiz_suggestion' | 'error_insight' | 'premium_prompt'
 
@@ -18,6 +19,7 @@ interface Message {
 interface CourseChatProps {
   courseId: string
   courseTitle: string
+  /** Starter/Pro : chat illimité. Free : quota mensuel, mais accès réel. */
   isPremium: boolean
 }
 
@@ -85,8 +87,12 @@ export function CourseChat({ courseId, courseTitle, isPremium }: CourseChatProps
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [historyLoaded, setHistoryLoaded] = useState(false)
+  const [quota, setQuota] = useState<ChatQuota | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Quota épuisé : on garde la conversation lisible, on bloque juste l'envoi
+  const quotaExhausted = Boolean(quota?.limited && quota.remaining <= 0)
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -107,13 +113,14 @@ export function CourseChat({ courseId, courseTitle, isPremium }: CourseChatProps
         if (Array.isArray(data.messages) && data.messages.length > 0) {
           setMessages(data.messages)
         }
+        if (data.quota) setQuota(data.quota as ChatQuota)
       })
       .catch(() => {})
   }, [open, courseId, historyLoaded, messages.length])
 
   async function handleSend() {
     const q = input.trim()
-    if (!q || loading) return
+    if (!q || loading || quotaExhausted) return
     const userMsg: Message = { role: 'user', content: q, type: 'text', timestamp: new Date().toISOString() }
     setMessages(prev => [...prev, userMsg])
     setInput('')
@@ -125,6 +132,7 @@ export function CourseChat({ courseId, courseTitle, isPremium }: CourseChatProps
         body: JSON.stringify({ courseId, question: q, history: messages.slice(-6) }),
       })
       const data = await res.json()
+      if (data.quota) setQuota(data.quota as ChatQuota)
       setMessages(prev => [
         ...prev,
         {
@@ -147,25 +155,6 @@ export function CourseChat({ courseId, courseTitle, isPremium }: CourseChatProps
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
-  if (!isPremium) {
-    return (
-      <div className="flex items-center gap-3 rounded-card border border-sky-border bg-sky-surface p-4 dark:border-night-border dark:bg-night-surface">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-sky-cloud dark:bg-night-border">
-          <Lock className="h-4 w-4 text-text-tertiary dark:text-text-dark-tertiary" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-body text-[14px] font-semibold text-main dark:text-dark-main">Chatbot IA du cours</p>
-          <p className="font-body text-[12px] text-text-tertiary dark:text-text-dark-tertiary">
-            Pose tes questions sur le cours. Disponible avec le plan Starter ou Pro.
-          </p>
-        </div>
-        <a href="/pricing" className="flex-shrink-0 rounded-input bg-brand px-3 py-1.5 font-body text-[12px] font-semibold text-white hover:bg-brand-hover dark:bg-brand-dark dark:text-night-bg transition-colors">
-          Voir les plans
-        </a>
-      </div>
-    )
-  }
-
   return (
     <>
       {!open && (
@@ -178,7 +167,11 @@ export function CourseChat({ courseId, courseTitle, isPremium }: CourseChatProps
           </div>
           <div>
             <p className="font-body text-[14px] font-semibold text-brand dark:text-brand-dark">Poser une question sur ce cours</p>
-            <p className="font-body text-[12px] text-brand/60 dark:text-brand-dark/60">L'IA répond en se basant sur le contenu du cours</p>
+            <p className="font-body text-[12px] text-brand/60 dark:text-brand-dark/60">
+              {isPremium
+                ? "L'IA répond en se basant sur le contenu du cours"
+                : 'Gratuit : 5 questions par mois sur ce cours'}
+            </p>
           </div>
         </button>
       )}
@@ -190,9 +183,29 @@ export function CourseChat({ courseId, courseTitle, isPremium }: CourseChatProps
               <MessageCircle className="h-4 w-4 text-brand dark:text-brand-dark" />
               <span className="font-body text-[14px] font-semibold text-main dark:text-dark-main truncate">Chatbot — {courseTitle}</span>
             </div>
-            <button onClick={() => setOpen(false)} className="flex-shrink-0 text-text-tertiary hover:text-main dark:hover:text-dark-main transition-colors">
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex flex-shrink-0 items-center gap-2">
+              {/* Compteur de questions restantes — visible en permanence pour le plan Free */}
+              {quota?.limited && (
+                <span
+                  title={`${quota.used}/${quota.limit} questions utilisées ce mois-ci sur ce cours`}
+                  className={cn(
+                    'rounded-pill px-2 py-0.5 font-body text-[11px] font-semibold',
+                    quota.remaining > 1
+                      ? 'bg-brand-soft text-brand dark:bg-brand-dark-soft dark:text-brand-dark'
+                      : quota.remaining === 1
+                      ? 'bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300'
+                      : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
+                  )}
+                >
+                  {quota.remaining > 0
+                    ? `${quota.remaining} question${quota.remaining > 1 ? 's' : ''} restante${quota.remaining > 1 ? 's' : ''}`
+                    : 'Quota du mois atteint'}
+                </span>
+              )}
+              <button onClick={() => setOpen(false)} className="text-text-tertiary hover:text-main dark:hover:text-dark-main transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           <div ref={scrollRef} className="flex flex-col gap-3 p-4 max-h-80 overflow-y-auto min-h-[120px]">
@@ -238,19 +251,36 @@ export function CourseChat({ courseId, courseTitle, isPremium }: CourseChatProps
           </div>
 
           <div className="border-t border-sky-border p-3 dark:border-night-border">
+            {/* Quota épuisé : incitation, pas une porte fermée — le reste du cours reste utilisable */}
+            {quotaExhausted && (
+              <div className="mb-3 flex items-center gap-3 rounded-input border border-brand/30 bg-brand/5 px-3 py-2.5">
+                <Sparkles className="h-4 w-4 flex-shrink-0 text-brand dark:text-brand-dark" />
+                <p className="flex-1 font-body text-[12px] leading-relaxed text-text-secondary dark:text-text-dark-secondary">
+                  Tes {quota?.limit} questions gratuites sur ce cours sont utilisées pour ce mois-ci.
+                  Elles reviennent le 1er du mois — et tu en as {quota?.limit} sur chacun de tes autres cours.
+                  Avec Starter, le chat devient illimité.
+                </p>
+                <Link
+                  href="/pricing"
+                  className="flex-shrink-0 rounded-input bg-brand px-3 py-1.5 font-body text-[12px] font-semibold text-white transition-colors hover:bg-brand-hover"
+                >
+                  Passer Starter
+                </Link>
+              </div>
+            )}
             <div className="flex gap-2">
               <input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Pose ta question..."
-                disabled={loading}
+                placeholder={quotaExhausted ? 'Quota du mois atteint' : 'Pose ta question...'}
+                disabled={loading || quotaExhausted}
                 className="flex-1 h-10 rounded-input border border-sky-border bg-sky-bg px-3 font-body text-[14px] text-main placeholder:text-text-tertiary focus:border-brand focus:outline-none disabled:opacity-50 dark:border-night-border dark:bg-night-bg dark:text-dark-main dark:focus:border-brand-dark"
               />
               <button
                 onClick={handleSend}
-                disabled={loading || !input.trim()}
+                disabled={loading || !input.trim() || quotaExhausted}
                 title="Envoyer (36 ✦)"
                 className="flex h-10 flex-shrink-0 items-center justify-center gap-1.5 rounded-input bg-brand px-3 text-white hover:bg-brand-hover disabled:opacity-40 dark:bg-brand-dark dark:text-night-bg transition-all active:scale-95"
               >

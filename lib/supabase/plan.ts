@@ -1,5 +1,12 @@
 import { createClient } from './server'
 import { createAdminClient } from './admin'
+import {
+  CHAT_QUOTA_UNLIMITED,
+  FREE_CHAT_QUESTIONS_PER_COURSE_PER_MONTH,
+  chatQuotaPeriod,
+  computeChatQuota,
+  type ChatQuota,
+} from '@/lib/chat-quota'
 
 export type PlanType = 'free' | 'starter' | 'pro'
 
@@ -13,14 +20,22 @@ export interface PlanLimits {
   isPro:          boolean
   /** Novas allouées par mois (ou one-time pour free) */
   novasPerMonth:  number
+  /**
+   * Questions de chat autorisées par cours et par mois.
+   * -1 = illimité. Le plan Free n'est plus bloqué : il a un quota d'essai
+   * réel (cf. lib/chat-quota.ts).
+   */
+  chatQuestionsPerCoursePerMonth: number
 }
 
 const FREE_LIMITS: PlanLimits = {
   vocalEnabled:   false,
-  chatbotEnabled: false,
+  // Le chatbot est accessible au plan Free, mais avec un quota mensuel.
+  chatbotEnabled: true,
   isStarter:      false,
   isPro:          false,
   novasPerMonth:  600,
+  chatQuestionsPerCoursePerMonth: FREE_CHAT_QUESTIONS_PER_COURSE_PER_MONTH,
 }
 
 const STARTER_LIMITS: PlanLimits = {
@@ -29,6 +44,7 @@ const STARTER_LIMITS: PlanLimits = {
   isStarter:      true,
   isPro:          false,
   novasPerMonth:  2000,
+  chatQuestionsPerCoursePerMonth: CHAT_QUOTA_UNLIMITED,
 }
 
 const PRO_LIMITS: PlanLimits = {
@@ -37,6 +53,7 @@ const PRO_LIMITS: PlanLimits = {
   isStarter:      true,
   isPro:          true,
   novasPerMonth:  4000,
+  chatQuestionsPerCoursePerMonth: CHAT_QUOTA_UNLIMITED,
 }
 
 export async function isBetaModeActive(): Promise<boolean> {
@@ -87,6 +104,64 @@ export async function getUserPlanLimits(userId: string): Promise<PlanLimits> {
 export async function isPremiumUser(userId: string): Promise<boolean> {
   const limits = await getUserPlanLimits(userId)
   return limits.isStarter
+}
+
+// ─── QUOTA CHATBOT (plan Free) ───────────────────────────────────────────────
+
+/**
+ * État du quota de chat pour un cours donné.
+ * Ne consomme rien — sert à l'affichage du compteur et au contrôle d'accès.
+ */
+export async function getChatQuota(userId: string, courseId: string): Promise<ChatQuota> {
+  const limits = await getUserPlanLimits(userId)
+  const limit  = limits.chatQuestionsPerCoursePerMonth
+
+  if (limit < 0) return computeChatQuota(limit, 0)
+
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('chat_quota_usage')
+    .select('used')
+    .eq('user_id', userId)
+    .eq('course_id', courseId)
+    .eq('period', chatQuotaPeriod())
+    .maybeSingle()
+
+  return computeChatQuota(limit, data?.used ?? 0)
+}
+
+/**
+ * Consomme une question du quota et renvoie l'état APRÈS consommation.
+ * Renvoie `allowed: false` sans rien consommer si le quota est déjà épuisé.
+ */
+export async function consumeChatQuestion(userId: string, courseId: string): Promise<ChatQuota> {
+  const before = await getChatQuota(userId, courseId)
+  if (!before.limited) return before
+  if (!before.allowed) return before
+
+  const { data, error } = await createAdminClient().rpc('consume_chat_question', {
+    p_user_id:   userId,
+    p_course_id: courseId,
+    p_period:    chatQuotaPeriod(),
+  })
+
+  if (error) {
+    console.error('[chat-quota] consume_chat_question error:', error)
+    // On ne pénalise pas l'élève si le compteur échoue : on laisse passer.
+    return computeChatQuota(before.limit, before.used + 1)
+  }
+
+  return computeChatQuota(before.limit, typeof data === 'number' ? data : before.used + 1)
+}
+
+/** Rend une question au quota (appel IA échoué après consommation). */
+export async function refundChatQuestion(userId: string, courseId: string): Promise<void> {
+  const { error } = await createAdminClient().rpc('refund_chat_question', {
+    p_user_id:   userId,
+    p_course_id: courseId,
+    p_period:    chatQuotaPeriod(),
+  })
+  if (error) console.error('[chat-quota] refund_chat_question error:', error)
 }
 
 // ─── FONCTIONS LEGACY (gardées pour compatibilité avec le reste du code) ─────

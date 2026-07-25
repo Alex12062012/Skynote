@@ -4,6 +4,8 @@ import Anthropic from '@anthropic-ai/sdk'
 import { NOVA_COST_CHAT, deductNovasForUser, addNovasForUser } from '@/lib/supabase/nova-actions'
 import { Errors, apiError } from '@/lib/errors'
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit'
+import { consumeChatQuestion, getChatQuota, refundChatQuestion } from '@/lib/supabase/plan'
+import { quotaExhaustedMessage } from '@/lib/chat-quota'
 
 export const maxDuration = 30
 
@@ -28,14 +30,20 @@ export async function GET(request: NextRequest) {
     const courseId = searchParams.get('courseId')
     if (!courseId) return NextResponse.json({ messages: [] })
 
-    const { data } = await supabase
-      .from('chat_sessions')
-      .select('messages')
-      .eq('user_id', user.id)
-      .eq('course_id', courseId)
-      .single()
+    const [{ data }, quota] = await Promise.all([
+      supabase
+        .from('chat_sessions')
+        .select('messages')
+        .eq('user_id', user.id)
+        .eq('course_id', courseId)
+        .single(),
+      getChatQuota(user.id, courseId),
+    ])
 
-    return NextResponse.json({ messages: (data?.messages as PersistedMessage[]) ?? [] })
+    return NextResponse.json({
+      messages: (data?.messages as PersistedMessage[]) ?? [],
+      quota,
+    })
   } catch {
     return NextResponse.json({ messages: [] })
   }
@@ -44,6 +52,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   let novaDeducted = false
   let userId: string | null = null
+  let quotaConsumed = false
+  let quotaCourseId: string | null = null
 
   try {
     const supabase = await createClient()
@@ -59,35 +69,30 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('plan')
-      .eq('id', user.id)
-      .single()
-
-    const isPremium = ['starter', 'pro'].includes(profile?.plan ?? '')
-
-    const { data: beta } = await supabase
-      .from('admin_settings')
-      .select('value')
-      .eq('key', 'beta_mode')
-      .single()
-    const betaActive = beta?.value === 'true'
-
-    if (!isPremium && !betaActive) {
-      return NextResponse.json({
-        answer: "Le chatbot est réservé aux abonnés Starter et Pro. Passe à un abonnement premium pour débloquer cette fonctionnalité !",
-        type: 'premium_prompt' as MessageType,
-      })
-    }
-
     const { courseId, question, history } = await request.json()
 
     if (!courseId || !question) throw Errors.badRequest('Parametres manquants')
 
+    // Quota Free : 5 questions par cours et par mois au lieu d'un blocage total.
+    // Starter/Pro (et le mode beta) sont illimités — getChatQuota s'en charge.
+    quotaCourseId = courseId
+    const quota = await consumeChatQuestion(user.id, courseId)
+
+    if (!quota.allowed) {
+      return NextResponse.json({
+        answer: quotaExhaustedMessage(quota.limit),
+        type: 'premium_prompt' as MessageType,
+        code: 'free_quota_exhausted',
+        quota,
+      })
+    }
+    quotaConsumed = quota.limited
+
     // Déduire les Novas AVANT l'appel IA
     const deductResult = await deductNovasForUser(user.id, NOVA_COST_CHAT, `Chat: ${String(question).slice(0, 60)}`)
     if (!deductResult.ok) {
+      // La question n'a pas été posée : on rend le crédit de quota.
+      if (quotaConsumed) await refundChatQuestion(user.id, courseId).catch(() => {})
       return NextResponse.json({
         answer: "Tu n'as plus assez de Novas ✦ pour utiliser le chatbot. Recharge ton solde depuis la page Abonnement.",
         type: 'premium_prompt' as MessageType,
@@ -103,7 +108,10 @@ export async function POST(request: NextRequest) {
       .eq('user_id', user.id)
       .single()
 
-    if (!course) return NextResponse.json({ error: 'Cours introuvable' }, { status: 404 })
+    if (!course) {
+      if (quotaConsumed) await refundChatQuestion(user.id, courseId).catch(() => {})
+      return NextResponse.json({ error: 'Cours introuvable' }, { status: 404 })
+    }
 
     let resolvedHistory: PersistedMessage[] = Array.isArray(history) && history.length > 0
       ? history
@@ -267,10 +275,13 @@ export async function POST(request: NextRequest) {
       { onConflict: 'user_id,course_id' }
     ) })().catch(() => {})
 
-    return NextResponse.json({ answer, type: detectedType })
+    return NextResponse.json({ answer, type: detectedType, quota })
   } catch (error: unknown) {
     if (novaDeducted && userId) {
       await addNovasForUser(userId, NOVA_COST_CHAT, 'Remboursement chat échoué').catch(() => {})
+    }
+    if (quotaConsumed && userId && quotaCourseId) {
+      await refundChatQuestion(userId, quotaCourseId).catch(() => {})
     }
     return apiError(error)
   }
