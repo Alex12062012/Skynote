@@ -564,7 +564,11 @@ function Brevet({ t }: { t: (k: string) => string }) {
                   <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-success-dark/15 px-3 py-1 text-[12px] font-semibold text-success-dark">
                     <Check size={13} strokeWidth={3} /> Mention Bien
                   </div>
-                  <p className="mt-4 text-[12px] text-text-dark-tertiary">Simulation · 20 questions</p>
+                  <p className="mt-4 text-[12px] text-text-dark-tertiary">
+                    Simulation · 20 questions
+                    <br />
+                    Estimation IA, pas une note officielle
+                  </p>
                 </Tilt>
               </motion.div>
             </div>

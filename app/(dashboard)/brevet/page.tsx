@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { GraduationCap, Lock, Loader2, Star, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { AiEstimateDisclaimer } from '@/components/brevet/AiEstimateDisclaimer'
 
 const MENTION_LABELS: Record<string, { label: string; color: string }> = {
   tres_bien:   { label: 'Tres Bien',   color: 'text-emerald-400' },
@@ -147,9 +148,11 @@ export default function BrevetPage() {
 
       {pastSessions.length > 0 && (
         <div className="mt-8">
-          <h2 className="mb-3 font-display text-[16px] font-semibold text-text-main dark:text-text-dark-main">
+          <h2 className="mb-1 font-display text-[16px] font-semibold text-text-main dark:text-text-dark-main">
             Mes epreuves precedentes
           </h2>
+          {/* Les scores listés ci-dessous sont des estimations IA */}
+          <AiEstimateDisclaimer variant="inline" className="mb-3" />
           <div className="flex flex-col gap-2">
             {pastSessions.map(s => {
               const m = s.mention ? MENTION_LABELS[s.mention] : null

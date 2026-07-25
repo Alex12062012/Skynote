@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import { AiEstimateDisclaimer } from '@/components/brevet/AiEstimateDisclaimer'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -377,9 +378,12 @@ export default function BrevetSessionPage() {
           </div>
 
           {/* CTA */}
-          <p className="mb-6 text-center font-body text-[15px] text-text-secondary dark:text-text-dark-secondary">
+          <p className="mb-3 text-center font-body text-[15px] text-text-secondary dark:text-text-dark-secondary">
             Passe en Starter ou Pro pour voir ta mention et les corrections.
           </p>
+          {/* Le chiffre flouté ci-dessus est un exemple : on annonce d'emblée
+              que ce qui sera débloqué est une estimation, pas une note officielle. */}
+          <AiEstimateDisclaimer className="mb-6" />
           <div className="flex flex-col gap-3">
             <Link href="/pricing"
               className="flex items-center justify-center rounded-input bg-brand py-3 font-body text-[15px] font-bold text-white shadow-md hover:bg-brand-hover dark:bg-brand-dark dark:text-night-bg">
@@ -406,13 +410,20 @@ export default function BrevetSessionPage() {
           <p className={`mt-1 font-display text-h3 font-bold ${m?.color ?? 'text-text-secondary'}`}>
             Mention {m?.label ?? result.mention}
           </p>
+          <p className="mt-1 font-body text-[12px] font-semibold text-text-tertiary dark:text-text-dark-tertiary">
+            Estimation IA
+          </p>
         </div>
+
+        {/* Disclaimer visible directement sous la note, pas seulement dans les CGU */}
+        <AiEstimateDisclaimer className="mt-3" />
 
         {result.corrections && result.corrections.length > 0 && (
           <div className="mt-6">
-            <h2 className="mb-3 font-display text-[16px] font-semibold text-text-main dark:text-text-dark-main">
+            <h2 className="mb-1 font-display text-[16px] font-semibold text-text-main dark:text-text-dark-main">
               Corrections détaillées
             </h2>
+            <AiEstimateDisclaimer variant="inline" className="mb-3" />
             <div className="flex flex-col gap-2">
               {result.corrections.map((c, i) => (
                 <div key={i} className="rounded-card border border-sky-border bg-sky-surface p-4 dark:border-night-border dark:bg-night-surface">

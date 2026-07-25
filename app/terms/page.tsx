@@ -111,6 +111,7 @@ export default function TermsPage() {
               <li>Il est recommandé de vérifier les informations importantes avec tes enseignants</li>
               <li>Skynote décline toute responsabilité pour les erreurs contenues dans le contenu généré</li>
             </ul>
+            <p className="mt-3"><strong>Notes et mentions estimées :</strong> les notes sur 20, pourcentages et mentions affichés à l&apos;issue d&apos;une mini-épreuve brevet sont des <strong>estimations produites par l&apos;IA</strong> à partir des réponses saisies. Elles ne constituent en aucun cas une note officielle, un résultat d&apos;examen ni une prédiction du résultat réel au Diplôme national du brevet, lequel dépend d&apos;un barème et de correcteurs officiels. Cette mention figure également directement sur chaque carte de résultat dans l&apos;application.</p>
           </section>
 
           <section>
