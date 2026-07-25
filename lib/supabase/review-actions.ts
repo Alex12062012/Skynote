@@ -51,6 +51,24 @@ export async function getDueCards(): Promise<DueCard[]> {
 }
 
 // ============================================================
+// getDueCount — compteur seul (navbar / carte dashboard)
+// ============================================================
+
+export async function getDueCount(): Promise<number> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return 0
+
+  const { count } = await supabase
+    .from('flashcards')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .or(`next_review_at.is.null,next_review_at.lte.${new Date().toISOString()}`)
+
+  return count ?? 0
+}
+
+// ============================================================
 // submitReview — applique SM-2, enregistre, award coins
 // ============================================================
 

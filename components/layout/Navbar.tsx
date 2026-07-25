@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, Suspense } from 'react'
-import { Trophy, LayoutDashboard, Menu, X, ShoppingBag } from 'lucide-react'
+import { Trophy, LayoutDashboard, Menu, X, ShoppingBag, Brain } from 'lucide-react'
 import { SkyCoin } from '@/components/ui/SkyCoin'
 import { CoinCounter } from '@/components/ui/CoinCounter'
 import { NovaCounter } from '@/components/ui/NovaCounter'
@@ -16,11 +16,16 @@ interface NavLink {
   href: string
   label: string
   icon: React.ElementType
+  /** pastille compteur (fiches dues aujourd'hui) */
+  badge?: number
 }
 
-function getNavLinks(t: (k: string) => string): NavLink[] {
+function getNavLinks(t: (k: string) => string, dueCount: number): NavLink[] {
   return [
     { href: '/dashboard', label: t('nav.home'), icon: LayoutDashboard },
+    // La répétition espacée (SM-2) est au même niveau de visibilité que le
+    // classement et la boutique : c'est le cœur pédagogique de l'app.
+    { href: '/review', label: t('nav.review'), icon: Brain, badge: dueCount },
     { href: '/leaderboard', label: t('nav.leaderboard'), icon: Trophy },
     { href: '/boutique', label: t('nav.boutique'), icon: ShoppingBag },
   ]
@@ -30,13 +35,15 @@ function NavbarInner({
   profile,
   novaBalance = 0,
   userId,
+  dueCount = 0,
 }: {
   profile: Profile | null
   novaBalance?: number
   userId?: string
+  dueCount?: number
 }) {
   const { t } = useI18n()
-  const navLinks = getNavLinks(t)
+  const navLinks = getNavLinks(t, dueCount)
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [coinSpinning, setCoinSpinning] = useState(false)
@@ -85,6 +92,14 @@ function NavbarInner({
                   : 'text-text-secondary hover:bg-sky-cloud hover:text-text-main dark:text-text-dark-secondary dark:hover:bg-night-border dark:hover:text-text-dark-main'
               )}>
               <l.icon className="h-4 w-4" />{l.label}
+              {Boolean(l.badge) && (
+                <span
+                  aria-label={`${l.badge} fiches à réviser`}
+                  className="ml-0.5 min-w-[18px] rounded-pill bg-brand px-1.5 py-0.5 text-center font-display text-[10px] font-bold leading-none text-white"
+                >
+                  {l.badge! > 99 ? '99+' : l.badge}
+                </span>
+              )}
             </Link>
           ))}
         </nav>
@@ -134,6 +149,14 @@ function NavbarInner({
                   : 'text-text-main hover:bg-sky-cloud dark:text-text-dark-main dark:hover:bg-night-border'
               )}>
               <l.icon className="h-4 w-4" />{l.label}
+              {Boolean(l.badge) && (
+                <span
+                  aria-label={`${l.badge} fiches à réviser`}
+                  className="ml-auto min-w-[18px] rounded-pill bg-brand px-1.5 py-0.5 text-center font-display text-[10px] font-bold leading-none text-white"
+                >
+                  {l.badge! > 99 ? '99+' : l.badge}
+                </span>
+              )}
             </Link>
           ))}
           {profile && (
@@ -158,14 +181,16 @@ export function Navbar({
   profile,
   novaBalance = 0,
   userId,
+  dueCount = 0,
 }: {
   profile: Profile | null
   novaBalance?: number
   userId?: string
+  dueCount?: number
 }) {
   return (
     <Suspense fallback={null}>
-      <NavbarInner profile={profile} novaBalance={novaBalance} userId={userId} />
+      <NavbarInner profile={profile} novaBalance={novaBalance} userId={userId} dueCount={dueCount} />
     </Suspense>
   )
 }
