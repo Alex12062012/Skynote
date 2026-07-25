@@ -93,7 +93,7 @@ export async function POST() {
         user_id:   user.id,
         item_type: 'frame',
         item_id:   wonSkinId,
-        data: { name: skinEntry?.label ?? 'Skin', rarity: skinEntry?.rarity ?? 'rare', secret: skinEntry?.secret ?? false },
+        data: { name: skinEntry?.label ?? 'Skin', tier: skinEntry?.tier ?? 'confirme', secret: skinEntry?.secret ?? false },
       }, { onConflict: 'user_id,item_type,item_id' })
       if (error) console.error('[chest] user_inventory upsert error:', error)
     } else {

@@ -16,9 +16,11 @@ const SIZES: Record<PlayerBadgeSize, { box: string; icon: number; letter: string
   xl: { box: 'h-28 w-28', icon: 56, letter: 'text-[44px]', ring: 'ring-4' },
 }
 
+// Mêmes couleurs / effets qu'avant : seul le vocabulaire change
+// (confirme = ex-« rare », maitre = ex-« legendary »).
 const FRAME_STYLES: Record<string, { ring: string; shadow: string }> = {
-  rare:      { ring: 'ring-yellow-400',  shadow: '0 0 12px 3px rgba(250,204,21,0.7)' },
-  legendary: { ring: 'ring-purple-500',  shadow: '0 0 16px 5px rgba(168,85,247,0.8)' },
+  confirme: { ring: 'ring-yellow-400',  shadow: '0 0 12px 3px rgba(250,204,21,0.7)' },
+  maitre:   { ring: 'ring-purple-500',  shadow: '0 0 16px 5px rgba(168,85,247,0.8)' },
 }
 
 interface PlayerBadgeProps {
@@ -28,19 +30,19 @@ interface PlayerBadgeProps {
   className?: string
   /** ajoute l'halo animé (utile pour gros badges profil) */
   glow?: boolean
-  /** rareté du cadre équipé — ajoute un ring coloré animé */
-  frameRarity?: 'rare' | 'legendary' | null
+  /** palier de maîtrise du cadre équipé — ajoute un ring coloré animé */
+  frameTier?: 'confirme' | 'maitre' | null
 }
 
 /**
  * Badge cosmétique du joueur — cartoon, couleurs vives, style Brawl Stars.
  * Si badgeId === 'letter' → affiche la lettre du pseudo (fallback par défaut).
  */
-export function PlayerBadge({ badgeId, letter, size = 'md', className, glow = false, frameRarity }: PlayerBadgeProps) {
+export function PlayerBadge({ badgeId, letter, size = 'md', className, glow = false, frameTier }: PlayerBadgeProps) {
   const conf = BADGES.find(b => b.id === badgeId) ?? BADGES[0]
   const s    = SIZES[size]
   const IconComp = conf.icon !== 'letter' ? (ICON_MAP as any)[conf.icon] : null
-  const frame = frameRarity ? FRAME_STYLES[frameRarity] : null
+  const frame = frameTier ? FRAME_STYLES[frameTier] : null
 
   return (
     <div
@@ -63,7 +65,7 @@ export function PlayerBadge({ badgeId, letter, size = 'md', className, glow = fa
         <span
           aria-hidden
           className="absolute inset-0 -z-10 rounded-full blur-xl opacity-50 animate-pulse"
-          style={{ background: frame ? (frameRarity === 'legendary' ? '#a855f7' : '#facc15') : conf.color }}
+          style={{ background: frame ? (frameTier === 'maitre' ? '#a855f7' : '#facc15') : conf.color }}
         />
       )}
       {IconComp ? (

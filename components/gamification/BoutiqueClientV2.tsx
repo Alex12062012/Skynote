@@ -4,7 +4,10 @@ import { useState, useTransition, type ElementType } from 'react'
 import { Lock, ShoppingBag, Palette, Award, Zap, Gift, Sparkles, Brain, Star, Rocket, Crown, Gem, Flame, Check, Frame, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SkyCoin } from '@/components/ui/SkyCoin'
-import { BADGES, CONSUMABLES, TITLES, SKINS, SKIN_ID_ALIASES, prestigeCost } from '@/lib/gamification/config'
+import {
+  BADGES, CONSUMABLES, TITLES, SKINS, SKIN_ID_ALIASES, prestigeCost,
+  MASTERY_TIER_LABELS, normalizeMasteryTier,
+} from '@/lib/gamification/config'
 import { buyItem, equip, equipFrame } from '@/lib/supabase/gamification-actions'
 import { MasteryChests, ChestTrack, formatChestTier } from '@/components/boutique/MasteryChests'
 import { PlayerBadge } from './PlayerBadge'
@@ -33,7 +36,7 @@ interface ConsumableState {
 
 interface FrameItem {
   item_id: string
-  data: { name: string; rarity: string }
+  data: { name: string; tier?: string; rarity?: string }
   equipped: boolean
 }
 
@@ -252,14 +255,15 @@ export function BoutiqueClientV2({
                   <div key={b.id} className="flex flex-col items-center gap-2 rounded-card border-2 border-sky-border bg-sky-surface p-4 text-center dark:border-night-border dark:bg-night-surface">
                     <PlayerBadge badgeId={b.id} letter="A" size="md" />
                     <p className="font-display text-[13px] font-bold">{b.label}</p>
+                    {/* Palier de maîtrise — mêmes couleurs qu'avant, vocabulaire de progression */}
                     <span className={cn(
                       'rounded-pill px-2 py-0.5 font-body text-[10px] font-bold uppercase',
-                      b.rarity === 'legendary' && 'bg-gradient-to-r from-pink-500 to-orange-500 text-white',
-                      b.rarity === 'epic'      && 'bg-purple-200 text-purple-900 dark:bg-purple-950/50 dark:text-purple-300',
-                      b.rarity === 'rare'      && 'bg-blue-200 text-blue-900 dark:bg-blue-950/50 dark:text-blue-300',
-                      b.rarity === 'common'    && 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
-                      b.rarity === 'default'   && 'bg-sky-cloud text-text-secondary',
-                    )}>{b.rarity}</span>
+                      b.tier === 'maitre'   && 'bg-gradient-to-r from-pink-500 to-orange-500 text-white',
+                      b.tier === 'expert'   && 'bg-purple-200 text-purple-900 dark:bg-purple-950/50 dark:text-purple-300',
+                      b.tier === 'confirme' && 'bg-blue-200 text-blue-900 dark:bg-blue-950/50 dark:text-blue-300',
+                      b.tier === 'debutant' && 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+                      b.tier === 'base'     && 'bg-sky-cloud text-text-secondary',
+                    )}>{MASTERY_TIER_LABELS[b.tier]}</span>
                     {owned ? (
                       <button
                         onClick={() => handleEquip('badge', b.id)}
@@ -467,8 +471,8 @@ export function BoutiqueClientV2({
                     const resolvedId = SKIN_ID_ALIASES[f.item_id] ?? f.item_id
                     const skinEntry = SKINS.find(s => s.id === resolvedId)
                     const isEquipped = equippedFrame === f.item_id
-                    const isSecret = (f.data as any)?.secret === true || skinEntry?.secret === true
-                    const rarity = skinEntry?.rarity ?? (f.data?.rarity as any) ?? 'rare'
+                    // normalizeMasteryTier accepte aussi l'ancien vocabulaire encore en base
+                    const tier = normalizeMasteryTier(skinEntry?.tier ?? (f.data?.tier as any) ?? (f.data?.rarity as any))
                     const label = skinEntry?.label ?? f.data?.name ?? 'Skin'
                     const desc = skinEntry?.desc ?? ''
                     const cardClass = skinEntry?.cardClass ?? 'border-sky-border bg-sky-surface dark:border-night-border dark:bg-night-surface'
@@ -522,21 +526,16 @@ export function BoutiqueClientV2({
                           <div>
                             <div className="flex items-center gap-1.5">
                               <p className="font-display text-[14px] font-bold text-text-main dark:text-text-dark-main">{label}</p>
-                              {isSecret && (
-                                <span className="rounded-pill bg-gradient-to-r from-violet-500 to-pink-500 px-1.5 py-0.5 font-display text-[9px] font-black uppercase text-white">
-                                  Secret
-                                </span>
-                              )}
                             </div>
                             {desc && <p className="font-body text-[11px] text-text-tertiary dark:text-text-dark-tertiary">{desc}</p>}
                           </div>
                           <span className={cn(
                             'flex-shrink-0 rounded-pill px-2 py-0.5 font-body text-[10px] font-bold uppercase',
-                            rarity === 'legendary'
+                            tier === 'maitre'
                               ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
                               : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
                           )}>
-                            {rarity}
+                            {MASTERY_TIER_LABELS[tier]}
                           </span>
                         </div>
 

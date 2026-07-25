@@ -11,7 +11,7 @@ interface PlayerEmblemProps {
   glow?: boolean
   animated?: boolean
   className?: string
-  frameRarity?: 'rare' | 'legendary' | null
+  frameTier?: 'confirme' | 'maitre' | null
 }
 
 /**
@@ -30,7 +30,7 @@ export function PlayerEmblem({
   glow,
   animated,
   className,
-  frameRarity,
+  frameTier,
 }: PlayerEmblemProps) {
   if (prestigeLevel > 0) {
     return (
@@ -51,7 +51,7 @@ export function PlayerEmblem({
       size={size}
       glow={glow}
       className={className}
-      frameRarity={frameRarity}
+      frameTier={frameTier}
     />
   )
 }

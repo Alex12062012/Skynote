@@ -4,7 +4,12 @@ import {
   streakBonus,
   prestigeCost,
   prestigeMultiplier,
+  BADGES,
   DIFFICULTY_COINS,
+  MASTERY_TIER_LABELS,
+  MASTERY_TIER_ORDER,
+  masteryTierLabel,
+  normalizeMasteryTier,
   MASTERY_CHEST_INTERVAL,
   MASTERY_CHEST_TRACK,
   SKIN_UNLOCK_ORDER,
@@ -207,6 +212,46 @@ describe('chestProgress', () => {
 
   it('jamais de claimable négatif même si claimed > unlocked', () => {
     expect(chestProgress(5, 99).claimable).toBe(0)
+  })
+})
+
+// ─── VOCABULAIRE DE MAÎTRISE (remplace Common/Rare/Epic/Legendary) ────────────
+describe('paliers de maîtrise', () => {
+  it('traduit l\'ancien vocabulaire gacha stocké en base', () => {
+    expect(normalizeMasteryTier('common')).toBe('debutant')
+    expect(normalizeMasteryTier('rare')).toBe('confirme')
+    expect(normalizeMasteryTier('epic')).toBe('expert')
+    expect(normalizeMasteryTier('legendary')).toBe('maitre')
+    expect(normalizeMasteryTier('default')).toBe('base')
+  })
+
+  it('laisse passer le nouveau vocabulaire', () => {
+    for (const tier of MASTERY_TIER_ORDER) {
+      expect(normalizeMasteryTier(tier)).toBe(tier)
+    }
+  })
+
+  it('valeur inconnue ou nulle → palier neutre, jamais un crash', () => {
+    expect(normalizeMasteryTier(null)).toBe('confirme')
+    expect(normalizeMasteryTier('n_importe_quoi')).toBe('confirme')
+  })
+
+  it('affiche un libellé de progression, jamais un terme de rareté', () => {
+    const labels = MASTERY_TIER_ORDER.map(t => MASTERY_TIER_LABELS[t])
+    expect(labels).toEqual(['Standard', 'Débutant', 'Confirmé', 'Expert', 'Maître'])
+    for (const label of labels) {
+      expect(label.toLowerCase()).not.toMatch(/rare|commun|épique|epique|légendaire|legendaire/)
+    }
+  })
+
+  it('masteryTierLabel accepte aussi une valeur héritée', () => {
+    expect(masteryTierLabel('legendary')).toBe('Maître')
+  })
+
+  it('le catalogue de badges n\'utilise plus que des paliers de maîtrise', () => {
+    for (const badge of BADGES) {
+      expect(MASTERY_TIER_ORDER).toContain(badge.tier)
+    }
   })
 })
 
