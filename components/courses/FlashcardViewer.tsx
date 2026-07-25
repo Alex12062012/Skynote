@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, CheckCircle, Circle, GraduationCap, Zap, Sha
 import { Button } from '@/components/ui/Button'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { ObjectiveBadge } from '@/components/ui/ObjectiveBadge'
+import { SpeakButton } from '@/components/ui/SpeakButton'
 import { toggleFlashcardMastered } from '@/lib/supabase/course-actions'
 import { checkMasteryObjective } from '@/lib/supabase/objectives-actions'
 import { cn } from '@/lib/utils'
@@ -112,6 +113,12 @@ export function FlashcardViewer({ flashcards, courseId, userId, qcmReady = false
               <h2 className="mt-1 font-display text-h3 text-text-main dark:text-text-dark-main">{card.title}</h2>
             </div>
             <div className="flex flex-shrink-0 items-center gap-2">
+              {/* Lecture à voix haute de la fiche (synthèse vocale native) */}
+              <SpeakButton
+                key={card.id}
+                text={[card.title, card.summary, ...keyPoints].filter(Boolean).join('. ')}
+                className="rounded-input px-2.5 py-1.5"
+              />
               <button onClick={handleShare}
                 className="flex items-center gap-1.5 rounded-input border border-sky-border px-2.5 py-1.5 font-body text-[12px] text-text-secondary transition-all hover:border-brand hover:text-brand dark:border-night-border dark:text-text-dark-secondary dark:hover:border-brand-dark dark:hover:text-brand-dark"
                 title="Partager le cours">

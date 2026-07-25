@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { SkyCoin } from '@/components/ui/SkyCoin'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { PlayerEmblem } from '@/components/gamification/PlayerEmblem'
+import { AccessibilitySettings } from '@/components/profile/AccessibilitySettings'
 import { getServerLocale, createServerT } from '@/lib/i18n/server'
 import type { Metadata } from 'next'
 
@@ -123,6 +124,8 @@ export default async function ProfilePage() {
           <ArrowRight className="h-4 w-4 text-text-tertiary dark:text-text-dark-tertiary" />
         </Link>
       </div>
+
+      <AccessibilitySettings />
 
       <div className="rounded-card border border-sky-border bg-sky-surface p-5 shadow-card dark:border-night-border dark:bg-night-surface dark:shadow-card-dark">
         <h3 className="font-display text-h4 text-text-main dark:text-text-dark-main mb-4">{t('profile.accountInfo')}</h3>

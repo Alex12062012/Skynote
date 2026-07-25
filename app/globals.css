@@ -9,6 +9,35 @@
   ::-webkit-scrollbar-track { @apply bg-sky-bg dark:bg-night-bg; }
   ::-webkit-scrollbar-thumb { @apply rounded-full bg-sky-border dark:bg-night-border; }
   :focus-visible { @apply outline-none ring-2 ring-brand ring-offset-2 dark:ring-brand-dark dark:ring-offset-night-bg; }
+
+  /* ─── MODE DYSLEXIE-FRIENDLY ────────────────────────────────────────────
+     Activé depuis le profil (toggle) → classe .dyslexia-mode sur <html>.
+     On remplace les deux familles de l'app par Lexend, conçue pour réduire
+     la charge visuelle en lecture, et on aère le texte (interlignage,
+     espacement des lettres et des mots) — ces trois réglages sont ceux qui
+     aident le plus les lecteurs dyslexiques.
+     `!important` est nécessaire : les classes Tailwind font-display /
+     font-body sont appliquées élément par élément dans tout le code. */
+  html.dyslexia-mode body,
+  html.dyslexia-mode .font-display,
+  html.dyslexia-mode .font-body,
+  html.dyslexia-mode input,
+  html.dyslexia-mode textarea,
+  html.dyslexia-mode button {
+    font-family: var(--font-lexend), system-ui, sans-serif !important;
+  }
+
+  html.dyslexia-mode body {
+    line-height: 1.75;
+    letter-spacing: 0.02em;
+    word-spacing: 0.08em;
+  }
+
+  /* Les titres très serrés redeviennent lisibles */
+  html.dyslexia-mode .text-h1,
+  html.dyslexia-mode .text-h2 {
+    letter-spacing: 0 !important;
+  }
 }
 
 @layer components {

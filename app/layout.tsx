@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Bricolage_Grotesque, DM_Sans } from 'next/font/google'
+import { Bricolage_Grotesque, DM_Sans, Lexend } from 'next/font/google'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { I18nProvider } from '@/lib/i18n/context'
 import { LiquidGlassFilter } from '@/components/ui/LiquidGlassFilter'
@@ -10,6 +10,12 @@ const bricolage = Bricolage_Grotesque({
 })
 const dmSans = DM_Sans({
   subsets: ['latin'], variable: '--font-dm-sans', display: 'swap', weight: ['400','500','600','700']
+})
+// Police « dyslexie-friendly » : Lexend est conçue pour réduire la charge
+// visuelle en lecture (formes de lettres distinctes, faible encombrement).
+// Activée par l'élève depuis son profil → classe .dyslexia-mode sur <html>.
+const lexend = Lexend({
+  subsets: ['latin'], variable: '--font-lexend', display: 'swap', weight: ['400','500','600','700']
 })
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://skynote.app'
@@ -52,9 +58,22 @@ export const viewport: Viewport = {
   ],
 }
 
+/**
+ * Applique la préférence « police dyslexie-friendly » AVANT le premier rendu,
+ * pour éviter que l'élève voie la page changer de police sous ses yeux.
+ */
+const DYSLEXIA_INIT = `try{if(localStorage.getItem('skynote-dyslexia')==='1'){document.documentElement.classList.add('dyslexia-mode')}}catch(e){}`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${bricolage.variable} ${dmSans.variable} dark`} suppressHydrationWarning>
+    <html
+      lang="fr"
+      className={`${bricolage.variable} ${dmSans.variable} ${lexend.variable} dark`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: DYSLEXIA_INIT }} />
+      </head>
       <body>
         <LiquidGlassFilter />
         <ThemeProvider><I18nProvider>{children}</I18nProvider></ThemeProvider>

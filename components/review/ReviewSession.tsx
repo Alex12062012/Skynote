@@ -13,6 +13,7 @@ import { useCallback, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Brain, Check, RotateCcw, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { SpeakButton } from '@/components/ui/SpeakButton'
 import { submitReview } from '@/lib/supabase/review-actions'
 import type { DueCard } from '@/lib/supabase/review-actions'
 import type { SM2Grade } from '@/lib/sm2'
@@ -102,11 +103,19 @@ export function ReviewSession({ cards }: ReviewSessionProps) {
 
       {/* Carte */}
       <div className="rounded-card border border-sky-border bg-sky-surface p-6 shadow-card dark:border-night-border dark:bg-night-surface dark:shadow-card-dark">
-        <div className="mb-4 flex items-center gap-2">
-          <Brain className="h-4 w-4 text-brand dark:text-brand-dark" />
-          <span className="font-display text-[11px] font-bold uppercase tracking-wide text-text-tertiary dark:text-text-dark-tertiary">
-            {revealed ? 'Réponse' : 'Essaie de te rappeler'}
-          </span>
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Brain className="h-4 w-4 text-brand dark:text-brand-dark" />
+            <span className="font-display text-[11px] font-bold uppercase tracking-wide text-text-tertiary dark:text-text-dark-tertiary">
+              {revealed ? 'Réponse' : 'Essaie de te rappeler'}
+            </span>
+          </div>
+          {/* Lecture à voix haute — synthèse vocale native, sans coût API.
+              Lit la question seule tant que la réponse n'est pas révélée. */}
+          <SpeakButton
+            key={`${card.id}-${revealed ? 'answer' : 'question'}`}
+            text={revealed ? `${card.title}. ${card.summary}` : card.title}
+          />
         </div>
 
         <p className="font-display text-h3 font-bold leading-snug text-text-main dark:text-text-dark-main">
