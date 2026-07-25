@@ -9,7 +9,7 @@ import {
 } from "framer-motion"
 import {
   Camera, Zap, BrainCircuit, MessageCircle, GraduationCap,
-  CalendarClock, ArrowRight, Check, Sparkles,
+  CalendarClock, ArrowRight, Check, Sparkles, ShieldCheck,
 } from "lucide-react"
 import { useI18n } from "@/lib/i18n/context"
 
@@ -675,6 +675,51 @@ function Pricing({ t, isBeta }: { t: (k: string) => string; isBeta: boolean }) {
   )
 }
 
+/**
+ * Section « jeu équitable ».
+ * Contrainte de rédaction : uniquement des faits sur Skynote lui-même,
+ * aucun concurrent nommé, aucune comparaison chiffrée. Chaque point est
+ * vérifiable dans lib/gamification/config.ts et sur /confiance.
+ */
+function FairPlay({ t }: { t: (k: string) => string }) {
+  const points = [t("landing.fair.point1"), t("landing.fair.point2"), t("landing.fair.point3")]
+
+  return (
+    <section className="relative z-10 mx-auto max-w-5xl px-4 py-16 sm:px-6">
+      <Reveal>
+        <Tilt className="rounded-card border border-night-border bg-night-surface p-7 sm:p-9" lift={-3}>
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-xl">
+              <Eyebrow>{t("landing.fair.eyebrow")}</Eyebrow>
+              <h2 className="mt-3 font-display text-[26px] font-extrabold leading-tight text-text-dark-main sm:text-[30px]">
+                {t("landing.fair.title")}
+              </h2>
+              <p className="mt-3 text-[14px] leading-relaxed text-text-dark-secondary">
+                {t("landing.fair.desc")}
+              </p>
+              <Link
+                href="/confiance"
+                className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold text-brand-dark transition-colors hover:text-brand"
+              >
+                {t("landing.fair.link")} <ArrowRight size={14} />
+              </Link>
+            </div>
+
+            <ul className="flex shrink-0 flex-col gap-2.5">
+              {points.map(p => (
+                <li key={p} className="flex items-start gap-2 text-[13px] text-text-dark-secondary">
+                  <ShieldCheck size={15} strokeWidth={2.4} className="mt-0.5 shrink-0 text-brand-dark" />
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Tilt>
+      </Reveal>
+    </section>
+  )
+}
+
 function Footer({ t }: { t: (k: string) => string }) {
   return (
     <footer className="relative z-10 mx-auto max-w-5xl border-t border-night-border/60 px-4 py-10 text-center sm:px-6">
@@ -716,6 +761,7 @@ export function LandingPage({ isBeta = true, testimonials }: { isBeta?: boolean;
       <Features t={t} />
       <Brevet t={t} />
       <Testimonials t={t} items={TESTIMONIALS} />
+      <FairPlay t={t} />
       <Pricing t={t} isBeta={isBeta} />
       <Footer t={t} />
     </div>

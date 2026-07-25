@@ -6,7 +6,7 @@ import Image from "next/image"
 import { Baloo_2, Nunito } from "next/font/google"
 import {
   Camera, Zap, BrainCircuit, MessageCircle, GraduationCap,
-  ArrowRight, Check, Star, Sparkles,
+  ArrowRight, Check, Star, Sparkles, ShieldCheck,
 } from "lucide-react"
 import { useI18n } from "@/lib/i18n/context"
 
@@ -310,6 +310,58 @@ function Reviews({ t, items }: { t: (k: string) => string; items: Testimonial[] 
   )
 }
 
+/**
+ * Section « jeu équitable ».
+ * Uniquement des faits sur Skynote lui-même : aucun concurrent nommé, aucune
+ * comparaison chiffrée. Chaque point est vérifiable dans
+ * lib/gamification/config.ts et détaillé sur /confiance.
+ */
+function FairPlay({ t }: { t: (k: string) => string }) {
+  const points = [t("landing.fair.point1"), t("landing.fair.point2"), t("landing.fair.point3")]
+
+  return (
+    <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+      <div className="reveal2 rounded-[26px] border-2 bg-white p-7 sm:p-9" style={{ borderColor: C.border }}>
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="max-w-xl">
+            <span
+              className="inline-block rounded-lg px-2.5 py-1 text-[12px] font-extrabold text-white"
+              style={{ background: C.accent }}
+            >
+              {t("landing.fair.eyebrow")}
+            </span>
+            <h2
+              className="mt-3 text-[clamp(24px,3.6vw,34px)] font-extrabold leading-tight"
+              style={{ fontFamily: "var(--font-baloo)", color: C.fg }}
+            >
+              {t("landing.fair.title")}
+            </h2>
+            <p className="mt-3 text-[15px] font-semibold leading-relaxed" style={{ color: C.secondary }}>
+              {t("landing.fair.desc")}
+            </p>
+            <Link
+              href="/confiance"
+              className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-extrabold hover:underline"
+              style={{ color: C.primary }}
+            >
+              {t("landing.fair.link")} <ArrowRight size={15} />
+            </Link>
+          </div>
+
+          <ul className="flex shrink-0 flex-col gap-3">
+            {points.map(p => (
+              <li key={p} className="flex items-start gap-2 text-[14px] font-bold" style={{ color: C.fg }}>
+                <ShieldCheck size={17} strokeWidth={2.6} className="mt-0.5 shrink-0" style={{ color: C.accent }} />
+                {p}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function Pricing({ t, isBeta }: { t: (k: string) => string; isBeta: boolean }) {
   if (isBeta) {
     return (
@@ -400,6 +452,7 @@ export function LandingPageProMax({ isBeta = true, testimonials }: { isBeta?: bo
       <Features t={t} />
       <Brevet t={t} />
       <Reviews t={t} items={TESTIMONIALS} />
+      <FairPlay t={t} />
       <Pricing t={t} isBeta={isBeta} />
       <Footer t={t} />
     </div>

@@ -58,6 +58,15 @@ export const STRINGS: Record<string, string> = {
     'landing.pricing.pro4': 'Support prioritaire',
     'landing.pricing.pro5': 'Mini-brevets illimités',
 
+    // Section « pas de hasard » — chaque phrase doit rester vérifiable dans le produit
+    'landing.fair.eyebrow': 'Conçu pour des mineurs',
+    'landing.fair.title': 'Zéro hasard, zéro coffre payant',
+    'landing.fair.desc': 'Aucune récompense de Skynote ne dépend de la chance. Rien ne s\'achète à l\'aveugle : le contenu de chaque coffre est affiché avant l\'ouverture, et il se débloque en réussissant des QCM, pas en dépensant.',
+    'landing.fair.point1': 'Aucune mise, aucun tirage au sort',
+    'landing.fair.point2': 'Contenu des récompenses connu à l\'avance',
+    'landing.fair.point3': 'Débloqué par le travail, pas par la dépense',
+    'landing.fair.link': 'Comment on le garantit',
+
     'landing.footer': 'Fait par des élèves, pour des élèves.',
     'landing.footer.privacy': 'Confidentialité',
     'landing.footer.trust': 'Confiance & sécurité',
