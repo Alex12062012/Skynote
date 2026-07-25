@@ -192,7 +192,8 @@ function Stats({ t }: { t: (k: string) => string }) {
   const blocks = [
     { v: "15s",  k: "landing.stats.fiches", bg: C.primary,   fg: "#fff" },
     { v: "4x",   k: "landing.stats.faster", bg: "#fff",      fg: C.fg },
-    { v: "100%", k: "landing.stats.adapted", bg: C.accent,   fg: "#fff" },
+    // Pas de chiffre ici : rien de quantifiable n'est vrai à cet endroit.
+    { v: t("landing.stats.ownCourseValue"), k: "landing.stats.ownCourse", bg: C.accent, fg: "#fff" },
   ]
   return (
     <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">

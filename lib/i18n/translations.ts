@@ -12,7 +12,11 @@ export const STRINGS: Record<string, string> = {
     'landing.hero.ctaBeta': 'Commencer gratuitement',
     'landing.stats.fiches': 'pour générer tes fiches',
     'landing.stats.faster': 'plus rapide que réécrire',
-    'landing.stats.adapted': 'adapté collège & lycée',
+    // Remplace l'ancien « 100 % adapté collège & lycée » : un pourcentage
+    // invérifiable, remplacé par le différenciateur réel et incontestable —
+    // les fiches viennent du cours que l'élève a lui-même fourni.
+    'landing.stats.ownCourseValue': 'Ton cours',
+    'landing.stats.ownCourse': 'pas un contenu générique',
     'landing.problem.label': 'Le problème',
     'landing.problem.title1': 'Tu passes 2h à recopier tes cours',
     'landing.problem.title2': 'pour 15 minutes de vraie révision.',

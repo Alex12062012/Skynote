@@ -453,13 +453,16 @@ function Hero({ t, isBeta }: { t: (k: string) => string; isBeta: boolean }) {
         animate={reduce ? undefined : { opacity: 1 }}
         transition={{ duration: 0.6, delay: 1 }}
       >
-        {[
+        {([
           { to: 15,  suffix: "s",  key: "landing.stats.fiches" },
           { to: 4,   suffix: "x",  key: "landing.stats.faster" },
-          { to: 100, suffix: "%",  key: "landing.stats.adapted" },
-        ].map(s => (
+          // Pas de chiffre ici : rien de quantifiable n'est vrai à cet endroit.
+          { literal: t("landing.stats.ownCourseValue"), key: "landing.stats.ownCourse" },
+        ] as { to?: number; suffix?: string; literal?: string; key: string }[]).map(s => (
           <div key={s.key} className="text-center">
-            <p className="font-display text-2xl font-bold text-text-dark-main"><Counter to={s.to} suffix={s.suffix} /></p>
+            <p className="font-display text-2xl font-bold text-text-dark-main">
+              {s.literal ?? <Counter to={s.to!} suffix={s.suffix} />}
+            </p>
             <p className="mt-1 text-xs text-text-dark-tertiary">{t(s.key)}</p>
           </div>
         ))}
