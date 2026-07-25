@@ -81,11 +81,6 @@ export default function ConfiancePage() {
               a le droit de parler. Cette liste est courte et publique&nbsp;: elle ne
               contient aucun domaine publicitaire.
             </p>
-            <Nuance>
-              Un outil de suivi technique existe malgré tout, et il est décrit
-              honnêtement juste en dessous — ce n&apos;est pas de la publicité, mais
-              ce n&apos;est pas «&nbsp;rien du tout&nbsp;» non plus.
-            </Nuance>
           </Section>
 
           {/* ─── 2. Sous-traitants ───────────────────────────────────────── */}
@@ -114,17 +109,9 @@ export default function ConfiancePage() {
               <Processor
                 name="Sentry"
                 role="Détection des bugs"
-                detail="Reçoit les erreurs techniques pour qu'elles soient corrigées. Enregistre aussi un rejeu de l'interface sur une petite partie des sessions et sur les sessions où une erreur se produit, afin de reproduire le problème."
+                detail="Reçoit les erreurs techniques (message d'erreur, page concernée, enchaînement des clics) pour qu'elles soient corrigées. Le rejeu d'interface qui accompagne une erreur est expurgé dans ton navigateur avant l'envoi : les textes sont remplacés par des blocs et les images sont bloquées. Sentry ne voit donc ni le contenu de tes cours, ni tes photos, ni tes réponses."
               />
             </div>
-
-            <Nuance>
-              Le rejeu de session de Sentry est un enregistrement de ce qui s&apos;affiche
-              à l&apos;écran pendant que tu utilises l&apos;app. Il sert uniquement à
-              comprendre des bugs, jamais à analyser ton comportement à des fins
-              commerciales — mais c&apos;est bien une donnée qui sort de l&apos;app, donc
-              elle figure ici plutôt que d&apos;être passée sous silence.
-            </Nuance>
           </Section>
 
           {/* ─── 3. Âge et consentement parental ─────────────────────────── */}
