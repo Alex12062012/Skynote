@@ -680,6 +680,8 @@ function Footer({ t }: { t: (k: string) => string }) {
     <footer className="relative z-10 mx-auto max-w-5xl border-t border-night-border/60 px-4 py-10 text-center sm:px-6">
       <p className="mb-5 text-[13px] text-text-dark-tertiary">{t("landing.footer")}</p>
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[13px] text-text-dark-tertiary">
+        <Link href="/confiance" className="transition-colors hover:text-text-dark-secondary">{t("landing.footer.trust")}</Link>
+        <span className="text-night-border">·</span>
         <Link href="/privacy" className="transition-colors hover:text-text-dark-secondary">{t("landing.footer.privacy")}</Link>
         <span className="text-night-border">·</span>
         <Link href="/terms" className="transition-colors hover:text-text-dark-secondary">{t("landing.footer.terms")}</Link>

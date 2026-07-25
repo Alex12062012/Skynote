@@ -60,6 +60,7 @@ export const STRINGS: Record<string, string> = {
 
     'landing.footer': 'Fait par des élèves, pour des élèves.',
     'landing.footer.privacy': 'Confidentialité',
+    'landing.footer.trust': 'Confiance & sécurité',
     'landing.footer.terms': 'CGU',
     'landing.footer.legal': 'Mentions légales',
     // Profile
