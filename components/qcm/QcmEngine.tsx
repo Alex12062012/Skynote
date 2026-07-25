@@ -26,6 +26,28 @@ interface QcmEngineProps {
 type AnswerState = 'unanswered' | 'correct' | 'incorrect'
 interface UserAnswer { questionIndex: number; chosenIndex: number; correct: boolean }
 
+/** Options d'une question, quelle que soit la forme stockée (array ou JSON). */
+function parseOptions(q: QcmQuestion | undefined): string[] {
+  if (Array.isArray(q?.options)) return q.options as string[]
+  try { return JSON.parse(String(q?.options ?? '[]')) } catch { return [] }
+}
+
+/**
+ * Explication à afficher pour une question.
+ * Le champ `explanation` est généré par l'IA (cf. lib/ai/prompts.ts) et la
+ * génération filtre les questions sans explication — mais d'anciennes lignes
+ * peuvent en être dépourvues. On garantit alors un texte utile plutôt qu'un
+ * bloc vide : l'élève doit TOUJOURS repartir avec une explication.
+ */
+function explanationFor(q: QcmQuestion, options: string[]): string {
+  const raw = String(q.explanation ?? '').trim()
+  if (raw) return raw
+  const correct = options[q.correct_index]
+  return correct
+    ? `La bonne réponse est « ${correct} ». Reprends la fiche correspondante pour revoir ce point en détail.`
+    : 'Reprends la fiche correspondante pour revoir ce point en détail.'
+}
+
 const DIFFICULTY_LABELS: Record<QcmDifficulty, { label: string; Icon: React.ElementType; color: string }> = {
   peaceful: { label: 'Paisible',          Icon: Leaf,         color: 'text-emerald-600 dark:text-emerald-400' },
   easy:     { label: 'Normal',            Icon: Target,       color: 'text-brand dark:text-brand-dark' },
@@ -75,9 +97,7 @@ export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium
 
   const question = questions[currentQ]
   const total = questions.length
-  const options: string[] = Array.isArray(question?.options)
-    ? question.options
-    : (() => { try { return JSON.parse(String(question?.options || '[]')) } catch { return [] } })()
+  const options: string[] = parseOptions(question)
 
   function handleOptionClick(i: number) {
     if (answerState !== 'unanswered') return
@@ -231,6 +251,10 @@ export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium
               {pct < 60 ? 'Relis les fiches puis réessaie !' : 'Encore un effort pour le score parfait !'}
             </p>
           )}
+
+          {/* Récap' : toutes les explications, accessibles à tous les plans */}
+          <AnswersRecap questions={questions} answers={answers} />
+
           <div className="flex flex-col gap-3 w-full max-w-xs">
             <Button onClick={handleRestart} className="w-full gap-2"><RotateCcw className="h-4 w-4" />Recommencer</Button>
             {!isPerfect && retryCharges > 0 && (
@@ -367,7 +391,9 @@ export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium
           })}
         </div>
 
-        {/* Explication */}
+        {/* Explication — affichée SYSTÉMATIQUEMENT après chaque réponse,
+            bonne ou mauvaise, et pour tous les plans (aucune condition premium
+            ici : c'est le moment pédagogique clé, il ne doit jamais être vendu). */}
         <div className="min-h-[72px]">
           {answerState !== 'unanswered' && (
             <div className={cn('rounded-input px-4 py-3 animate-slide-in',
@@ -379,8 +405,20 @@ export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium
                   ? (<><Check className="h-3.5 w-3.5 text-green-600" /> Bonne réponse !</>)
                   : (<><X className="h-3.5 w-3.5 text-red-500" /> Pas tout à fait...</>)}
               </p>
-              <p className="font-body text-[13px] text-text-secondary dark:text-text-dark-secondary">
-                {question.explanation}
+
+              {/* Rappel de la bonne réponse quand l'élève s'est trompé */}
+              {answerState === 'incorrect' && options[question.correct_index] && (
+                <p className="mb-1 font-body text-[13px] font-medium text-text-main dark:text-text-dark-main">
+                  La bonne réponse était : {options[question.correct_index]}
+                </p>
+              )}
+
+              <p className="flex items-start gap-1.5 font-body text-[13px] text-text-secondary dark:text-text-dark-secondary">
+                <Lightbulb className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-amber-500" />
+                <span>
+                  <span className="font-semibold">Pourquoi&nbsp;? </span>
+                  {explanationFor(question, options)}
+                </span>
               </p>
             </div>
           )}
@@ -405,6 +443,80 @@ export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium
           }
         </Button>
       </div>
+    </div>
+  )
+}
+
+/**
+ * Récapitulatif de fin de QCM : chaque question avec la réponse donnée, la
+ * bonne réponse et l'explication de l'IA. Ouvert par défaut quand l'élève a
+ * fait au moins une erreur — c'est là qu'il apprend le plus.
+ *
+ * Aucune restriction de plan : un élève Free, qui n'a pas de chat illimité,
+ * doit malgré tout comprendre POURQUOI il s'est trompé.
+ */
+function AnswersRecap({ questions, answers }: { questions: QcmQuestion[]; answers: UserAnswer[] }) {
+  const hasMistake = answers.some(a => !a.correct)
+  const [open, setOpen] = useState(hasMistake)
+
+  if (answers.length === 0) return null
+
+  return (
+    <div className="w-full max-w-md text-left">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex w-full items-center justify-between gap-2 rounded-input border border-sky-border bg-sky-surface px-4 py-2.5 font-body text-[13px] font-semibold text-text-main transition-colors hover:border-brand/40 dark:border-night-border dark:bg-night-surface dark:text-text-dark-main"
+      >
+        <span className="flex items-center gap-2">
+          <Lightbulb className="h-4 w-4 text-amber-500" />
+          Revoir les explications
+        </span>
+        <span className="font-body text-[12px] font-normal text-text-tertiary dark:text-text-dark-tertiary">
+          {open ? 'Masquer' : `${answers.length} question${answers.length > 1 ? 's' : ''}`}
+        </span>
+      </button>
+
+      {open && (
+        <div className="mt-2 flex flex-col gap-2 animate-fade-in">
+          {answers.map((a) => {
+            const q = questions[a.questionIndex]
+            if (!q) return null
+            const options = parseOptions(q)
+            return (
+              <div
+                key={a.questionIndex}
+                className={cn(
+                  'rounded-input border px-4 py-3',
+                  a.correct
+                    ? 'border-success/20 bg-success-soft dark:border-emerald-800/30 dark:bg-emerald-950/20'
+                    : 'border-error/20 bg-red-50 dark:border-red-800/30 dark:bg-red-950/20',
+                )}
+              >
+                <p className="flex items-start gap-1.5 font-body text-[13px] font-semibold text-text-main dark:text-text-dark-main">
+                  {a.correct
+                    ? <CheckCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-success" />
+                    : <XCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-error" />}
+                  {q.question}
+                </p>
+
+                {!a.correct && (
+                  <p className="mt-1.5 font-body text-[12px] text-text-secondary dark:text-text-dark-secondary">
+                    Ta réponse : {options[a.chosenIndex] ?? '—'}
+                    <br />
+                    <span className="font-medium text-text-main dark:text-text-dark-main">
+                      Bonne réponse : {options[q.correct_index] ?? '—'}
+                    </span>
+                  </p>
+                )}
+
+                <p className="mt-1.5 font-body text-[12px] leading-relaxed text-text-secondary dark:text-text-dark-secondary">
+                  {explanationFor(q, options)}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
