@@ -296,7 +296,7 @@ export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, i
             ['C\'est quoi les Novas ✦ ?', 'Les Novas sont la monnaie qui alimente les fonctionnalités IA : OCR (2✦), fiches (30✦), QCM (88✦), chatbot (36✦). Ils ne s\'expirent pas et s\'accumulent.'],
             ['Comment annuler mon abonnement ?', 'Clique sur "Gérer mon abonnement" ci-dessus. Tu seras redirigé vers le portail LemonSqueezy où tu peux annuler en un clic. Ton plan reste actif jusqu\'à la fin de la période payée.'],
             ['Comment changer de forfait ?', 'Tu peux passer de Starter à Pro (ou l\'inverse) depuis le portail LemonSqueezy. Le changement prend effet immédiatement.'],
-            ['Je peux gagner des Novas autrement ?', 'Oui ! La roue de la fortune en boutique peut donner des Novas ✦. Tu peux aussi en gagner via les objectifs de fidélité.'],
+            ['Je peux gagner des Novas autrement ?', 'Oui ! Les coffres de maîtrise en boutique donnent des Novas ✦ — un coffre gratuit tous les 5 QCM réussis en 5/5, avec un contenu connu à l\'avance. Tu peux aussi en gagner via les objectifs de fidélité.'],
           ].map(([q, a]) => (
             <div key={q} className="rounded-card border border-sky-border bg-sky-surface p-4 dark:border-night-border dark:bg-night-surface">
               <p className="font-body text-[14px] font-semibold text-text-main dark:text-text-dark-main mb-1">{q}</p>

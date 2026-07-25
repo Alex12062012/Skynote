@@ -4,10 +4,10 @@ import { createClient } from './server'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 import {
-  BADGES, CONSUMABLES, TITLES, WHEEL_COST, WHEEL_SEGMENTS,
+  BADGES, CONSUMABLES, TITLES,
   type LeaderboardMode, LEADERBOARD_PAGE_SIZE, prestigeCost,
 } from '@/lib/gamification/config'
-import { computeReward, drawWheelSegment, type RewardBreakdown } from '@/lib/gamification/rewards'
+import { computeReward, type RewardBreakdown } from '@/lib/gamification/rewards'
 
 // Service role client : nécessaire pour lire les profils d'autres joueurs (leaderboard, profil public)
 function svc() {
@@ -563,77 +563,11 @@ export async function equipFrame(itemId: string | null): Promise<{ error: string
   return { error: null }
 }
 
-// ─── WHEEL OF FORTUNE ────────────────────────────────────────────────────────
-export interface WheelSpinResult {
-  segmentIndex: number
-  segmentId: string
-  label: string
-  netGain: number
-  newBalance: number
-}
-
-/**
- * Tirage côté server (anti-triche) avec probabilités config.
- * EV ≈ -26 coins → l'économie est protégée.
- */
-export async function spinWheel(): Promise<{ error: string | null; result: WheelSpinResult | null }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Non connecté', result: null }
-
-  // Débiter le ticket
-  const { data: afterDebit, error: errDebit } = await svc().rpc('spend_coins', {
-    p_user_id: user.id, p_amount: WHEEL_COST, p_reason: 'Tour de roue',
-  })
-  if (errDebit) {
-    if (errDebit.message.includes('insufficient')) return { error: 'Coins insuffisants', result: null }
-    return { error: errDebit.message, result: null }
-  }
-
-  // Tirage pondéré
-  const draw = drawWheelSegment(WHEEL_SEGMENTS)
-  const seg = draw.segment
-  let newBalance = typeof afterDebit === 'number' ? afterDebit : 0
-  let reward = 0
-
-  if (seg.type === 'coins' && seg.value > 0) {
-    reward = seg.value
-    const { data: awarded } = await svc().rpc('award_coins', {
-      p_user_id: user.id, p_amount: seg.value, p_reason: `Roue ${seg.label}`,
-    })
-    if (typeof awarded === 'number') newBalance = awarded
-  } else if (seg.type === 'nova' && seg.value > 0) {
-    // Créditer des Novas ✦ via le wallet
-    reward = seg.value
-    await svc().rpc('add_novas', {
-      p_user_id: user.id,
-      p_amount:  seg.value,
-      p_reason:  `Roue de la fortune — ${seg.label}`,
-    })
-  }
-
-  // Historique
-  await supabase.from('wheel_spins').insert({
-    user_id: user.id,
-    segment_id: seg.id,
-    reward_type: seg.type,
-    reward_value: reward,
-    cost: WHEEL_COST,
-    net_gain: reward - WHEEL_COST,
-  })
-
-  revalidatePath('/boutique')
-  return {
-    error: null,
-    result: {
-      segmentIndex: draw.index,
-      segmentId: seg.id,
-      label: seg.label,
-      netGain: reward - WHEEL_COST,
-      newBalance,
-    },
-  }
-}
+// ─── COFFRES DE MAÎTRISE ─────────────────────────────────────────────────────
+// L'action serveur `spinWheel` (roue de la fortune à tirage pondéré, 50 coins
+// le tour) a été supprimée : cf. l'en-tête de lib/gamification/config.ts.
+// L'ouverture d'un coffre passe désormais par POST /api/boutique/chest, qui
+// vérifie l'effort réel (QCM parfaits) et applique une récompense déterministe.
 
 // ─── TITRES AUTO-DÉBLOQUÉS ───────────────────────────────────────────────────
 async function unlockDerivedTitles(userId: string) {
@@ -650,10 +584,10 @@ async function unlockDerivedTitles(userId: string) {
   if ((p.total_qcm_perfect ?? 0) >= 500) unlocks.push('qcm_500')
   if ((p.best_perfect_streak ?? 0) >= 10) unlocks.push('intouchable')
 
-  // Pro du casino
-  const { count: spins } = await admin
-    .from('wheel_spins').select('id', { count: 'exact', head: true }).eq('user_id', userId)
-  if ((spins ?? 0) >= 50) unlocks.push('pro_casino')
+  // Collectionneur — 50 coffres de maîtrise ouverts (id conservé pour l'historique)
+  const { count: chests } = await admin
+    .from('mastery_chest_claims').select('id', { count: 'exact', head: true }).eq('user_id', userId)
+  if ((chests ?? 0) >= 50) unlocks.push('pro_casino')
 
   for (const titleId of unlocks) {
     await admin.from('user_titles').insert({

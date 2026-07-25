@@ -5,10 +5,15 @@ import {
   prestigeCost,
   prestigeMultiplier,
   DIFFICULTY_COINS,
-  WHEEL_COST,
-  WHEEL_SEGMENTS,
+  MASTERY_CHEST_INTERVAL,
+  MASTERY_CHEST_TRACK,
+  SKIN_UNLOCK_ORDER,
+  chestProgress,
+  chestReward,
+  chestsUnlocked,
+  nextSkinToUnlock,
 } from './config'
-import { computeReward, drawWheelSegment } from './rewards'
+import { computeReward } from './rewards'
 
 // ─── scoreMultiplier ──────────────────────────────────────────────────────────
 describe('scoreMultiplier', () => {
@@ -117,46 +122,109 @@ describe('computeReward', () => {
   })
 })
 
-// ─── drawWheelSegment ─────────────────────────────────────────────────────────
-describe('drawWheelSegment', () => {
-  it('toujours retourne un segment valide', () => {
-    for (let i = 0; i < 100; i++) {
-      const { segment } = drawWheelSegment(WHEEL_SEGMENTS)
-      expect(segment).toBeDefined()
-      expect(typeof segment.id).toBe('string')
+// ─── COFFRES DE MAÎTRISE (remplace la roue de la fortune) ─────────────────────
+// L'ancien bloc `drawWheelSegment` testait le tirage pondéré de la roue : il a
+// été retiré en même temps que la mécanique elle-même (risque loot-box mineurs,
+// cf. en-tête de config.ts). Les tests ci-dessous garantissent la propriété qui
+// remplace ces garanties : le gain ne dépend QUE de l'effort, jamais du hasard.
+
+describe('chestsUnlocked', () => {
+  it('0 QCM parfait → aucun coffre', () => expect(chestsUnlocked(0)).toBe(0))
+  it('4 QCM parfaits → toujours aucun coffre', () => expect(chestsUnlocked(4)).toBe(0))
+  it('5 QCM parfaits → 1 coffre', () => expect(chestsUnlocked(5)).toBe(1))
+  it('12 QCM parfaits → 2 coffres', () => expect(chestsUnlocked(12)).toBe(2))
+  it('valeur négative → 0 (pas de coffre fantôme)', () => expect(chestsUnlocked(-3)).toBe(0))
+  it('1 coffre par palier de MASTERY_CHEST_INTERVAL', () => {
+    expect(chestsUnlocked(MASTERY_CHEST_INTERVAL * 7)).toBe(7)
+  })
+})
+
+describe('chestReward', () => {
+  it('est déterministe — même numéro, même récompense', () => {
+    for (let n = 1; n <= 50; n++) {
+      expect(chestReward(n)).toBe(chestReward(n))
     }
   })
 
-  it('rng=0 → premier segment', () => {
-    const { segment } = drawWheelSegment(WHEEL_SEGMENTS, () => 0)
-    expect(segment.id).toBe(WHEEL_SEGMENTS[0].id)
+  it('suit le cycle fixe de la piste', () => {
+    expect(chestReward(1).id).toBe(MASTERY_CHEST_TRACK[0].id)
+    expect(chestReward(MASTERY_CHEST_TRACK.length).id)
+      .toBe(MASTERY_CHEST_TRACK[MASTERY_CHEST_TRACK.length - 1].id)
+    // le cycle recommence
+    expect(chestReward(MASTERY_CHEST_TRACK.length + 1).id).toBe(MASTERY_CHEST_TRACK[0].id)
   })
 
-  it('rng=0.9999 → dernier segment (distribution extrême)', () => {
-    const { segment } = drawWheelSegment(WHEEL_SEGMENTS, () => 0.9999)
-    expect(segment.id).toBe(WHEEL_SEGMENTS[WHEEL_SEGMENTS.length - 1].id)
+  it('le contenu du 12ᵉ coffre est connaissable à l\'avance', () => {
+    const idx = (12 - 1) % MASTERY_CHEST_TRACK.length
+    expect(chestReward(12)).toEqual(MASTERY_CHEST_TRACK[idx])
   })
 
-  it('distribue les poids — "lost" ~38% sur 10 000 tirages', () => {
-    let lostCount = 0
-    const N = 10_000
-    for (let i = 0; i < N; i++) {
-      const { segment } = drawWheelSegment(WHEEL_SEGMENTS)
-      if (segment.type === 'lost') lostCount++
+  it('aucun palier « perdu » — chaque coffre donne quelque chose', () => {
+    for (const tier of MASTERY_CHEST_TRACK) {
+      const givesSomething = tier.value > 0 || tier.type === 'boost_x2' || tier.type === 'skin'
+      expect(givesSomething).toBe(true)
     }
-    const ratio = lostCount / N
-    expect(ratio).toBeGreaterThan(0.33)
-    expect(ratio).toBeLessThan(0.43)
   })
 
-  it('EV négative — le joueur perd en moyenne des coins sur 1000 tours', () => {
-    let netTotal = 0
-    const N = 1000
-    for (let i = 0; i < N; i++) {
-      const { segment } = drawWheelSegment(WHEEL_SEGMENTS)
-      const gain = segment.type === 'coins' ? (segment as any).value : 0
-      netTotal += gain - WHEEL_COST
-    }
-    expect(netTotal / N).toBeLessThan(0)
+  it('numéro invalide (0 ou négatif) → premier palier, jamais un crash', () => {
+    expect(chestReward(0).id).toBe(MASTERY_CHEST_TRACK[0].id)
+    expect(chestReward(-5).id).toBe(MASTERY_CHEST_TRACK[0].id)
+  })
+})
+
+describe('chestProgress', () => {
+  it('débutant (0 parfait) → rien à ouvrir, 5 QCM à faire', () => {
+    const p = chestProgress(0, 0)
+    expect(p.claimable).toBe(0)
+    expect(p.remainingToUnlock).toBe(MASTERY_CHEST_INTERVAL)
+    expect(p.nextChestNumber).toBe(1)
+  })
+
+  it('3 parfaits → 2 QCM restants avant le coffre', () => {
+    const p = chestProgress(3, 0)
+    expect(p.progressInStep).toBe(3)
+    expect(p.remainingToUnlock).toBe(MASTERY_CHEST_INTERVAL - 3)
+    expect(p.claimable).toBe(0)
+  })
+
+  it('5 parfaits, 0 ouvert → 1 coffre ouvrable', () => {
+    const p = chestProgress(5, 0)
+    expect(p.claimable).toBe(1)
+    expect(p.remainingToUnlock).toBe(0)
+  })
+
+  it('15 parfaits, 3 ouverts → plus rien à ouvrir', () => {
+    const p = chestProgress(15, 3)
+    expect(p.unlocked).toBe(3)
+    expect(p.claimable).toBe(0)
+    expect(p.nextChestNumber).toBe(4)
+  })
+
+  it('annonce le contenu exact du prochain coffre', () => {
+    const p = chestProgress(15, 3)
+    expect(p.nextReward).toEqual(chestReward(4))
+  })
+
+  it('jamais de claimable négatif même si claimed > unlocked', () => {
+    expect(chestProgress(5, 99).claimable).toBe(0)
+  })
+})
+
+describe('nextSkinToUnlock', () => {
+  it('collection vide → premier skin de l\'ordre fixe', () => {
+    expect(nextSkinToUnlock([])).toBe(SKIN_UNLOCK_ORDER[0])
+  })
+
+  it('premier possédé → deuxième skin (aucun doublon possible)', () => {
+    expect(nextSkinToUnlock([SKIN_UNLOCK_ORDER[0]])).toBe(SKIN_UNLOCK_ORDER[1])
+  })
+
+  it('collection complète → null', () => {
+    expect(nextSkinToUnlock(SKIN_UNLOCK_ORDER)).toBeNull()
+  })
+
+  it('est déterministe (aucun tirage)', () => {
+    const owned = SKIN_UNLOCK_ORDER.slice(0, 3)
+    expect(nextSkinToUnlock(owned)).toBe(nextSkinToUnlock(owned))
   })
 })

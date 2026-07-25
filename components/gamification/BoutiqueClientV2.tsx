@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useTransition, type ElementType } from 'react'
-import { Lock, ShoppingBag, Palette, Award, Zap, FerrisWheel, Sparkles, Brain, Star, Rocket, Crown, Gem, Flame, Check, Frame, Eye } from 'lucide-react'
+import { Lock, ShoppingBag, Palette, Award, Zap, Gift, Sparkles, Brain, Star, Rocket, Crown, Gem, Flame, Check, Frame, Eye } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SkyCoin } from '@/components/ui/SkyCoin'
 import { BADGES, CONSUMABLES, TITLES, SKINS, SKIN_ID_ALIASES, prestigeCost } from '@/lib/gamification/config'
 import { buyItem, equip, equipFrame } from '@/lib/supabase/gamification-actions'
-import { SpinWheel, WHEEL_SEGMENTS as WHEEL_LEGACY, formatSegmentLabel } from '@/components/boutique/SpinWheel'
+import { MasteryChests, ChestTrack, formatChestTier } from '@/components/boutique/MasteryChests'
 import { PlayerBadge } from './PlayerBadge'
 import { PlayerEmblem } from './PlayerEmblem'
 import { PrestigeButton } from './PrestigeButton'
@@ -21,7 +21,7 @@ type ShopTab = 'badges' | 'consumables' | 'titles' | 'frames'
 interface UserStats {
   total_qcm_perfect: number
   best_perfect_streak: number
-  wheel_spins: number
+  chests_claimed: number
 }
 
 interface ConsumableState {
@@ -47,7 +47,9 @@ interface Props {
   ownedFrames?: FrameItem[]
   activeFrame?: string | null
   pseudo?: string
-  recentSpins: Array<{ segment_id: string; reward_type: string; net_gain: number; created_at: string }>
+  recentChests: Array<{ chest_number: number; tier_id: string; reward_type: string; reward_value: number; created_at: string }>
+  /** coffres de maîtrise déjà ouverts */
+  chestsClaimed?: number
   userStats?: UserStats
   consumableState?: ConsumableState
 }
@@ -62,7 +64,7 @@ function parseTitleProgress(unlockRule: string | undefined, stats: UserStats): {
   const metricMap: Record<string, number> = {
     total_qcm_perfect:   stats.total_qcm_perfect,
     best_perfect_streak: stats.best_perfect_streak,
-    wheel_spins:         stats.wheel_spins,
+    chests_claimed:      stats.chests_claimed,
   }
   const current = metricMap[metric] ?? 0
   return { current: Math.min(current, max), max }
@@ -71,10 +73,10 @@ function parseTitleProgress(unlockRule: string | undefined, stats: UserStats): {
 export function BoutiqueClientV2({
   initialCoins, prestigeLevel, ownedBadges, ownedTitles, activeBadge, activeTitle,
   ownedFrames = [], activeFrame: initialActiveFrame = null, pseudo = 'Moi',
-  recentSpins, userStats, consumableState,
+  recentChests, chestsClaimed = 0, userStats, consumableState,
 }: Props) {
   const { t } = useI18n()
-  const defaultStats: UserStats = { total_qcm_perfect: 0, best_perfect_streak: 0, wheel_spins: 0 }
+  const defaultStats: UserStats = { total_qcm_perfect: 0, best_perfect_streak: 0, chests_claimed: 0 }
   const stats = userStats ?? defaultStats
   const cs: ConsumableState = consumableState ?? { x2_active: false, x2_expires: null, retry_qcm_charges: 0, hint_question_charges: 0 }
   const [coins, setCoins] = useState(initialCoins)
@@ -166,49 +168,45 @@ export function BoutiqueClientV2({
         </div>
       </section>
 
-      {/* ROUE */}
+      {/* COFFRES DE MAÎTRISE (remplace la roue de la fortune) */}
       <section>
-        <SectionHeader icon={FerrisWheel} title={t('boutique.wheel')} badge={t('boutique.wheelBadge')}
-          desc={t('boutique.wheelDesc')} />
+        <SectionHeader icon={Gift} title={t('boutique.chests')} badge={t('boutique.chestsBadge')}
+          desc={t('boutique.chestsDesc')} />
         <div className="mt-5 rounded-card border border-sky-border bg-sky-surface p-6 dark:border-night-border dark:bg-night-surface">
           <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-start lg:gap-12">
-            <div className="flex-shrink-0">
-              <SpinWheel coins={coins} onBalanceUpdate={setCoins} />
+            <div className="w-full flex-shrink-0 lg:w-72">
+              <MasteryChests
+                totalPerfectQcm={stats.total_qcm_perfect}
+                chestsClaimed={chestsClaimed}
+                onCoinsEarned={(amount) => setCoins(c => c + amount)}
+              />
             </div>
             <div className="flex w-full flex-col gap-5">
               <div>
                 <p className="mb-3 font-display text-[13px] font-semibold uppercase tracking-wide text-text-tertiary dark:text-text-dark-tertiary">
-                  {t('boutique.lotsPossibles')}
+                  {t('boutique.chestTrack')}
                 </p>
-                <div className="grid grid-cols-2 gap-2">
-                  {WHEEL_LEGACY.map((seg) => (
-                    <div key={seg.id} className="flex items-center gap-2 rounded-input border border-sky-border bg-sky-surface-2 px-3 py-2 dark:border-night-border dark:bg-night-surface-2">
-                      <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: seg.color }} />
-                      <span className="flex-1 font-body text-[12px] font-medium text-text-secondary dark:text-text-dark-secondary">
-                        {seg.label}
-                      </span>
-                      <span className="font-display text-[11px] font-bold tabular-nums text-text-tertiary dark:text-text-dark-tertiary">
-                        {seg.probability}%
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <ChestTrack chestsClaimed={chestsClaimed} />
+                <p className="mt-2 font-body text-[12px] text-text-secondary dark:text-text-dark-secondary">
+                  {t('boutique.chestTrackHint')}
+                </p>
               </div>
-              {recentSpins.length > 0 && (
+              {recentChests.length > 0 && (
                 <div>
                   <p className="mb-3 font-display text-[13px] font-semibold uppercase tracking-wide text-text-tertiary dark:text-text-dark-tertiary">
-                    {t('boutique.lastSpins')}
+                    {t('boutique.lastChests')}
                   </p>
                   <div className="space-y-1.5">
-                    {recentSpins.map((spin, i) => (
-                      <div key={i} className="flex items-center justify-between rounded-input border border-sky-border bg-sky-surface-2 px-3 py-1.5 dark:border-night-border dark:bg-night-surface-2">
-                        <span className="font-body text-[12px]">{formatSegmentLabel(spin.segment_id)}</span>
-                        <span className={cn(
-                          'font-display text-[13px] font-bold tabular-nums',
-                          spin.net_gain > 0 ? 'text-emerald-600' : spin.net_gain < 0 ? 'text-red-600' : 'text-text-tertiary',
-                        )}>
-                          {spin.net_gain > 0 ? '+' + spin.net_gain : spin.net_gain}
+                    {recentChests.map((chest) => (
+                      <div key={chest.chest_number} className="flex items-center justify-between rounded-input border border-sky-border bg-sky-surface-2 px-3 py-1.5 dark:border-night-border dark:bg-night-surface-2">
+                        <span className="font-body text-[12px]">
+                          Coffre n°{chest.chest_number} — {formatChestTier(chest.tier_id)}
                         </span>
+                        {chest.reward_value > 0 && (
+                          <span className="font-display text-[13px] font-bold tabular-nums text-emerald-600">
+                            +{chest.reward_value}
+                          </span>
+                        )}
                       </div>
                     ))}
                   </div>

@@ -1,7 +1,42 @@
 /**
  * GAMIFICATION CONFIG — single source of truth
  * Toutes les règles économiques / progression / cosmétiques sont ici.
- * Modifier ces valeurs met à jour l'app ET la roue ET la boutique.
+ * Modifier ces valeurs met à jour l'app ET les coffres ET la boutique.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * POURQUOI IL N'Y A PLUS DE ROUE DE LA FORTUNE (suppression du hasard pur)
+ * ─────────────────────────────────────────────────────────────────────────────
+ * L'ancien système était une roue payante (50 coins le tour) à probabilités
+ * pondérées (~38 % « Perdu », skins à 5 %, secrets à 4 %) avec une espérance de
+ * gain volontairement négative. Sur un public de 10-17 ans, ce design coche
+ * toutes les cases de la « loot box » :
+ *   • mise obligatoire d'une monnaie ayant une valeur d'usage dans l'app ;
+ *   • résultat aléatoire non connu à l'avance ;
+ *   • récompenses à rareté artificielle (skins secrets) ;
+ *   • espérance négative → boucle de rejeu compulsif.
+ *
+ * Risque régulatoire identifié à l'audit :
+ *   • Belgique (Commission des jeux de hasard, 2018) et Pays-Bas : loot boxes
+ *     assimilées à des jeux de hasard → interdiction pure et simple ;
+ *   • France : position DGCCRF / ARJEL-ANJ et rapport du Sénat sur la
+ *     protection des mineurs en ligne, vigilance accrue sur les mécaniques
+ *     aléatoires payantes visant les mineurs ;
+ *   • UE : Digital Fairness Act et résolution du Parlement européen (2023) sur
+ *     les loot boxes et les « dark patterns » ciblant les mineurs ;
+ *   • RGPD / design éthique : une app EdTech scolaire ne peut pas défendre une
+ *     boucle de renforcement aléatoire auprès des établissements et des parents.
+ *
+ * REMPLACEMENT — « Coffres de Maîtrise » (MASTERY_CHEST_TRACK ci-dessous) :
+ *   • le coffre se débloque à l'EFFORT : 1 coffre tous les MASTERY_CHEST_INTERVAL
+ *     QCM réussis en 5/5 (aucune mise, aucune monnaie dépensée) ;
+ *   • le contenu de CHAQUE coffre est connu à l'avance et affiché dans l'UI :
+ *     la piste est un cycle fixe et déterministe, l'élève sait exactement ce
+ *     qu'il obtiendra au coffre n°7 avant de l'ouvrir ;
+ *   • aucun tirage : chestReward(n) est une fonction pure de n, il n'y a plus
+ *     un seul Math.random() dans la boucle de récompense ;
+ *   • aucun « Perdu » possible : l'effort fourni est toujours récompensé.
+ * Conséquence : la progression reste motivante mais elle est indexée sur le
+ * travail scolaire, pas sur la chance ni sur la dépense.
  */
 
 // ─── DIFFICULTÉS ──────────────────────────────────────────────────────────────
@@ -62,34 +97,94 @@ export function prestigeMultiplier(level: number): number {
   return 1 + 0.05 * level
 }
 
-// ─── ROUE DE LA FORTUNE ───────────────────────────────────────────────────────
-export const WHEEL_COST = 50
+// ─── COFFRES DE MAÎTRISE ──────────────────────────────────────────────────────
+/**
+ * Remplace la roue de la fortune (cf. avertissement en tête de fichier).
+ * Règle unique : 1 coffre débloqué tous les MASTERY_CHEST_INTERVAL QCM parfaits.
+ * Gratuit, garanti, et le contenu est public avant l'ouverture.
+ */
+export const MASTERY_CHEST_INTERVAL = 5
+
+export type ChestRewardType = 'coins' | 'nova' | 'boost_x2' | 'skin'
+
+export interface MasteryChestTier {
+  /** identifiant stable du palier (position dans le cycle) */
+  id: string
+  label: string
+  type: ChestRewardType
+  /** montant de coins / de Novas ; 0 pour un boost ou un skin */
+  value: number
+  /** description affichée à l'élève AVANT l'ouverture */
+  desc: string
+  color: string
+  text: string
+}
 
 /**
- * EV attendue (espérance de gain NET) — poids total = 100 :
- *   lost      : 38/100 → −50 coins net
- *   coins_20  : 28/100 → −30 coins net
- *   coins_40  : 14/100 → −10 coins net
- *   coins_60  :  8/100 → +10 coins net
- *   coins_100 :  4/100 → +50 coins net
- *   coins_200 :  1/100 → +150 coins net
- *   nova_50   :  4/100 → 50 ✦  (crédits IA)
- *   nova_100  :  2/100 → 100 ✦ (rare)
- *   nova_200  :  1/100 → 200 ✦ (très rare)
- * EV coins ≈ −27 → économie protégée (EV < coût du tour).
+ * Piste de récompenses — cycle fixe et déterministe de 8 paliers.
+ * Le coffre n°N donne MASTERY_CHEST_TRACK[(N - 1) % 8]. Rien n'est tiré au sort :
+ * l'élève peut lire à l'avance ce que donnera son 12ᵉ coffre.
  */
-export const WHEEL_SEGMENTS = [
-  { id: 'lost',      label: 'Perdu',     type: 'lost'  as const, value:   0, weight: 38, color: '#EF4444', text: '#fff'    },
-  { id: 'coins_20',  label: '+20',       type: 'coins' as const, value:  20, weight: 28, color: '#FB923C', text: '#fff'    },
-  { id: 'coins_40',  label: '+40',       type: 'coins' as const, value:  40, weight: 14, color: '#FBBF24', text: '#fff'    },
-  { id: 'coins_60',  label: '+60',       type: 'coins' as const, value:  60, weight:  8, color: '#A3E635', text: '#1a2e05' },
-  { id: 'coins_100', label: '+100',      type: 'coins' as const, value: 100, weight:  4, color: '#34D399', text: '#022c22' },
-  { id: 'coins_200', label: '+200',      type: 'coins' as const, value: 200, weight:  1, color: '#2DD4BF', text: '#042f2e' },
-  { id: 'nova_50',   label: '+50 ✦',    type: 'nova'  as const, value:  50, weight:  4, color: '#6366f1', text: '#fff'    },
-  { id: 'nova_100',  label: '+100 ✦',   type: 'nova'  as const, value: 100, weight:  2, color: '#4F46E5', text: '#fff'    },
-  { id: 'nova_200',  label: '+200 ✦',   type: 'nova'  as const, value: 200, weight:  1, color: '#3730A3', text: '#fff'    },
+export const MASTERY_CHEST_TRACK: readonly MasteryChestTier[] = [
+  { id: 'tier_1', label: '+40 coins',   type: 'coins',    value:  40, desc: '40 Sky Coins',                    color: '#FB923C', text: '#fff'    },
+  { id: 'tier_2', label: '+60 coins',   type: 'coins',    value:  60, desc: '60 Sky Coins',                    color: '#FBBF24', text: '#fff'    },
+  { id: 'tier_3', label: '+25 ✦',      type: 'nova',     value:  25, desc: '25 Novas ✦ (crédits IA)',         color: '#6366F1', text: '#fff'    },
+  { id: 'tier_4', label: '+80 coins',   type: 'coins',    value:  80, desc: '80 Sky Coins',                    color: '#A3E635', text: '#1a2e05' },
+  { id: 'tier_5', label: 'Boost ×2',    type: 'boost_x2', value:   0, desc: 'Boost ×2 coins pendant 1 heure',  color: '#A78BFA', text: '#fff'    },
+  { id: 'tier_6', label: '+120 coins',  type: 'coins',    value: 120, desc: '120 Sky Coins',                   color: '#34D399', text: '#022c22' },
+  { id: 'tier_7', label: '+50 ✦',      type: 'nova',     value:  50, desc: '50 Novas ✦ (crédits IA)',         color: '#4F46E5', text: '#fff'    },
+  { id: 'tier_8', label: 'Skin',        type: 'skin',     value:   0, desc: 'Le prochain skin de ta collection', color: '#F472B6', text: '#fff'  },
 ] as const
-export type WheelSegment = typeof WHEEL_SEGMENTS[number]
+
+/** Si la collection de skins est complète, le coffre « Skin » donne ce montant. */
+export const CHEST_SKIN_FALLBACK_COINS = 150
+
+/** Nombre de coffres débloqués par l'effort fourni (QCM parfaits cumulés). */
+export function chestsUnlocked(totalPerfectQcm: number): number {
+  if (totalPerfectQcm <= 0) return 0
+  return Math.floor(totalPerfectQcm / MASTERY_CHEST_INTERVAL)
+}
+
+/** Contenu du coffre n°N (1-indexé) — fonction pure, aucun aléa. */
+export function chestReward(chestNumber: number): MasteryChestTier {
+  const idx = (Math.max(1, Math.trunc(chestNumber)) - 1) % MASTERY_CHEST_TRACK.length
+  return MASTERY_CHEST_TRACK[idx]
+}
+
+export interface ChestProgress {
+  /** coffres débloqués au total par l'effort */
+  unlocked: number
+  /** coffres déjà ouverts */
+  claimed: number
+  /** coffres ouvrables tout de suite */
+  claimable: number
+  /** numéro du prochain coffre à ouvrir (1-indexé) */
+  nextChestNumber: number
+  /** contenu du prochain coffre — connu à l'avance */
+  nextReward: MasteryChestTier
+  /** QCM parfaits déjà faits dans le palier en cours (0 → INTERVAL-1) */
+  progressInStep: number
+  /** QCM parfaits restants avant le prochain déblocage */
+  remainingToUnlock: number
+}
+
+/** État complet de la piste pour l'UI — pur, dérivé de l'effort et des ouvertures. */
+export function chestProgress(totalPerfectQcm: number, chestsClaimed: number): ChestProgress {
+  const unlocked  = chestsUnlocked(totalPerfectQcm)
+  const claimed   = Math.max(0, chestsClaimed)
+  const claimable = Math.max(0, unlocked - claimed)
+  const perfect   = Math.max(0, totalPerfectQcm)
+  const progressInStep = perfect % MASTERY_CHEST_INTERVAL
+  return {
+    unlocked,
+    claimed,
+    claimable,
+    nextChestNumber: claimed + 1,
+    nextReward: chestReward(claimed + 1),
+    progressInStep,
+    remainingToUnlock: claimable > 0 ? 0 : MASTERY_CHEST_INTERVAL - progressInStep,
+  }
+}
 
 // ─── BADGES COSMÉTIQUES ───────────────────────────────────────────────────────
 export type BadgeRarity = 'default' | 'common' | 'rare' | 'epic' | 'legendary'
@@ -115,7 +210,7 @@ export const BADGES: BadgeCatalogEntry[] = [
 ]
 
 // ─── TITRES ───────────────────────────────────────────────────────────────────
-export type TitleCategory = 'skill' | 'progression' | 'casino' | 'prestige' | 'shop'
+export type TitleCategory = 'skill' | 'progression' | 'chest' | 'prestige' | 'shop'
 
 export interface TitleCatalogEntry {
   id: string
@@ -133,8 +228,8 @@ export const TITLES: TitleCatalogEntry[] = [
   // Progression
   { id: 'qcm_100',       label: '100 QCM réussis', category: 'progression', desc: '100 QCM parfaits',               unlockRule: 'total_qcm_perfect >= 100' },
   { id: 'qcm_500',       label: '500 QCM réussis', category: 'progression', desc: '500 QCM parfaits',               unlockRule: 'total_qcm_perfect >= 500' },
-  // Casino
-  { id: 'pro_casino',    label: 'Pro du casino',   category: 'casino',      desc: '50 tours de roue',               unlockRule: 'wheel_spins >= 50' },
+  // Coffres de maîtrise (id conservé pour ne pas casser les lignes user_titles existantes)
+  { id: 'pro_casino',    label: 'Collectionneur',  category: 'chest',       desc: '50 coffres de maîtrise ouverts', unlockRule: 'chests_claimed >= 50' },
   // Prestige (auto générés par le RPC perform_prestige)
   { id: 'renaissance_1', label: 'Renaissance I',   category: 'prestige',    desc: 'Prestige 1 atteint' },
   { id: 'renaissance_2', label: 'Renaissance II',  category: 'prestige',    desc: 'Prestige 2 atteint' },
@@ -246,10 +341,23 @@ export const SKINS: SkinEntry[] = [
   },
 ]
 
-/** IDs des skins normaux (non secrets) — utilisé pour le tirage roue */
+/** IDs des skins normaux (non secrets), dans l'ordre d'obtention */
 export const REGULAR_SKIN_IDS = SKINS.filter(s => !s.secret).map(s => s.id)
-/** IDs des skins secrets — utilisé pour le tirage roue */
+/** IDs des skins secrets, dans l'ordre d'obtention (après les normaux) */
 export const SECRET_SKIN_IDS  = SKINS.filter(s => s.secret).map(s => s.id)
+
+/**
+ * Ordre d'obtention des skins via les coffres — fixe et public.
+ * On donne le premier skin non possédé : aucun tirage, aucun doublon,
+ * et l'élève sait quel skin il obtiendra à son prochain coffre « Skin ».
+ */
+export const SKIN_UNLOCK_ORDER = [...REGULAR_SKIN_IDS, ...SECRET_SKIN_IDS]
+
+/** Prochain skin à débloquer, ou null si la collection est complète. */
+export function nextSkinToUnlock(ownedSkinIds: readonly string[]): string | null {
+  const owned = new Set(ownedSkinIds)
+  return SKIN_UNLOCK_ORDER.find(id => !owned.has(id)) ?? null
+}
 
 // Rétrocompatibilité avec l'ancien item_id
 export const SKIN_ID_ALIASES: Record<string, string> = {

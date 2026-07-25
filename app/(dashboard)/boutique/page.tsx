@@ -19,18 +19,23 @@ export default async function BoutiquePage() {
     spinsResult,
     framesResult,
     boostsResult,
+    chestCountResult,
   ] = await Promise.allSettled([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase.from('user_badges').select('badge_id').eq('user_id', user.id),
     supabase.from('user_titles').select('title_id').eq('user_id', user.id),
     supabase
-      .from('wheel_spins').select('segment_id, reward_type, net_gain, created_at')
-      .eq('user_id', user.id).order('created_at', { ascending: false }).limit(5),
+      .from('mastery_chest_claims')
+      .select('chest_number, tier_id, reward_type, reward_value, created_at')
+      .eq('user_id', user.id).order('chest_number', { ascending: false }).limit(5),
     supabase
       .from('user_inventory').select('item_id, data, equipped')
       .eq('user_id', user.id).eq('item_type', 'frame'),
     supabase
       .from('user_boosts').select('boost_type, expires_at, charges')
+      .eq('user_id', user.id),
+    supabase
+      .from('mastery_chest_claims').select('id', { count: 'exact', head: true })
       .eq('user_id', user.id),
   ])
 
@@ -41,7 +46,7 @@ export default async function BoutiquePage() {
   const ownedTitles = titlesResult.status === 'fulfilled'
     ? (titlesResult.value.data ?? []).map((t: any) => t.title_id)
     : []
-  const recentSpins: Array<{ segment_id: string; reward_type: string; net_gain: number; created_at: string }> =
+  const recentChests: Array<{ chest_number: number; tier_id: string; reward_type: string; reward_value: number; created_at: string }> =
     spinsResult.status === 'fulfilled' ? (spinsResult.value.data ?? []) : []
   const ownedFrames = framesResult.status === 'fulfilled'
     ? (framesResult.value.data ?? []).map((f: any) => ({
@@ -66,10 +71,14 @@ export default async function BoutiquePage() {
     }
   }
 
+  const chestsClaimed = chestCountResult.status === 'fulfilled'
+    ? (chestCountResult.value.count ?? 0)
+    : 0
+
   const userStats = {
     total_qcm_perfect:   (profile as any)?.total_qcm_perfect   ?? 0,
     best_perfect_streak: (profile as any)?.best_perfect_streak  ?? 0,
-    wheel_spins:         (profile as any)?.total_wheel_spins    ?? 0,
+    chests_claimed:      chestsClaimed,
   }
 
   return (
@@ -83,7 +92,8 @@ export default async function BoutiquePage() {
       ownedFrames={ownedFrames}
       activeFrame={(profile as any)?.active_frame_id ?? null}
       pseudo={(profile as any)?.pseudo ?? `user_${(profile as any)?.user_number ?? '?'}`}
-      recentSpins={recentSpins}
+      recentChests={recentChests}
+      chestsClaimed={chestsClaimed}
       userStats={userStats}
       consumableState={consumableState}
     />

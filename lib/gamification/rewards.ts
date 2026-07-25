@@ -103,18 +103,7 @@ export function computeReward(input: RewardInput): RewardBreakdown {
 }
 
 /**
- * Helper : tire un segment de la roue pondérée par weight.
- * Utilisé côté server (edge function) pour empêcher la triche.
+ * NOTE : `drawWheelSegment` (tirage pondéré de la roue de la fortune) a été
+ * supprimé — cf. l'avertissement en tête de lib/gamification/config.ts.
+ * Les récompenses de coffre sont désormais déterministes : voir chestReward().
  */
-export function drawWheelSegment<T extends { weight: number }>(
-  segments: readonly T[],
-  rng: () => number = Math.random,
-): { segment: T; index: number } {
-  const totalWeight = segments.reduce((s, x) => s + x.weight, 0)
-  let roll = rng() * totalWeight
-  for (let i = 0; i < segments.length; i++) {
-    roll -= segments[i].weight
-    if (roll <= 0) return { segment: segments[i], index: i }
-  }
-  return { segment: segments[segments.length - 1], index: segments.length - 1 }
-}
