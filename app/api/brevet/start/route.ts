@@ -53,12 +53,14 @@ export async function POST(_req: NextRequest) {
     }
   }
 
-  const deductResult = await deductNovas(NOVA_COST_EXAM_SIMULATION, 'Épreuve brevet simulée')
-  if (!deductResult.ok) {
-    return NextResponse.json(
-      { error: `Il te faut ${NOVA_COST_EXAM_SIMULATION} ✦ pour lancer une épreuve.`, code: 'insufficient_novas' },
-      { status: 402 }
-    )
+  if (NOVA_COST_EXAM_SIMULATION > 0) {
+    const deductResult = await deductNovas(NOVA_COST_EXAM_SIMULATION, 'Épreuve brevet simulée')
+    if (!deductResult.ok) {
+      return NextResponse.json(
+        { error: `Il te faut ${NOVA_COST_EXAM_SIMULATION} ✦ pour lancer une épreuve.`, code: 'insufficient_novas' },
+        { status: 402 }
+      )
+    }
   }
 
   // Creer la session immediatement avec status='generating'
