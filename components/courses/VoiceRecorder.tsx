@@ -45,8 +45,12 @@ export function VoiceRecorder({ onTranscript, onChange, transcript, value, error
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3">
-        <button type="button" onClick={recording ? stop : start}
-          className={cn('flex h-12 w-12 items-center justify-center rounded-full transition-all', recording ? 'bg-error text-white animate-pulse' : 'bg-brand text-white hover:bg-brand-hover dark:bg-brand-dark dark:text-night-bg')}>
+        <button
+          type="button"
+          onClick={recording ? stop : start}
+          aria-label={recording ? "Arrêter l'enregistrement" : 'Démarrer la dictée vocale'}
+          aria-pressed={recording}
+          className={cn('flex h-12 w-12 items-center justify-center rounded-full transition-[background-color,border-color,color,box-shadow,transform,opacity]', recording ? 'bg-error text-white animate-pulse' : 'bg-brand text-white hover:bg-brand-hover dark:bg-brand-dark dark:text-night-bg')}>
           {recording ? <Square className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
         </button>
         <span className="font-body text-[14px] text-text-secondary dark:text-text-dark-secondary">

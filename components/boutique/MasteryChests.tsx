@@ -91,7 +91,7 @@ export function MasteryChests({ totalPerfectQcm, chestsClaimed, onCoinsEarned }:
       {/* Coffre + état */}
       <div
         className={cn(
-          'flex h-32 w-32 items-center justify-center rounded-card border-2 transition-all duration-300',
+          'flex h-32 w-32 items-center justify-center rounded-card border-2 transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-300',
           canOpen
             ? 'animate-glow-pulse border-brand bg-brand-soft dark:border-brand-dark dark:bg-brand-dark-soft'
             : 'border-sky-border bg-sky-surface-2 dark:border-night-border dark:bg-night-surface-2',
@@ -116,7 +116,7 @@ export function MasteryChests({ totalPerfectQcm, chestsClaimed, onCoinsEarned }:
         </div>
         <div className="h-2.5 w-full overflow-hidden rounded-pill bg-sky-cloud dark:bg-night-border">
           <div
-            className="h-full rounded-pill bg-brand transition-all duration-500 dark:bg-brand-dark"
+            className="h-full rounded-pill bg-brand transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-500 dark:bg-brand-dark"
             style={{ width: `${stepPct}%` }}
           />
         </div>
@@ -144,7 +144,7 @@ export function MasteryChests({ totalPerfectQcm, chestsClaimed, onCoinsEarned }:
         onClick={openChest}
         disabled={!canOpen}
         className={cn(
-          'flex items-center gap-2 rounded-pill px-8 py-3 font-display text-[16px] font-bold transition-all duration-200',
+          'flex items-center gap-2 rounded-pill px-8 py-3 font-display text-[16px] font-bold transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-200',
           canOpen
             ? 'bg-brand text-white shadow-btn hover:bg-brand-hover active:scale-95'
             : 'cursor-not-allowed bg-sky-cloud text-text-tertiary dark:bg-night-border dark:text-text-dark-tertiary',

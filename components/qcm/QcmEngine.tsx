@@ -9,8 +9,10 @@ import { useCoinReward } from '@/components/providers/CoinRewardProvider'
 import { saveQcmAttempt, type QcmDifficulty } from '@/lib/supabase/qcm-actions'
 import { consumeBoostCharge } from '@/lib/supabase/gamification-actions'
 import { createClient } from '@/lib/supabase/client'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useI18n } from '@/lib/i18n/context'
+import { EASE, DUR, SPRING } from '@/lib/motion'
 import type { QcmQuestion, Flashcard } from '@/types/database'
 import type { RewardBreakdown } from '@/lib/gamification/rewards'
 
@@ -325,7 +327,7 @@ export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium
             </div>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-pill bg-sky-cloud dark:bg-night-border">
-            <div className="h-full rounded-pill transition-all duration-500"
+            <div className="h-full rounded-pill transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-500"
               style={{ width: `${(currentQ / total) * 100}%`, background: 'linear-gradient(90deg,#2563EB,#60A5FA)' }} />
           </div>
         </div>
@@ -340,8 +342,17 @@ export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium
           </h2>
         </div>
 
-        {/* Options */}
-        <div className="flex flex-col gap-2">
+        {/* Options — la cascade est rejouee a chaque question (cle = currentQ).
+            Purpose : eviter le changement brutal quand tout le bloc se
+            substitue d'un coup. Pas rejouee apres une reponse : le bloc ne
+            doit pas bouger pendant que l'eleve lit la correction. */}
+        <motion.div
+          key={currentQ}
+          className="flex flex-col gap-2"
+          initial="hidden"
+          animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.035 } } }}
+        >
           {options.map((option, index) => {
             const isSelected    = selectedOption === index
             const isCorrect     = index === question.correct_index
@@ -361,12 +372,19 @@ export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium
             }
 
             return (
-              <button
+              <motion.button
                 key={index}
+                variants={{
+                  hidden: { opacity: 0, y: 8 },
+                  show: { opacity: 1, y: 0, transition: { duration: DUR.fast, ease: EASE.out } },
+                }}
+                whileTap={isAnswered || isEliminated ? undefined : { scale: 0.985 }}
+                transition={SPRING.press}
                 onClick={() => handleOptionClick(index)}
                 disabled={isAnswered || isEliminated}
                 className={cn(
-                  'flex w-full items-center gap-3 rounded-card-sm border-[1.5px] px-4 py-3 text-left transition-all duration-150',
+                  'flex w-full items-center gap-3 rounded-card-sm border-[1.5px] px-4 py-3 text-left',
+                  'transition-[background-color,border-color,color,opacity] duration-150',
                   cls,
                   // Animations de feedback
                   isAnswered && isCorrect && isSelected ? 'animate-bounce-in' : '',
@@ -386,15 +404,18 @@ export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium
                 {isAnswered && isCorrect  && <CheckCircle className="h-4 w-4 flex-shrink-0 text-success dark:text-success-dark" />}
                 {isAnswered && isSelected && !isCorrect && <XCircle className="h-4 w-4 flex-shrink-0 text-error" />}
                 {isEliminated && !isAnswered && <X className="h-3.5 w-3.5 flex-shrink-0 text-text-tertiary" />}
-              </button>
+              </motion.button>
             )
           })}
-        </div>
+        </motion.div>
 
         {/* Explication — affichée SYSTÉMATIQUEMENT après chaque réponse,
             bonne ou mauvaise, et pour tous les plans (aucune condition premium
             ici : c'est le moment pédagogique clé, il ne doit jamais être vendu). */}
-        <div className="min-h-[72px]">
+        {/* aria-live : la correction apparait apres la reponse. Sans region
+            live, un lecteur d'ecran ne l'annonce jamais — l'eleve aveugle
+            repond sans jamais savoir s'il a eu juste. */}
+        <div className="min-h-[72px]" aria-live="polite" aria-atomic="true">
           {answerState !== 'unanswered' && (
             <div className={cn('rounded-input px-4 py-3 animate-slide-in',
               answerState === 'correct'
@@ -433,7 +454,7 @@ export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium
           disabled={answerState === 'unanswered'}
           size="lg"
           className={cn(
-            'w-full gap-2 transition-all duration-200',
+            'w-full gap-2 transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-200',
             answerState === 'unanswered' ? 'opacity-40' : 'opacity-100 shadow-btn'
           )}
         >

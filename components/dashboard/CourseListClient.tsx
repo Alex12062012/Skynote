@@ -102,7 +102,7 @@ export function CourseListClient({ courses }: CourseListClientProps) {
           id="course-sort"
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortKey)}
-          className="h-9 rounded-input border border-sky-border bg-sky-surface px-3 font-body text-[13px] text-text-main transition-all focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15 dark:border-night-border dark:bg-night-surface dark:text-text-dark-main dark:focus:border-brand-dark"
+          className="h-9 rounded-input border border-sky-border bg-sky-surface px-3 font-body text-[13px] text-text-main transition-[background-color,border-color,color,box-shadow,transform,opacity] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15 dark:border-night-border dark:bg-night-surface dark:text-text-dark-main dark:focus:border-brand-dark"
         >
           <option value="date">{t('courses.sortDateAdded')}</option>
           <option value="alpha">{t('courses.sortAlphabetical')}</option>

@@ -55,11 +55,11 @@ export function EditableTitle({ courseId, initialTitle, canEdit }: EditableTitle
           className="flex-1 rounded-input border border-brand bg-sky-surface px-3 py-1.5 font-display text-h2 text-text-main leading-tight focus:outline-none dark:border-brand-dark dark:bg-night-surface dark:text-text-dark-main"
           disabled={isPending}
         />
-        <button onClick={save} disabled={isPending}
+        <button onClick={save} disabled={isPending} aria-label="Enregistrer le titre"
           className="flex h-8 w-8 items-center justify-center rounded-full bg-success text-white hover:bg-success/80 transition-colors">
           <Check className="h-4 w-4" />
         </button>
-        <button onClick={cancel}
+        <button onClick={cancel} aria-label="Annuler la modification"
           className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-cloud text-text-secondary hover:bg-red-100 hover:text-error transition-colors dark:bg-night-border dark:hover:bg-red-950/30">
           <X className="h-4 w-4" />
         </button>
@@ -73,8 +73,8 @@ export function EditableTitle({ courseId, initialTitle, canEdit }: EditableTitle
         {title}
       </h1>
       {canEdit && (
-        <button onClick={startEdit}
-          className="flex h-7 w-7 items-center justify-center rounded-full text-text-tertiary opacity-0 transition-all hover:bg-sky-cloud hover:text-text-main group-hover:opacity-100 dark:hover:bg-night-border dark:hover:text-text-dark-main">
+        <button onClick={startEdit} aria-label="Modifier le titre du cours"
+          className="flex h-7 w-7 items-center justify-center rounded-full text-text-tertiary opacity-0 transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:bg-sky-cloud hover:text-text-main group-hover:opacity-100 dark:hover:bg-night-border dark:hover:text-text-dark-main">
           <Pencil className="h-3.5 w-3.5" />
         </button>
       )}

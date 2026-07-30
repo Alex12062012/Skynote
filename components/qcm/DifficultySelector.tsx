@@ -99,7 +99,7 @@ export function DifficultySelector({ flashcardTitle, onSelect, isLoading }: Diff
             onClick={() => !isLoading && onSelect(d.key)}
             disabled={isLoading}
             className={cn(
-              'group flex items-center gap-4 rounded-card border-[1.5px] p-4 text-left transition-all duration-150',
+              'group flex items-center gap-4 rounded-card border-[1.5px] p-4 text-left transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-150',
               d.bgLight, d.bgDark, d.borderLight, d.borderDark,
               'hover:scale-[1.01] hover:shadow-md active:scale-[0.99]',
               isLoading && 'opacity-50 cursor-not-allowed'

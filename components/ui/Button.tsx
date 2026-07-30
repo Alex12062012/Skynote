@@ -10,7 +10,19 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', loading, disabled, children, ...props }, ref) => {
-    const base = 'inline-flex items-center justify-center gap-2 rounded-input font-body font-semibold transition-all duration-200 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:focus-visible:ring-brand-dark dark:focus-visible:ring-offset-night-bg'
+    // Un bouton est actionné des dizaines de fois par session : le mouvement
+    // doit rester sous le seuil de perception, sinon l'interface semble lente.
+    // D'où 160ms (--dur-fast) et non 200ms+, et une transition limitée aux
+    // propriétés réellement animées : le raccourci « toutes propriétés »
+    // embarquait aussi la géométrie et déclenchait des recalculs de mise en
+    // page à chaque survol.
+    const base =
+      'inline-flex items-center justify-center gap-2 rounded-input font-body font-semibold ' +
+      'transition-[background-color,border-color,color,box-shadow,transform,opacity] ' +
+      '[transition-duration:var(--dur-fast)] [transition-timing-function:var(--ease-out)] ' +
+      'active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 ' +
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ' +
+      'dark:focus-visible:ring-brand-dark dark:focus-visible:ring-offset-night-bg'
     const variants = {
       // Aligné sur le CTA de la landing : bleu marque plein + texte blanc dans les deux modes
       primary: 'bg-brand text-white shadow-[0_8px_24px_-8px_rgba(37,99,235,0.7)] hover:bg-brand-hover hover:shadow-[0_14px_38px_-10px_rgba(37,99,235,0.9)] hover:-translate-y-0.5 dark:bg-brand dark:text-white dark:hover:bg-brand-hover',

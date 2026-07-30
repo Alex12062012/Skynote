@@ -85,9 +85,9 @@ export function PrestigeButton({
               disabled={!canAfford || pending}
               onClick={() => setConfirming(true)}
               className={cn(
-                'mt-4 inline-flex items-center gap-2 rounded-pill px-5 py-2 font-display text-[14px] font-bold transition-all',
+                'mt-4 inline-flex items-center gap-2 rounded-pill px-5 py-2 font-display text-[14px] font-bold transition-[background-color,border-color,color,box-shadow,transform,opacity]',
                 canAfford
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-btn hover:scale-[1.02] active:scale-95'
+                  ? 'bg-gradient-to-r from-violet-600 to-indigo-700 text-white shadow-btn hover:scale-[1.02] active:scale-95'
                   : 'cursor-not-allowed bg-sky-cloud text-text-tertiary dark:bg-night-border dark:text-text-dark-tertiary',
               )}
             >
@@ -101,7 +101,7 @@ export function PrestigeButton({
               <button
                 disabled={pending}
                 onClick={handlePrestige}
-                className="flex-1 rounded-pill bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 font-display text-[13px] font-bold text-white shadow-btn disabled:opacity-50"
+                className="flex-1 rounded-pill bg-gradient-to-r from-violet-600 to-indigo-700 px-4 py-2 font-display text-[13px] font-bold text-white shadow-btn disabled:opacity-50"
               >
                 {pending ? 'Ascension…' : `OK, dépenser ${nextCost} coins`}
               </button>

@@ -1,9 +1,11 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { BookOpen, Zap, Flame } from 'lucide-react'
 import { SkyCoin } from '@/components/ui/SkyCoin'
 import { useI18n } from '@/lib/i18n/context'
 import { cn } from '@/lib/utils'
+import { fadeUp, stagger, SPRING } from '@/lib/motion'
 
 interface StatsBarProps { coursesCount: number; qcmCount: number; streak: number; coins: number }
 
@@ -48,15 +50,22 @@ export function StatsBar({ coursesCount, qcmCount, streak, coins }: StatsBarProp
   ]
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-      {stats.map((s, i) => (
-        <div
+    <motion.div
+      className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+      variants={stagger()}
+      initial="hidden"
+      animate="show"
+    >
+      {stats.map((s) => (
+        <motion.div
           key={s.label}
+          variants={fadeUp}
+          whileHover={{ y: -3 }}
+          transition={SPRING.press}
           className={cn(
-            'lglass-liquid flex items-center gap-3 rounded-card p-4 animate-card-enter',
+            'lglass-liquid flex items-center gap-3 rounded-card p-4',
             s.highlight && 'ring-1 ring-orange-400/50',
           )}
-          style={{ animationDelay: `${i * 60}ms` }}
         >
           {s.icon}
           <div>
@@ -72,8 +81,8 @@ export function StatsBar({ coursesCount, qcmCount, streak, coins }: StatsBarProp
               {s.label}
             </p>
           </div>
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   )
 }

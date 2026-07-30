@@ -43,7 +43,7 @@ function MiniChart({ data, color, height = 40 }: { data: TimeSeries[]; color: st
   return (
     <div className="flex items-end gap-0.5" style={{ height }}>
       {data.map((d, i) => (
-        <div key={i} className="flex-1 rounded-sm transition-all"
+        <div key={i} className="flex-1 rounded-sm transition-[background-color,border-color,color,box-shadow,transform,opacity]"
           style={{ height: `${Math.max((d.count / max) * 100, d.count > 0 ? 8 : 2)}%`, background: color, opacity: d.count > 0 ? 0.9 : 0.15 }} />
       ))}
     </div>
@@ -65,7 +65,7 @@ function BigChart({ data, color, label, period }: { data: TimeSeries[]; color: s
           <div key={i} className="flex flex-1 flex-col items-center gap-1 group">
             <div className="relative w-full">
               {d.count > 0 && <div className="absolute -top-6 left-1/2 -translate-x-1/2 hidden group-hover:block bg-slate-700 text-white text-[10px] rounded px-1.5 py-0.5 whitespace-nowrap z-10">{d.count}</div>}
-              <div className="w-full rounded-t transition-all" style={{ height: `${Math.max((d.count / max) * 160, d.count > 0 ? 6 : 2)}px`, background: color, opacity: d.count > 0 ? 1 : 0.15 }} />
+              <div className="w-full rounded-t transition-[width,height,background-color,opacity,transform]" style={{ height: `${Math.max((d.count / max) * 160, d.count > 0 ? 6 : 2)}px`, background: color, opacity: d.count > 0 ? 1 : 0.15 }} />
             </div>
           </div>
         ))}
@@ -490,7 +490,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                           if (card.modal) setStatModal(card.modal as StatModal)
                           if (card.key) setActiveChart(activeChart === card.key ? null : card.key)
                         }}
-                        className={`rounded-xl border p-4 transition-all cursor-pointer hover:border-slate-600 ${isActive ? 'border-blue-500 bg-slate-800' : 'border-slate-800 bg-slate-900'}`}>
+                        className={`rounded-xl border p-4 transition-[background-color,border-color,color,box-shadow,transform,opacity] cursor-pointer hover:border-slate-600 ${isActive ? 'border-blue-500 bg-slate-800' : 'border-slate-800 bg-slate-900'}`}>
                         <div className="flex items-center justify-between mb-2">
                           <div style={{ color: card.color }}>{card.icon}</div>
                           <ChevronUp className={`h-3.5 w-3.5 text-slate-500 transition-transform ${isActive ? 'rotate-180' : ''}`} />
@@ -698,7 +698,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                         <button
                           onClick={() => toggleFeatured(f.id, !!f.featured)}
                           disabled={isMaxed}
-                          className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-all ${
+                          className={`mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border-2 transition-[background-color,border-color,color,box-shadow,transform,opacity] ${
                             f.featured
                               ? 'border-emerald-500 bg-emerald-600'
                               : isMaxed
@@ -734,7 +734,7 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             <div className="rounded-xl border border-slate-800 bg-slate-900 p-6">
               <div className="flex items-center justify-between">
                 <div><h3 className="font-semibold text-[15px] text-white">Mode Bêta Testing</h3><p className="flex items-center gap-1.5 text-[13px] text-slate-400 mt-1"><Circle className={`h-2.5 w-2.5 ${betaEnabled ? 'fill-green-500 text-green-500' : 'fill-red-500 text-red-500'}`} /> {betaEnabled ? 'Activé' : 'Désactivé'}</p></div>
-                <button onClick={toggleBeta} disabled={betaLoading} className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-all duration-200 ${betaEnabled ? "border-blue-500 bg-blue-600" : "border-slate-600 bg-transparent"}`}>
+                <button onClick={toggleBeta} disabled={betaLoading} className={`flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-200 ${betaEnabled ? "border-blue-500 bg-blue-600" : "border-slate-600 bg-transparent"}`}>
                   {betaEnabled && <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                 </button>
               </div>

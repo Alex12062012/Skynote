@@ -99,7 +99,7 @@ function NavbarInner({
           {profile && (
             <Link href="/profile"
               className={cn(
-                'hidden flex-shrink-0 items-center justify-center rounded-full transition-all hover:scale-105 md:flex',
+                'hidden flex-shrink-0 items-center justify-center rounded-full transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:scale-105 md:flex',
                 pathname.startsWith('/profile') && 'ring-2 ring-brand/30 ring-offset-2 ring-offset-sky-surface dark:ring-offset-night-surface rounded-full',
               )}>
               <PlayerEmblem

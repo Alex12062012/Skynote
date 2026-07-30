@@ -52,7 +52,7 @@ export function PublicCourseViewer({ flashcards, courseId, isLoggedIn = false, i
       <div className="flex gap-2 overflow-x-auto pb-1">
         {flashcards.map((f, i) => (
           <button key={f.id} onClick={() => setIndex(i)}
-            className={cn('flex-shrink-0 rounded-input px-3 py-1.5 font-body text-[12px] font-medium transition-all',
+            className={cn('flex-shrink-0 rounded-input px-3 py-1.5 font-body text-[12px] font-medium transition-[background-color,border-color,color,box-shadow,transform,opacity]',
               i === index ? 'bg-brand text-white dark:bg-brand-dark dark:text-night-bg'
                 : 'bg-sky-cloud text-text-secondary dark:bg-night-border dark:text-text-dark-secondary')}>
             {i + 1}

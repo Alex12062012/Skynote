@@ -124,7 +124,7 @@ export function QcmGenerator({ courseId, flashcards }: QcmGeneratorProps) {
 
       <div className="h-2 w-full overflow-hidden rounded-pill bg-sky-cloud dark:bg-night-border">
         <div
-          className="h-full rounded-pill bg-brand transition-all duration-500 dark:bg-brand-dark"
+          className="h-full rounded-pill bg-brand transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-500 dark:bg-brand-dark"
           style={{ width: `${percent}%` }}
         />
       </div>

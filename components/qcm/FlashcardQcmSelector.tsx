@@ -17,7 +17,7 @@ export function FlashcardQcmSelector({ flashcards, selectedId, onSelect }: Flash
           const isSelected = selectedId === f.id
           return (
             <button key={f.id} onClick={() => onSelect(f.id)}
-              className={cn('flex items-center gap-3 rounded-card-sm border-[1.5px] px-4 py-3 text-left transition-all duration-150',
+              className={cn('flex items-center gap-3 rounded-card-sm border-[1.5px] px-4 py-3 text-left transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-150',
                 isSelected ? 'border-brand bg-brand-soft dark:border-brand-dark dark:bg-brand-dark-soft'
                   : 'border-sky-border bg-sky-surface hover:border-brand/40 dark:border-night-border dark:bg-night-surface dark:hover:border-brand-dark/40')}>
               <span className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full font-body text-[13px] font-bold',

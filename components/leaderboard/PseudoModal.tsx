@@ -84,7 +84,7 @@ export function PseudoModal({ userId }: { userId: string }) {
           <button
             type="submit"
             disabled={loading || pseudo.trim().length === 0}
-            className="h-11 w-full rounded-input bg-brand font-body text-[14px] font-semibold text-white transition-all hover:bg-brand-hover disabled:opacity-50 dark:bg-brand-dark dark:text-night-bg dark:hover:bg-brand-dark-hover"
+            className="h-11 w-full rounded-input bg-brand font-body text-[14px] font-semibold text-white transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:bg-brand-hover disabled:opacity-50 dark:bg-brand-dark dark:text-night-bg dark:hover:bg-brand-dark-hover"
           >            {loading ? 'Validation...' : 'Valider mon pseudo'}
           </button>
         </form>

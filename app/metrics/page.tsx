@@ -48,7 +48,7 @@ function MiniBar({ data, color }: { data: { date: string; count: number }[]; col
   return (
     <div className="flex items-end gap-0.5 h-16 w-full">
       {data.map((d, i) => (
-        <div key={i} className="flex-1 rounded-t transition-all"
+        <div key={i} className="flex-1 rounded-t transition-[background-color,border-color,color,box-shadow,transform,opacity]"
           style={{ height: `${Math.max((d.count / max) * 100, d.count > 0 ? 8 : 2)}%`, background: color, opacity: d.count > 0 ? 1 : 0.15 }} />
       ))}
     </div>

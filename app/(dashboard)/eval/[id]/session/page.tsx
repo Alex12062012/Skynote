@@ -6,7 +6,9 @@ import { getTodayCards } from '@/lib/supabase/eval-actions'
 import { submitReview } from '@/lib/supabase/review-actions'
 import { triggerErrorAnalysis } from '@/lib/supabase/error-analysis-actions'
 import { createClient } from '@/lib/supabase/client'
+import { motion } from 'framer-motion'
 import { GRADE_COINS } from '@/lib/sm2'
+import { fadeUp, stagger, SPRING } from '@/lib/motion'
 import type { SM2Grade } from '@/lib/sm2'
 import type { ErrorAnalysis } from '@/lib/supabase/error-analysis-actions'
 import { CheckCircle, Coins, RotateCcw, ChevronRight, Lightbulb, AlertCircle, BookOpen, Zap, Crown } from 'lucide-react'
@@ -140,7 +142,7 @@ export default function EvalSessionPage() {
     <div className="flex min-h-screen flex-col bg-sky-bg dark:bg-night-bg">
       {/* Progress */}
       <div className="h-1 w-full bg-white/5">
-        <div className="h-full bg-brand transition-all duration-300" style={{ width: `${progress}%` }} />
+        <div className="h-full bg-brand transition-[width,height,background-color,opacity,transform] duration-300" style={{ width: `${progress}%` }} />
       </div>
 
       {/* Header */}
@@ -198,11 +200,22 @@ export default function EvalSessionPage() {
           </div>
         </div>
 
+        {/* Les boutons de notation apparaissent au retournement de la carte :
+            ils n'existaient pas avant, donc ils entrent au lieu de surgir.
+            Purpose : éviter un changement brutal. */}
         {flipped && (
-          <div className="mt-8 grid w-full max-w-lg grid-cols-2 gap-3 sm:grid-cols-4">
+          <motion.div
+            className="mt-8 grid w-full max-w-lg grid-cols-2 gap-3 sm:grid-cols-4"
+            variants={stagger(0.04)}
+            initial="hidden"
+            animate="show"
+          >
             {GRADE_BUTTONS.map(({ grade, label, color }) => (
-              <button
+              <motion.button
                 key={grade}
+                variants={fadeUp}
+                whileTap={isPending ? undefined : { scale: 0.95 }}
+                transition={SPRING.press}
                 onClick={() => handleGrade(grade)}
                 disabled={isPending}
                 className={`h-12 rounded-input border text-sm font-semibold transition disabled:opacity-50 ${color}`}
@@ -211,9 +224,9 @@ export default function EvalSessionPage() {
                 {GRADE_COINS[grade] > 0 && (
                   <span className="ml-1 text-xs opacity-60">+{GRADE_COINS[grade]}</span>
                 )}
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
         )}
 
         {/* Panneau analyse d'erreur */}

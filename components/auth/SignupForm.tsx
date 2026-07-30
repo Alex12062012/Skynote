@@ -139,7 +139,7 @@ export function SignupForm({ sharedCourseId, ficheIndex }: SignupFormProps = {})
               </label>
               <select value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)}
                 className={cn(
-                  'h-11 w-full appearance-none rounded-input border border-sky-border bg-sky-surface px-4 font-body text-[14px] text-text-main transition-all',
+                  'h-11 w-full appearance-none rounded-input border border-sky-border bg-sky-surface px-4 font-body text-[14px] text-text-main transition-[background-color,border-color,color,box-shadow,transform,opacity]',
                   'focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15',
                   'dark:border-night-border dark:bg-night-surface dark:text-text-dark-main dark:focus:border-brand-dark',
                   !gradeLevel && 'text-text-tertiary dark:text-text-dark-tertiary'

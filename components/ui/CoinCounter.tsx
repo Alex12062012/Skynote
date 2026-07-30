@@ -81,7 +81,7 @@ export function CoinCounter({ initialCoins, userId }: CoinCounterProps) {
     >
       <SkyCoin size={18} />
       <span
-        className="font-display text-[14px] font-bold tabular-nums text-text-main dark:text-text-dark-main transition-all duration-300"
+        className="font-display text-[14px] font-bold tabular-nums text-text-main dark:text-text-dark-main transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-300"
         style={{ minWidth: 24 }}
         title={`${coins.toLocaleString('fr-FR')} Sky Coins`}
       >

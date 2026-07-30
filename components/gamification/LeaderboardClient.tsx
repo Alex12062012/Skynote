@@ -2,7 +2,9 @@
 
 import { useState, useTransition } from 'react'
 import { Coins } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { fadeUp, stagger } from '@/lib/motion'
 import { PlayerCard } from './PlayerCard'
 import { getLeaderboard, type LeaderboardRow } from '@/lib/supabase/gamification-actions'
 import type { LeaderboardMode } from '@/lib/gamification/config'
@@ -54,7 +56,7 @@ export function LeaderboardClient({
             key={tab.key}
             onClick={() => switchMode(tab.key)}
             className={cn(
-              'flex flex-1 flex-col items-center justify-center gap-0.5 rounded-input py-2.5 font-body transition-all',
+              'flex flex-1 flex-col items-center justify-center gap-0.5 rounded-input py-2.5 font-body transition-[background-color,border-color,color,box-shadow,transform,opacity]',
               mode === tab.key
                 ? 'bg-sky-surface text-brand shadow-card dark:bg-night-surface dark:text-brand-dark'
                 : 'text-text-secondary hover:text-text-main dark:text-text-dark-secondary dark:hover:text-text-dark-main',
@@ -79,13 +81,23 @@ export function LeaderboardClient({
       </p>
 
       {/* Liste */}
-      <div className={cn('space-y-2 transition-opacity', pending && 'opacity-60')}>
+      {/* La cascade est rejouee a chaque changement d'onglet (cle = mode) :
+          le classement est un contenu different, pas le meme reordonne.
+          Pas 45ms ici mais 25 : jusqu'a 100 lignes, un pas standard rendrait
+          la fin de liste plus lente que patiente. */}
+      <motion.div
+        key={mode}
+        className={cn('space-y-2 transition-opacity', pending && 'opacity-60')}
+        variants={stagger(0.025)}
+        initial="hidden"
+        animate="show"
+      >
         {rows.length === 0 && (
           <p className="py-12 text-center font-body text-text-tertiary">{t('leaderboard.noOne')}</p>
         )}
         {rows.map((r, i) => (
+          <motion.div key={r.id} variants={fadeUp}>
           <PlayerCard
-            key={r.id}
             rank={i + 1}
             player={{
               id: r.id,
@@ -102,8 +114,9 @@ export function LeaderboardClient({
             isMe={r.id === currentUserId}
             href={r.pseudo ? `/profil/${encodeURIComponent(r.pseudo)}` : undefined}
           />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Ma position si hors top */}
       {me && !rows.some(r => r.id === me.id) && (

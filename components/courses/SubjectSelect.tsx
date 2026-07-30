@@ -23,7 +23,7 @@ export function SubjectSelect({ value, onChange, error }: SubjectSelectProps) {
     <div className="flex flex-col gap-1.5">
       <label className="font-body text-[13px] font-medium text-text-main dark:text-text-dark-main">{t('newCourse.subject')}</label>
       <select value={value} onChange={(e) => onChange(e.target.value)}
-        className={cn('h-11 w-full appearance-none rounded-input border border-sky-border bg-sky-surface px-4 font-body text-[14px] text-text-main transition-all',
+        className={cn('h-11 w-full appearance-none rounded-input border border-sky-border bg-sky-surface px-4 font-body text-[14px] text-text-main transition-[background-color,border-color,color,box-shadow,transform,opacity]',
           'focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15',
           'dark:border-night-border dark:bg-night-surface dark:text-text-dark-main dark:focus:border-brand-dark',
           !value && 'text-text-tertiary dark:text-text-dark-tertiary', error && 'border-error')}>

@@ -52,7 +52,7 @@ export function BrevetProcessingLoader({ debugLine }: { debugLine?: string }) {
       <div className="w-full max-w-xs space-y-2">
         <div className="h-2 w-full overflow-hidden rounded-pill bg-sky-cloud dark:bg-night-border">
           <div
-            className="relative h-full rounded-pill transition-all duration-700 ease-out overflow-hidden"
+            className="relative h-full rounded-pill transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-700 ease-out overflow-hidden"
             style={{ width: `${barProgress}%`, background: 'linear-gradient(90deg, #2563EB, #60A5FA)' }}
           >
             <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/30 to-transparent bg-[length:200%_100%]" />

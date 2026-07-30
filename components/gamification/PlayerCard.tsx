@@ -43,8 +43,14 @@ export function PlayerCard({ rank, player, isMe, href }: PlayerCardProps) {
   const inner = (
     <div
       className={cn(
-        'group relative overflow-hidden flex items-center gap-4 rounded-card border px-4 py-3 transition-all',
-        'hover:-translate-y-0.5 hover:shadow-card-hover',
+        // Une ligne de classement est survolée des dizaines de fois pendant
+        // qu'on parcourt la liste : la réaction doit rester sous le seuil de
+        // perception. D'où --dur-fast et une transition ciblée, qui exclut la
+        // géométrie et évite de recalculer la mise en page à chaque survol.
+        'group relative overflow-hidden flex items-center gap-4 rounded-card border px-4 py-3',
+        'transition-[transform,border-color,box-shadow,background-color]',
+        '[transition-duration:var(--dur-fast)] [transition-timing-function:var(--ease-out)]',
+        'hover:-translate-y-0.5 hover:shadow-card-hover active:translate-y-0',
         skin
           ? skin.cardClass
           : isMe

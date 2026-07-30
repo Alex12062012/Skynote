@@ -93,7 +93,7 @@ export function OtpForm({ email, onBack, sharedCourseId, ficheIndex }: OtpFormPr
             value={d}
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
-            className="h-14 w-11 rounded-input border-2 border-sky-border bg-sky-surface text-center font-display text-[22px] font-bold text-text-main transition-all focus:border-brand focus:outline-none dark:border-night-border dark:bg-night-surface dark:text-text-dark-main dark:focus:border-brand-dark"
+            className="h-14 w-11 rounded-input border-2 border-sky-border bg-sky-surface text-center font-display text-[22px] font-bold text-text-main transition-[background-color,border-color,color,box-shadow,transform,opacity] focus:border-brand focus:outline-none dark:border-night-border dark:bg-night-surface dark:text-text-dark-main dark:focus:border-brand-dark"
             autoFocus={i === 0}
           />
         ))}

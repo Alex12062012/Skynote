@@ -78,7 +78,7 @@ export default async function DashboardPage() {
       {/* Mini-Épreuve Brevet — bannière pleine largeur, look landing */}
       <Reveal i={2} inView={false} className="relative">
         <Link href="/brevet"
-          className="group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-card border border-brand-dark/30 bg-gradient-to-br from-brand/25 via-night-surface to-night-surface px-5 py-4 transition-all hover:-translate-y-0.5 hover:border-brand-dark/50 hover:shadow-[0_18px_50px_-30px_rgba(37,99,235,0.8)]">
+          className="group relative flex w-full items-center justify-between gap-4 overflow-hidden rounded-card border border-brand-dark/30 bg-gradient-to-br from-brand/25 via-night-surface to-night-surface px-5 py-4 transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:-translate-y-0.5 hover:border-brand-dark/50 hover:shadow-[0_18px_50px_-30px_rgba(37,99,235,0.8)]">
           <span className="cta-sheen" />
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-input bg-brand text-white shadow-[0_6px_18px_-6px_rgba(37,99,235,0.8)]">

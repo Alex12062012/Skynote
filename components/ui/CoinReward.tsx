@@ -61,6 +61,9 @@ function playRewardChord() {
 }
 
 function playCoinTick() {
+  // Le mouvement réduit traduit aussi une demande de sobriété sensorielle :
+  // on coupe le son en même temps que l'animation.
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
   try {
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext
     if (!AudioCtx) return
@@ -298,6 +301,9 @@ export function CoinReward({
   }
 
   function playCoinTick() {
+    // Le mouvement reduit traduit aussi une demande de sobriete
+    // sensorielle : on coupe le son avec l'animation.
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
     try {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)()
       const osc = ctx.createOscillator()
@@ -363,8 +369,8 @@ export function CoinReward({
             transform: 'translate(-50%, -50%)',
             zIndex: 10000,
             animation: flyPhase
-              ? `sk-coin-fly 0.68s cubic-bezier(0.4,0,0.2,1) ${p.delay}ms forwards`
-              : `sk-coin-spawn 0.26s cubic-bezier(0.34,1.56,0.64,1) ${p.delay}ms both`,
+              ? `sk-coin-fly 0.68s var(--ease-in-out) ${p.delay}ms forwards`
+              : `sk-coin-spawn 0.26s var(--ease-overshoot) ${p.delay}ms both`,
             ['--rot' as string]: `${p.rotation}deg`,
             ['--cp-x' as string]: `${p.cpOffX}px`,
             ['--cp-y' as string]: `${p.cpOffY}px`,

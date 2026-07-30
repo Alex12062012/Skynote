@@ -2,7 +2,9 @@
 
 import { useState, useTransition, type ElementType } from 'react'
 import { Lock, ShoppingBag, Palette, Award, Zap, Gift, Sparkles, Brain, Star, Rocket, Crown, Gem, Flame, Check, Frame, Eye } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { SPRING, EASE, DUR } from '@/lib/motion'
 import { SkyCoin } from '@/components/ui/SkyCoin'
 import {
   BADGES, CONSUMABLES, TITLES, SKINS, SKIN_ID_ALIASES, prestigeCost,
@@ -234,7 +236,7 @@ export function BoutiqueClientV2({
           ] as { key: ShopTab; icon: ElementType; label: string }[]).map(({ key, icon: Icon, label }) => (
             <button key={key} onClick={() => setTab(key)}
               className={cn(
-                'flex flex-1 items-center justify-center gap-2 rounded-input py-2 font-body text-[13px] font-medium transition-all',
+                'flex flex-1 items-center justify-center gap-2 rounded-input py-2 font-body text-[13px] font-medium transition-[background-color,border-color,color,box-shadow,transform,opacity]',
                 tab === key
                   ? 'bg-sky-surface text-brand shadow-card dark:bg-night-surface dark:text-brand-dark'
                   : 'text-text-secondary hover:text-text-main dark:text-text-dark-secondary dark:hover:text-text-dark-main',
@@ -391,7 +393,9 @@ export function BoutiqueClientV2({
                       </div>
                       <div className="ml-3 flex flex-shrink-0 items-center gap-2">
                         {owned ? (
-                          <button
+                          <motion.button
+                            whileTap={pending ? undefined : { scale: 0.94 }}
+                            transition={SPRING.press}
                             onClick={() => handleEquip('title', equipped ? null : title.id)}
                             disabled={pending}
                             className={cn(
@@ -400,9 +404,11 @@ export function BoutiqueClientV2({
                             )}
                           >
                             {equipped ? t('boutique.equipped') : t('boutique.equip')}
-                          </button>
+                          </motion.button>
                         ) : buyable ? (
-                          <button
+                          <motion.button
+                            whileTap={coins >= (title.price ?? 0) && !pending ? { scale: 0.92 } : undefined}
+                            transition={SPRING.press}
                             onClick={() => handleBuy('title', title.id, title.price!)}
                             disabled={coins < (title.price ?? 0) || pending}
                             className={cn(
@@ -413,7 +419,7 @@ export function BoutiqueClientV2({
                             )}
                           >
                             <SkyCoin size={10} /> {title.price}
-                          </button>
+                          </motion.button>
                         ) : (
                           <Lock className="h-4 w-4 text-text-tertiary" />
                         )}
@@ -431,9 +437,12 @@ export function BoutiqueClientV2({
                           </span>
                         </div>
                         <div className="h-1.5 w-full overflow-hidden rounded-full bg-sky-cloud dark:bg-night-border">
-                          <div
-                            className="h-full rounded-full bg-brand transition-all duration-500 dark:bg-brand-dark"
-                            style={{ width: `${pct}%` }}
+                          <motion.div
+                            className="h-full rounded-full bg-brand dark:bg-brand-dark"
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${pct}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: DUR.deliberate, ease: EASE.out }}
                           />
                         </div>
                       </div>

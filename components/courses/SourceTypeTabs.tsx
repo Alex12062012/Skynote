@@ -26,7 +26,7 @@ export function SourceTypeTabs({ value, onChange, vocalEnabled = true }: SourceT
       <div className="flex gap-2">
         {tabs.map((tab) => (
           <button key={tab.id} type="button" onClick={() => onChange(tab.id)}
-            className={cn('flex flex-1 flex-col items-center gap-1 rounded-input border px-2 py-3 font-body text-[13px] font-medium transition-all',
+            className={cn('flex flex-1 flex-col items-center gap-1 rounded-input border px-2 py-3 font-body text-[13px] font-medium transition-[background-color,border-color,color,box-shadow,transform,opacity]',
               value === tab.id ? 'border-brand bg-brand-soft text-brand dark:border-brand-dark dark:bg-brand-dark-soft dark:text-brand-dark'
                 : 'border-sky-border bg-sky-surface text-text-secondary hover:border-brand/40 dark:border-night-border dark:bg-night-surface dark:text-text-dark-secondary')}>
             <span className="text-lg">{tab.icon}</span>

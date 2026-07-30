@@ -104,7 +104,7 @@ export default async function ObjectivesPage() {
 
             return (
               <div key={obj.id} className={cn(
-                'flex items-center gap-4 rounded-card border p-5 transition-all',
+                'flex items-center gap-4 rounded-card border p-5 transition-[background-color,border-color,color,box-shadow,transform,opacity]',
                 canClaim
                   ? 'border-brand/30 bg-brand-soft dark:border-brand-dark/30 dark:bg-brand-dark-soft'
                   : completed && claimed

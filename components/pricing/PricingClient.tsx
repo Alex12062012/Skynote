@@ -173,7 +173,7 @@ export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, i
             <div className="inline-flex items-center gap-1 rounded-pill border border-sky-border bg-sky-surface p-1 dark:border-night-border dark:bg-night-surface">
               {(['monthly', 'yearly'] as Billing[]).map((b) => (
                 <button key={b} onClick={() => setBilling(b)}
-                  className={cn('flex items-center gap-2 rounded-pill px-4 py-2 font-body text-[14px] font-medium transition-all',
+                  className={cn('flex items-center gap-2 rounded-pill px-4 py-2 font-body text-[14px] font-medium transition-[background-color,border-color,color,box-shadow,transform,opacity]',
                     billing === b
                       ? 'bg-brand text-white dark:bg-brand-dark dark:text-night-bg'
                       : 'text-text-secondary dark:text-text-dark-secondary'
@@ -276,7 +276,7 @@ export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, i
                   ) : (
                     <button onClick={() => handleCheckout(plan.id)} disabled={isLoading}
                       className={cn(
-                        'flex items-center justify-center h-11 w-full rounded-input font-body text-[14px] font-semibold transition-all disabled:opacity-60',
+                        'flex items-center justify-center h-11 w-full rounded-input font-body text-[14px] font-semibold transition-[background-color,border-color,color,box-shadow,transform,opacity] disabled:opacity-60',
                         plan.id === 'starter'
                           ? 'bg-brand text-white hover:bg-brand-hover dark:bg-brand-dark dark:text-night-bg'
                           : 'bg-violet-500 text-white hover:bg-violet-600'

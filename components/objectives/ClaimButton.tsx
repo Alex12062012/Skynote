@@ -75,7 +75,7 @@ export function ClaimButton({ objectiveId, rewardCoins, objectiveTitle, objectiv
         ref={btnRef}
         onClick={handleClaim}
         disabled={isPending}
-        className="inline-flex items-center gap-1.5 rounded-pill border border-brand/30 bg-brand-soft px-3 py-1.5 font-body text-[12px] font-semibold text-brand transition-all hover:bg-brand hover:text-white disabled:opacity-60 dark:border-brand-dark/30 dark:bg-brand-dark-soft dark:text-brand-dark dark:hover:bg-brand-dark dark:hover:text-night-bg"
+        className="inline-flex items-center gap-1.5 rounded-pill border border-brand/30 bg-brand-soft px-3 py-1.5 font-body text-[12px] font-semibold text-brand transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:bg-brand hover:text-white disabled:opacity-60 dark:border-brand-dark/30 dark:bg-brand-dark-soft dark:text-brand-dark dark:hover:bg-brand-dark dark:hover:text-night-bg"
       >
         <SkyCoin size={14} />
         {isPending ? 'En cours...' : `Récupérer +${rewardCoins}`}

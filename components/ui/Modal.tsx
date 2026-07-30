@@ -21,7 +21,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
       <div className={cn('relative z-10 w-full max-w-md rounded-card-login bg-sky-surface p-6 shadow-2xl dark:bg-night-surface animate-slide-in', className)}>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-display text-h4 text-text-main dark:text-text-dark-main">{title}</h2>
-          <button onClick={onClose} className="rounded-input p-1.5 text-text-tertiary hover:bg-sky-cloud hover:text-text-main dark:hover:bg-night-border dark:hover:text-text-dark-main transition-colors">
+          <button onClick={onClose} aria-label="Fermer" className="rounded-input p-1.5 text-text-tertiary hover:bg-sky-cloud hover:text-text-main dark:hover:bg-night-border dark:hover:text-text-dark-main transition-colors">
             <X className="h-4 w-4" />
           </button>
         </div>

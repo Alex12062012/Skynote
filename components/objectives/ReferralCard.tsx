@@ -69,7 +69,7 @@ export function ReferralCard({ userId, initialCode, referralsCount }: ReferralCa
             </div>
             <button
               onClick={handleCopy}
-              className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-input border border-sky-border bg-sky-surface transition-all hover:border-brand/40 hover:bg-brand-soft dark:border-night-border dark:bg-night-surface dark:hover:border-brand-dark/40 dark:hover:bg-brand-dark-soft"
+              className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-input border border-sky-border bg-sky-surface transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:border-brand/40 hover:bg-brand-soft dark:border-night-border dark:bg-night-surface dark:hover:border-brand-dark/40 dark:hover:bg-brand-dark-soft"
               title="Copier le message"
             >
               {copied

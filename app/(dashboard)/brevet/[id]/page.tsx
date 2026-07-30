@@ -4,8 +4,10 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import {
   ChevronLeft, ChevronRight, Send, Lock, Loader2, Star,
-  FileText, X, CheckCircle,
+  FileText, X, CheckCircle, CheckCircle2, Trophy, ThumbsUp, BookOpen,
+  ClipboardList,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { AiEstimateDisclaimer } from '@/components/brevet/AiEstimateDisclaimer'
@@ -58,12 +60,19 @@ interface SessionData {
 
 // ─── Mentions ─────────────────────────────────────────────────────────────────
 
-const MENTION_LABELS: Record<string, { label: string; emoji: string; color: string; bg: string }> = {
-  tres_bien:   { label: 'Très Bien',   emoji: '🏆', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
-  bien:        { label: 'Bien',         emoji: '⭐', color: 'text-sky-400',     bg: 'bg-sky-500/10 border-sky-500/20' },
-  assez_bien:  { label: 'Assez Bien',   emoji: '👍', color: 'text-blue-400',   bg: 'bg-blue-500/10 border-blue-500/20' },
-  passable:    { label: 'Passable',     emoji: '📝', color: 'text-amber-400',  bg: 'bg-amber-500/10 border-amber-500/20' },
-  insuffisant: { label: 'Insuffisant',  emoji: '📚', color: 'text-red-400',    bg: 'bg-red-500/10 border-red-500/20' },
+// Icônes vectorielles plutôt qu'emojis : la mention est une information
+// structurelle, affichée en très grand. Un emoji change complètement de
+// dessin entre Windows, iOS et Android, et ne peut pas prendre la couleur
+// du token de la mention — l'icône, si.
+const MENTION_LABELS: Record<
+  string,
+  { label: string; Icon: LucideIcon; color: string; bg: string }
+> = {
+  tres_bien:   { label: 'Très Bien',   Icon: Trophy,      color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+  bien:        { label: 'Bien',        Icon: Star,        color: 'text-sky-400',     bg: 'bg-sky-500/10 border-sky-500/20' },
+  assez_bien:  { label: 'Assez Bien',  Icon: ThumbsUp,    color: 'text-blue-400',    bg: 'bg-blue-500/10 border-blue-500/20' },
+  passable:    { label: 'Passable',    Icon: CheckCircle2, color: 'text-amber-400',  bg: 'bg-amber-500/10 border-amber-500/20' },
+  insuffisant: { label: 'Insuffisant', Icon: BookOpen,    color: 'text-red-400',     bg: 'bg-red-500/10 border-red-500/20' },
 }
 
 const HG_MATIERES = new Set(['Histoire-Géographie', 'EMC'])
@@ -342,10 +351,10 @@ export default function BrevetSessionPage() {
     if (result.locked) {
       // Score fictif dérivé de l'id de session — cohérent entre rechargements
       const FAKE_SCORES = [
-        { note: '14/20', mention: 'Assez Bien', emoji: '👍', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
-        { note: '15/20', mention: 'Bien',        emoji: '⭐', color: 'text-sky-400',  bg: 'bg-sky-500/10 border-sky-500/20' },
-        { note: '16/20', mention: 'Bien',        emoji: '⭐', color: 'text-sky-400',  bg: 'bg-sky-500/10 border-sky-500/20' },
-        { note: '17/20', mention: 'Très Bien',   emoji: '🏆', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+        { note: '14/20', mention: 'Assez Bien', Icon: ThumbsUp, color: 'text-blue-400',    bg: 'bg-blue-500/10 border-blue-500/20' },
+        { note: '15/20', mention: 'Bien',       Icon: Star,     color: 'text-sky-400',     bg: 'bg-sky-500/10 border-sky-500/20' },
+        { note: '16/20', mention: 'Bien',       Icon: Star,     color: 'text-sky-400',     bg: 'bg-sky-500/10 border-sky-500/20' },
+        { note: '17/20', mention: 'Très Bien',  Icon: Trophy,   color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
       ]
       const fakeIdx = id.charCodeAt(id.length - 1) % FAKE_SCORES.length
       const fake = FAKE_SCORES[fakeIdx]
@@ -359,7 +368,11 @@ export default function BrevetSessionPage() {
 
               {/* Score card — structure identique à la page payante */}
               <div className={`rounded-card border p-6 text-center ${fake.bg}`}>
-                <p className="mb-2 text-5xl">{fake.emoji}</p>
+                <fake.Icon
+                  className={`mx-auto mb-3 h-14 w-14 ${fake.color}`}
+                  strokeWidth={1.6}
+                  aria-hidden
+                />
                 <h1 className="font-display text-h1 font-bold text-text-main dark:text-text-dark-main">
                   {fake.note}
                 </h1>
@@ -403,7 +416,16 @@ export default function BrevetSessionPage() {
     return (
       <div className="mx-auto max-w-xl animate-fade-in px-4 py-10">
         <div className={`rounded-card border p-6 text-center ${m?.bg ?? 'border-sky-border bg-sky-surface dark:border-night-border dark:bg-night-surface'}`}>
-          <p className="mb-2 text-5xl">{m?.emoji ?? '📋'}</p>
+          {(() => {
+            const Icon = m?.Icon ?? ClipboardList
+            return (
+              <Icon
+                className={`mx-auto mb-3 h-14 w-14 ${m?.color ?? 'text-text-tertiary'}`}
+                strokeWidth={1.6}
+                aria-hidden
+              />
+            )
+          })()}
           <h1 className="font-display text-h1 font-bold text-text-main dark:text-text-dark-main">
             {totalSur20 !== null ? `${totalSur20}/20` : `${result.score}%`}
           </h1>
@@ -518,7 +540,7 @@ export default function BrevetSessionPage() {
 
         <div className="mx-auto mt-2 max-w-6xl">
           <div className="h-1 w-full overflow-hidden rounded-full bg-sky-cloud dark:bg-night-border">
-            <div className="h-full rounded-full bg-brand transition-all dark:bg-brand-dark"
+            <div className="h-full rounded-full bg-brand transition-[background-color,border-color,color,box-shadow,transform,opacity] dark:bg-brand-dark"
               style={{ width: `${(totalAnswered / totalSlots) * 100}%` }} />
           </div>
         </div>

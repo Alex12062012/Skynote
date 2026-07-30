@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, CheckCircle, Circle, GraduationCap, Zap, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -10,6 +11,7 @@ import { SpeakButton } from '@/components/ui/SpeakButton'
 import { toggleFlashcardMastered } from '@/lib/supabase/course-actions'
 import { checkMasteryObjective } from '@/lib/supabase/objectives-actions'
 import { cn } from '@/lib/utils'
+import { EASE, DUR, exitDur } from '@/lib/motion'
 import { useI18n } from '@/lib/i18n/context'
 import type { Flashcard } from '@/types/database'
 
@@ -24,6 +26,17 @@ interface FlashcardViewerProps {
 export function FlashcardViewer({ flashcards, courseId, userId, qcmReady = false }: FlashcardViewerProps) {
   const { t } = useI18n()
   const [index, setIndex] = useState(0)
+  // Sens du dernier deplacement : +1 en avant, -1 en arriere. Sert a faire
+  // entrer la fiche du bon cote. Une navigation qui glisse toujours dans le
+  // meme sens perd le fil spatial : l'eleve ne sait plus s'il avance ou revient.
+  const [sens, setSens] = useState(1)
+
+  function allerA(cible: number) {
+    const borne = Math.max(0, Math.min(total - 1, cible))
+    if (borne === index) return
+    setSens(borne > index ? 1 : -1)
+    setIndex(borne)
+  }
   const [localCards, setLocalCards] = useState(flashcards)
   const [isPending, startTransition] = useTransition()
   const [showMasteryBadge, setShowMasteryBadge] = useState(false)
@@ -92,8 +105,8 @@ export function FlashcardViewer({ flashcards, courseId, userId, qcmReady = false
         {/* Miniatures */}
         <div className="flex gap-2 overflow-x-auto pb-1">
           {localCards.map((f, i) => (
-            <button key={f.id} onClick={() => setIndex(i)}
-              className={cn('flex-shrink-0 rounded-input px-3 py-1.5 font-body text-[12px] font-medium transition-all',
+            <button key={f.id} onClick={() => allerA(i)}
+              className={cn('flex-shrink-0 rounded-input px-3 py-1.5 font-body text-[12px] font-medium transition-[background-color,border-color,color,box-shadow,transform,opacity]',
                 i === index ? 'bg-brand text-white dark:bg-brand-dark dark:text-night-bg'
                   : f.is_mastered ? 'bg-success-soft text-success dark:bg-emerald-950/30 dark:text-success-dark'
                     : 'bg-sky-cloud text-text-secondary dark:bg-night-border dark:text-text-dark-secondary')}>
@@ -102,9 +115,24 @@ export function FlashcardViewer({ flashcards, courseId, userId, qcmReady = false
           ))}
         </div>
 
-        {/* Carte principale */}
-        <div key={card.id}
-          className="rounded-card border border-sky-border bg-sky-surface p-6 shadow-card dark:border-night-border dark:bg-night-surface dark:shadow-card-dark animate-fade-in">
+        {/* Carte principale — entre du cote vers lequel on navigue.
+            `mode="wait"` : la fiche sortante part avant que l'entrante
+            arrive, sinon deux fiches se superposent et le texte devient
+            illisible pendant la transition. La sortie est plus courte que
+            l'entree, sinon l'attente se voit. */}
+        <AnimatePresence mode="wait" custom={sens} initial={false}>
+        <motion.div key={card.id}
+          custom={sens}
+          variants={{
+            enter: (d: number) => ({ opacity: 0, x: d * 28 }),
+            center: { opacity: 1, x: 0 },
+            exit: (d: number) => ({ opacity: 0, x: d * -28 }),
+          }}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: DUR.base, ease: EASE.out }}
+          className="rounded-card border border-sky-border bg-sky-surface p-6 shadow-card dark:border-night-border dark:bg-night-surface dark:shadow-card-dark">
           <div className="mb-5 flex items-start justify-between gap-3">
             <div>
               <span className="font-body text-label-caps text-text-tertiary dark:text-text-dark-tertiary">
@@ -120,7 +148,7 @@ export function FlashcardViewer({ flashcards, courseId, userId, qcmReady = false
                 className="rounded-input px-2.5 py-1.5"
               />
               <button onClick={handleShare}
-                className="flex items-center gap-1.5 rounded-input border border-sky-border px-2.5 py-1.5 font-body text-[12px] text-text-secondary transition-all hover:border-brand hover:text-brand dark:border-night-border dark:text-text-dark-secondary dark:hover:border-brand-dark dark:hover:text-brand-dark"
+                className="flex items-center gap-1.5 rounded-input border border-sky-border px-2.5 py-1.5 font-body text-[12px] text-text-secondary transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:border-brand hover:text-brand dark:border-night-border dark:text-text-dark-secondary dark:hover:border-brand-dark dark:hover:text-brand-dark"
                 title="Partager le cours">
                 <Share2 className="h-3.5 w-3.5" />Partager
               </button>
@@ -151,11 +179,12 @@ export function FlashcardViewer({ flashcards, courseId, userId, qcmReady = false
               ))}
             </ul>
           </div>
-        </div>
+        </motion.div>
+        </AnimatePresence>
 
         {/* Navigation + bouton QCM contextuel */}
         <div className="flex items-center justify-between">
-          <Button variant="secondary" size="sm" onClick={() => setIndex(Math.max(0, index - 1))} disabled={index === 0} className="gap-1.5">
+          <Button variant="secondary" size="sm" onClick={() => allerA(index - 1)} disabled={index === 0} className="gap-1.5">
             <ChevronLeft className="h-4 w-4" />Précédente
           </Button>
 
@@ -169,7 +198,7 @@ export function FlashcardViewer({ flashcards, courseId, userId, qcmReady = false
             </Link>
           )}
 
-          <Button variant="secondary" size="sm" onClick={() => setIndex(Math.min(total - 1, index + 1))} disabled={index === total - 1} className="gap-1.5">
+          <Button variant="secondary" size="sm" onClick={() => allerA(index + 1)} disabled={index === total - 1} className="gap-1.5">
             Suivante<ChevronRight className="h-4 w-4" />
           </Button>
         </div>

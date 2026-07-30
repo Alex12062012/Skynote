@@ -236,7 +236,7 @@ function PrimaryCTA({ children, className = "", href = "/signup" }: { children: 
       <Link
         href={href}
         className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-brand px-7 py-3.5 text-[15px] font-semibold text-white
-          shadow-[0_8px_28px_-8px_rgba(37,99,235,0.7)] transition-all duration-200
+          shadow-[0_8px_28px_-8px_rgba(37,99,235,0.7)] transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-200
           hover:bg-brand-hover hover:shadow-[0_16px_44px_-10px_rgba(37,99,235,0.95)] active:scale-[0.98]"
       >
         <span className="cta-sheen" />
@@ -388,7 +388,7 @@ function NavBar({ t }: { t: (k: string) => string }) {
           <div className="flex items-center gap-2">
             <Link href="/login" className="hidden px-3 py-2 text-[13px] text-text-dark-secondary transition-colors hover:text-text-dark-main sm:block">Connexion</Link>
             <Magnetic>
-              <Link href="/signup" className="block rounded-xl bg-brand px-5 py-2.5 text-[13px] font-semibold text-white shadow-[0_6px_20px_-8px_rgba(37,99,235,0.8)] transition-all hover:bg-brand-hover active:scale-95">
+              <Link href="/signup" className="block rounded-xl bg-brand px-5 py-2.5 text-[13px] font-semibold text-white shadow-[0_6px_20px_-8px_rgba(37,99,235,0.8)] transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:bg-brand-hover active:scale-95">
                 {t("landing.hero.ctaBeta")}
               </Link>
             </Magnetic>
@@ -664,7 +664,7 @@ function Pricing({ t, isBeta }: { t: (k: string) => string; isBeta: boolean }) {
               </ul>
               <Link
                 href="/signup"
-                className={`mt-6 rounded-xl py-2.5 text-center text-[13px] font-semibold transition-all hover:-translate-y-0.5 active:translate-y-0 ${
+                className={`mt-6 rounded-xl py-2.5 text-center text-[13px] font-semibold transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:-translate-y-0.5 active:translate-y-0 ${
                   p.featured ? "bg-brand text-white hover:bg-brand-hover" : "border border-night-border text-text-dark-secondary hover:border-brand-dark/40 hover:text-text-dark-main"
                 }`}
               >

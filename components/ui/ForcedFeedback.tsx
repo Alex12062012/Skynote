@@ -82,7 +82,7 @@ export function ForcedFeedback({ userId, milestone, onDone }: ForcedFeedbackProp
                   {[1,2,3,4,5,6,7,8,9,10].map((n) => (
                     <div key={n} className="relative flex-1">
                       <button type="button" onClick={() => { setScore(n); setError('') }}
-                        className={`w-full h-9 rounded-input font-body text-[13px] font-bold transition-all ${
+                        className={`w-full h-9 rounded-input font-body text-[13px] font-bold transition-[background-color,border-color,color,box-shadow,transform,opacity] ${
                           n === 10
                             ? score === n ? 'bg-amber-400 text-white shadow-md' : 'bg-amber-100 text-amber-600 hover:bg-amber-200 dark:bg-amber-950/40 dark:text-amber-400'
                             : score === n ? 'bg-brand text-white dark:bg-brand-dark dark:text-night-bg' : 'bg-sky-cloud text-text-secondary hover:bg-brand-soft dark:bg-night-border dark:text-text-dark-secondary'
@@ -118,7 +118,7 @@ export function ForcedFeedback({ userId, milestone, onDone }: ForcedFeedbackProp
               </div>
 
               <button type="submit" disabled={isPending}
-                className="flex items-center justify-center gap-2 h-11 rounded-input bg-brand font-body text-[14px] font-semibold text-white transition-all hover:bg-brand-hover disabled:opacity-50 dark:bg-brand-dark dark:text-night-bg">
+                className="flex items-center justify-center gap-2 h-11 rounded-input bg-brand font-body text-[14px] font-semibold text-white transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:bg-brand-hover disabled:opacity-50 dark:bg-brand-dark dark:text-night-bg">
                 <Send className="h-4 w-4" />
                 {isPending ? 'Envoi...' : 'Envoyer mon avis'}
               </button>

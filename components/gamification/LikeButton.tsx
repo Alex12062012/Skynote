@@ -39,8 +39,12 @@ export function LikeButton({ targetUserId, initialLiked, initialCount, disabled 
     <button
       onClick={handleClick}
       disabled={disabled || pending}
+      // Sans cela, un lecteur d'écran n'annonce que le nombre — « 12 » — sans
+      // dire de quoi il s'agit ni si le bouton est déjà activé.
+      aria-label={liked ? `Retirer mon j'aime (${count})` : `Aimer ce profil (${count})`}
+      aria-pressed={liked}
       className={cn(
-        'group inline-flex items-center gap-2 rounded-pill border-2 px-4 py-2 font-display text-[14px] font-bold transition-all',
+        'group inline-flex items-center gap-2 rounded-pill border-2 px-4 py-2 font-display text-[14px] font-bold transition-[background-color,border-color,color,box-shadow,transform,opacity]',
         liked
           ? 'border-pink-500 bg-pink-500 text-white shadow-btn'
           : 'border-pink-300 bg-white text-pink-600 hover:bg-pink-50 dark:bg-night-surface dark:border-pink-900 dark:text-pink-400',

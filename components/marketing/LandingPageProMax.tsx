@@ -57,7 +57,7 @@ function useScrollReveal() {
 // ---------------------------------------------------------------------------
 
 function CTA({ children, href = "/signup", variant = "primary", className = "" }: { children: React.ReactNode; href?: string; variant?: "primary" | "ghost"; className?: string }) {
-  const base = "group inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-[16px] font-extrabold transition-all duration-200 active:translate-y-0.5"
+  const base = "group inline-flex items-center justify-center gap-2 rounded-2xl px-7 py-4 text-[16px] font-extrabold transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-200 active:translate-y-0.5"
   const styles = variant === "primary"
     ? "text-white shadow-[0_10px_0_-2px_#3730A3] hover:shadow-[0_6px_0_-2px_#3730A3] hover:translate-y-0.5"
     : "border-2 bg-white hover:bg-[#F5F7FF]"

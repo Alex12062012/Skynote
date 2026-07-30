@@ -293,7 +293,7 @@ export function CreateCourseForm({
               <select
                 value={selectedFolderId}
                 onChange={(e) => setSelectedFolderId(e.target.value)}
-                className={`h-11 w-full appearance-none rounded-input border border-sky-border bg-sky-surface px-4 font-body text-[14px] text-text-main transition-all focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15 dark:border-night-border dark:bg-night-surface dark:text-text-dark-main dark:focus:border-brand-dark ${!selectedFolderId ? 'text-text-tertiary dark:text-text-dark-tertiary' : ''} ${errors.folder ? 'border-error' : ''}`}
+                className={`h-11 w-full appearance-none rounded-input border border-sky-border bg-sky-surface px-4 font-body text-[14px] text-text-main transition-[background-color,border-color,color,box-shadow,transform,opacity] focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/15 dark:border-night-border dark:bg-night-surface dark:text-text-dark-main dark:focus:border-brand-dark ${!selectedFolderId ? 'text-text-tertiary dark:text-text-dark-tertiary' : ''} ${errors.folder ? 'border-error' : ''}`}
               >
                 <option value="">Choisir un dossier...</option>
                 {teacherFolders.map((f) => (
@@ -419,7 +419,7 @@ export function CreateCourseForm({
             <button
               type="button"
               onClick={() => { setFile(null); setShowExtracted(false) }}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-input bg-brand py-3.5 font-body text-[14px] font-semibold text-white shadow-btn transition-all hover:bg-brand-hover active:scale-[0.98] dark:bg-brand-dark dark:text-night-bg dark:hover:bg-brand-dark-hover"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-input bg-brand py-3.5 font-body text-[14px] font-semibold text-white shadow-btn transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:bg-brand-hover active:scale-[0.98] dark:bg-brand-dark dark:text-night-bg dark:hover:bg-brand-dark-hover"
             >
               <Camera className="h-4 w-4" />
               Ajouter une autre photo

@@ -8,11 +8,11 @@ export function ProgressBar({ value, max = 100, showCoin = false, className }: P
   return (
     <div className={cn('relative h-2 w-full overflow-visible rounded-pill bg-sky-cloud dark:bg-night-border', className)}>
       <div
-        className="h-full rounded-pill transition-all duration-700 ease-out"
+        className="h-full rounded-pill transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-700 ease-out"
         style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #2563EB, #60A5FA)' }}
       />
       {showCoin && pct > 0 && pct < 100 && (
-        <div className="absolute -top-2.5 transition-all duration-700" style={{ left: `calc(${pct}% - 10px)` }}>
+        <div className="absolute -top-2.5 transition-[width,height,background-color,opacity,transform] duration-700" style={{ left: `calc(${pct}% - 10px)` }}>
           <SkyCoin size={20} />
         </div>
       )}

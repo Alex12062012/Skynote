@@ -43,7 +43,7 @@ export function FileDropzone({ accept, label, onFile, onChange, file, value, err
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
           className={cn(
-            'flex cursor-pointer flex-col items-center justify-center gap-3 rounded-card border-2 border-dashed py-10 transition-all',
+            'flex cursor-pointer flex-col items-center justify-center gap-3 rounded-card border-2 border-dashed py-10 transition-[background-color,border-color,color,box-shadow,transform,opacity]',
             dragging ? 'border-brand bg-brand-soft dark:border-brand-dark dark:bg-brand-dark-soft' : 'border-sky-border hover:border-brand/40 dark:border-night-border dark:hover:border-brand-dark/40'
           )}>
           <Upload className="h-8 w-8 text-text-tertiary dark:text-text-dark-tertiary" />

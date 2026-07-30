@@ -77,7 +77,7 @@ export function FeedbackButton({ userId }: { userId: string }) {
                         <button
                           type="button"
                           onClick={() => setScore(n)}
-                          className={`relative w-full h-9 rounded-input font-body text-[13px] font-bold transition-all ${
+                          className={`relative w-full h-9 rounded-input font-body text-[13px] font-bold transition-[background-color,border-color,color,box-shadow,transform,opacity] ${
                             n === 10
                               ? score === n
                                 ? 'bg-amber-400 text-white shadow-md'
@@ -125,7 +125,7 @@ export function FeedbackButton({ userId }: { userId: string }) {
                 <button
                   type="submit"
                   disabled={!score || isPending}
-                  className="flex items-center justify-center gap-2 h-11 rounded-input bg-brand font-body text-[14px] font-semibold text-white transition-all hover:bg-brand-hover disabled:opacity-50 dark:bg-brand-dark dark:text-night-bg"
+                  className="flex items-center justify-center gap-2 h-11 rounded-input bg-brand font-body text-[14px] font-semibold text-white transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:bg-brand-hover disabled:opacity-50 dark:bg-brand-dark dark:text-night-bg"
                 >
                   <Send className="h-4 w-4" />
                   {isPending ? 'Envoi...' : 'Envoyer'}

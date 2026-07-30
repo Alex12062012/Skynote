@@ -41,7 +41,7 @@ export default async function EvalPage({ params }: { params: Promise<{ id: strin
           await deleteEvaluation(id)
           redirect('/dashboard')
         }}>
-          <button type="submit" className="flex h-9 w-9 items-center justify-center rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition">
+          <button type="submit" aria-label="Supprimer cette evaluation" className="flex h-9 w-9 items-center justify-center rounded-lg border border-red-500/20 text-red-400 hover:bg-red-500/10 transition">
             <Trash2 className="h-4 w-4" />
           </button>
         </form>

@@ -116,7 +116,7 @@ export default async function ObjectivesPage() {
       <div>
         <h2 className="mb-4 font-display text-h3 text-text-main dark:text-text-dark-main">{t('objectives.challenges')}</h2>
         <div className="flex flex-col gap-3">
-          {objectives.map((obj: any) => {
+          {objectives.map((obj: any, objIdx: number) => {
             const uo = userObjMap.get(obj.id)
             const current = uo?.current_value ?? 0
             const completed = uo?.completed ?? false
@@ -124,8 +124,12 @@ export default async function ObjectivesPage() {
             const canClaim = completed && !claimed
 
             return (
-              <div key={obj.id} className={cn(
-                'flex items-center gap-4 rounded-card border p-5 transition-all',
+              <div key={obj.id}
+                // Cascade en CSS : page serveur, pas de Framer Motion possible.
+                style={{ animationDelay: `${Math.min(objIdx, 10) * 40}ms` }}
+                className={cn(
+                'flex items-center gap-4 rounded-card border p-5 animate-card-enter',
+                'transition-[background-color,border-color,color,box-shadow,transform,opacity]',
                 canClaim
                   ? 'border-brand/30 bg-brand-soft dark:border-brand-dark/30 dark:bg-brand-dark-soft'
                   : completed && claimed
@@ -194,7 +198,12 @@ export default async function ObjectivesPage() {
           <h2 className="mb-4 font-display text-h3 text-text-main dark:text-text-dark-main">{t('objectives.history')}</h2>
           <div className="rounded-card border border-sky-border bg-sky-surface overflow-hidden dark:border-night-border dark:bg-night-surface">
             {transactions.map((tx: any, i: number) => (
-              <div key={tx.id} className={cn('flex items-center justify-between px-5 py-3.5',
+              <div key={tx.id}
+                // Cascade en CSS : cette page est un composant serveur, elle ne
+                // peut pas utiliser Framer Motion. Le pas est plafonne pour que
+                // le dernier element n'attende pas plus d'une demi-seconde.
+                style={{ animationDelay: `${Math.min(i, 10) * 30}ms` }}
+                className={cn('flex items-center justify-between px-5 py-3.5 animate-fade-in',
                 i > 0 && 'border-t border-sky-border dark:border-night-border')}>
                 <div className="flex-1 mr-4 min-w-0">
                   <p className="font-body text-[14px] text-text-main dark:text-text-dark-main truncate">{tx.reason}</p>

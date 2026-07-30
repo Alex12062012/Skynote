@@ -160,7 +160,7 @@ export function CourseChat({ courseId, courseTitle, isPremium }: CourseChatProps
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="flex items-center gap-3 w-full rounded-card border border-brand/20 bg-brand-soft px-5 py-4 text-left transition-all hover:border-brand/40 dark:border-brand-dark/20 dark:bg-brand-dark-soft dark:hover:border-brand-dark/40"
+          className="flex items-center gap-3 w-full rounded-card border border-brand/20 bg-brand-soft px-5 py-4 text-left transition-[background-color,border-color,color,box-shadow,transform,opacity] hover:border-brand/40 dark:border-brand-dark/20 dark:bg-brand-dark-soft dark:hover:border-brand-dark/40"
         >
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-brand dark:bg-brand-dark">
             <MessageCircle className="h-5 w-5 text-white dark:text-night-bg" />
@@ -243,7 +243,12 @@ export function CourseChat({ courseId, courseTitle, isPremium }: CourseChatProps
               <div className="flex justify-start">
                 <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md bg-sky-cloud px-4 py-3 dark:bg-night-border">
                   {[0, 1, 2].map((i) => (
-                    <div key={i} className="h-1.5 w-1.5 rounded-full bg-text-tertiary animate-bounce dark:bg-text-dark-tertiary" style={{ animationDelay: `${i * 0.15}s` }} />
+                    <div key={i}
+                      // Vague de 3 points : amplitude 3px, pas les 25% du
+                      // `bounce` de Tailwind, prevu pour des fleches de defilement.
+                      style={{ animationDelay: `${i * 160}ms` }}
+                      className="h-1.5 w-1.5 rounded-full bg-text-tertiary animate-typing-dot dark:bg-text-dark-tertiary"
+                    />
                   ))}
                 </div>
               </div>
@@ -282,7 +287,7 @@ export function CourseChat({ courseId, courseTitle, isPremium }: CourseChatProps
                 onClick={handleSend}
                 disabled={loading || !input.trim() || quotaExhausted}
                 title="Envoyer (36 ✦)"
-                className="flex h-10 flex-shrink-0 items-center justify-center gap-1.5 rounded-input bg-brand px-3 text-white hover:bg-brand-hover disabled:opacity-40 dark:bg-brand-dark dark:text-night-bg transition-all active:scale-95"
+                className="flex h-10 flex-shrink-0 items-center justify-center gap-1.5 rounded-input bg-brand px-3 text-white hover:bg-brand-hover disabled:opacity-40 dark:bg-brand-dark dark:text-night-bg transition-[background-color,border-color,color,box-shadow,transform,opacity] active:scale-95"
               >
                 <Send className="h-4 w-4" />
                 <span className="flex items-center gap-0.5 font-body text-[11px] font-semibold opacity-80">
