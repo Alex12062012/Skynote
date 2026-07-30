@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { redeemPromoCode } from '@/lib/supabase/promo-actions'
 import { claimSharedCourse } from '@/lib/supabase/claim-actions'
 import { Button } from '@/components/ui/Button'
 
@@ -12,9 +13,11 @@ interface OtpFormProps {
   sharedCourseId?: string
   /** Index de la fiche pour laquelle ouvrir le QCM directement après récupération du cours */
   ficheIndex?: string
+  /** Code promo saisi à l'inscription, appliqué une fois le compte créé */
+  promoCode?: string
 }
 
-export function OtpForm({ email, onBack, sharedCourseId, ficheIndex }: OtpFormProps) {
+export function OtpForm({ email, onBack, sharedCourseId, ficheIndex, promoCode }: OtpFormProps) {
   const router = useRouter()
   const [digits, setDigits] = useState(['', '', '', '', '', ''])
   const [error, setError] = useState('')
@@ -51,6 +54,20 @@ export function OtpForm({ email, onBack, sharedCourseId, ficheIndex }: OtpFormPr
     setLoading(true); setError('')
     const { error } = await supabase.auth.verifyOtp({ email, token, type: 'email' })
     if (error) { setError('Code incorrect ou expiré'); setLoading(false); return }
+
+    // Le code promo est appliqué maintenant, et pas au moment du formulaire :
+    // il faut un compte existant et une session pour que le serveur sache à
+    // qui accorder quoi. Un échec ici (code faux, expiré, plafond atteint)
+    // ne doit jamais bloquer la création du compte — l'élève est prévenu
+    // depuis son profil, il n'a pas perdu son inscription.
+    if (promoCode) {
+      try {
+        const r = await redeemPromoCode(promoCode)
+        if (!r.ok) console.warn('[promo] non applique:', r.message)
+      } catch (e) {
+        console.error("[promo] erreur a l'inscription:", e)
+      }
+    }
 
     // Si l'inscription vient d'un lien de cours partagé, on récupère
     // automatiquement ce cours (+ ses fiches et QCM) dans le nouveau compte.

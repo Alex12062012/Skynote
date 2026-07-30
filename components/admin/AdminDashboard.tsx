@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { PromoCodesPanel } from './PromoCodesPanel'
 import {
   Users, BookOpen, Zap, Trophy, DollarSign, LogOut, Search, Trash2, RefreshCw, X, ChevronUp,
   Star, UserX, Coins, Flame, Sparkles, BarChart3, MessageCircle, Settings,
@@ -750,6 +751,11 @@ export function AdminDashboard({ onLogout }: { onLogout: () => void }) {
             </div>
           </div>
         )}
+
+        {/* Codes promo */}
+        <div className="mt-6">
+          <PromoCodesPanel />
+        </div>
       </div>
     </div>
   )

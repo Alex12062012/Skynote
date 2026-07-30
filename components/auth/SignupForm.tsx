@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { OtpForm } from './OtpForm'
 import { ReferralInput } from './ReferralInput'
+import { PromoCodeInput } from './PromoCodeInput'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 
@@ -32,6 +33,7 @@ export function SignupForm({ sharedCourseId, ficheIndex }: SignupFormProps = {})
   const [gradeLevel, setGradeLevel] = useState('')
   const [parentEmail, setParentEmail] = useState('')
   const [referralCode, setReferralCode] = useState('')
+  const [promoCode, setPromoCode] = useState('')
   const [error, setError] = useState('')
   const [rgpdAccepted, setRgpdAccepted] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -99,7 +101,7 @@ export function SignupForm({ sharedCourseId, ficheIndex }: SignupFormProps = {})
             </p>
           </div>
         )}
-        <OtpForm email={targetEmail} onBack={() => setOtpSent(false)} sharedCourseId={sharedCourseId} ficheIndex={ficheIndex} />
+        <OtpForm email={targetEmail} onBack={() => setOtpSent(false)} sharedCourseId={sharedCourseId} ficheIndex={ficheIndex} promoCode={promoCode} />
       </div>
     )
   }
@@ -151,6 +153,7 @@ export function SignupForm({ sharedCourseId, ficheIndex }: SignupFormProps = {})
           )}
 
           <ReferralInput value={referralCode} onChange={setReferralCode} />
+          <PromoCodeInput value={promoCode} onChange={setPromoCode} />
 
           {isMinor ? (
             <label className="flex items-start gap-3 cursor-pointer">
