@@ -275,7 +275,7 @@ Effectif |  1 |  1 |  1 |  1 |  1 |  1 |  1 |  1 |  1 |  1`,
 ]
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FRANÇAIS — 16 questions, on pioche 5
+// FRANÇAIS — 29 questions, on pioche 5
 // ─────────────────────────────────────────────────────────────────────────────
 
 const FRANCAIS_QUESTIONS: FullBankQuestion[] = [
@@ -628,12 +628,419 @@ Nos blessures ne pouvaient qu'effrayer cette femme qui se réfléchissait en nou
       'Le lien est identifié comme juxtaposition (pas de conjonction)',
     ],
   },
+
+  // ── 2022 · Jean de La Fontaine, « Le Lion et le Moucheron » ───────────────
+  {
+    id: 'fr_2022_01',
+    matiere: 'Français',
+    theme: 'Compréhension — situation d\'énonciation et réaction',
+    annee: 2022,
+    source: 'DNB Métropole 2022 — Compréhension',
+    documents: [
+      {
+        titre: 'Jean de La Fontaine, « Le Lion et le Moucheron », Fables, livre II, fable 9 (1668) — vers 1 à 14',
+        type: 'texte',
+        contenu: `« Va-t'en, chétif insecte, excrément de la terre ! »
+C'est en ces mots que le Lion
+Parlait un jour au Moucheron.
+L'autre lui déclara la guerre.
+5 « Penses-tu, lui dit-il, que ton titre de Roi
+Me fasse peur ni me soucie ?
+Un bœuf est plus puissant que toi :
+Je le mène à ma fantaisie. »
+À peine il achevait ces mots
+10 Que lui-même il sonna la charge,
+Fut le Trompette et le Héros.
+Dans l'abord il se met au large ;
+Puis prend son temps, fond sur le cou
+Du Lion, qu'il rend presque fou.
+
+Notes : chétif = faible ; excrément de la terre = ce qui est rejeté par la terre (insulte méprisante) ; à ma fantaisie = comme je veux ; sonna la charge = annonça l'attaque ; Trompette = celui qui joue de la trompette pendant une bataille ; dans l'abord il se met au large = pour commencer, il s'éloigne ; fond = se précipite pour attaquer.`,
+      },
+    ],
+    question: 'Vers 1 à 8 :\n1. Qui parle au vers 1 ? À qui s\'adresse-t-il ?\n2. Quelle réaction ce propos déclenche-t-il et pourquoi ?',
+    corrige: `1. C'est le Lion qui parle (il est mentionné au vers 2 et sujet du verbe « Parlait » au vers 3). Il s'adresse au Moucheron (même vers).
+2. Le Moucheron déclare la guerre au Lion (vers 4). Il réagit ainsi parce que le Lion s'est montré profondément méprisant : le tutoiement associé à l'impératif « Va-t'en » (vers 1) le chasse violemment, et les deux apostrophes insultantes « chétif insecte » et « excrément de la terre » visent à la fois sa faiblesse physique et sa nature jugée inférieure. Cette position de supériorité provoque sa colère.`,
+    criteres: [
+      'Le Lion est identifié comme locuteur et le Moucheron comme destinataire',
+      'La réaction est identifiée : le Moucheron déclare la guerre',
+      "Le mépris / l'insulte du Lion est donné comme cause, avec appui sur le texte",
+    ],
+  },
+  {
+    id: 'fr_2022_02',
+    matiere: 'Français',
+    theme: 'Compréhension — relevé et justification',
+    annee: 2022,
+    source: 'DNB Métropole 2022 — Compréhension',
+    documents: [
+      {
+        titre: 'Jean de La Fontaine, « Le Lion et le Moucheron » (1668) — vers 9 à 29',
+        type: 'texte',
+        contenu: `À peine il achevait ces mots
+10 Que lui-même il sonna la charge,
+Fut le Trompette et le Héros.
+Dans l'abord il se met au large ;
+Puis prend son temps, fond sur le cou
+Du Lion, qu'il rend presque fou.
+15 Le quadrupède écume, et son œil étincelle ;
+Il rugit ; on se cache, on tremble à l'environ ;
+Et cette alarme universelle
+Est l'ouvrage d'un Moucheron.
+Un avorton de Mouche en cent lieux le harcelle :
+20 Tantôt pique l'échine, et tantôt le museau,
+Tantôt entre au fond du naseau.
+La rage alors se trouve à son faîte montée.
+L'invisible ennemi triomphe, et rit de voir
+Qu'il n'est griffe ni dent en la bête irritée
+25 Qui de la mettre en sang ne fasse son devoir.
+Le malheureux Lion se déchire lui-même,
+Fait résonner sa queue à l'entour de ses flancs,
+Bat l'air, qui n'en peut mais ; et sa fureur extrême
+Le fatigue, l'abat : le voilà sur les dents.
+
+Notes : l'échine = le dos de l'animal ; à son faîte = au plus haut ; qui n'en peut mais = qui n'en peut plus.`,
+      },
+    ],
+    question: 'Quel animal domine le combat ? Justifiez votre réponse en relevant trois expressions dans ce passage.',
+    corrige: `C'est le Moucheron qui domine le combat.
+Trois expressions possibles parmi : « lui-même il sonna la charge » (vers 10), qui insiste sur le fait qu'il mène le combat seul ; « Fut le Trompette et le Héros » (vers 11), qui souligne son exploit ; « L'invisible ennemi triomphe » (vers 23), qui montre sa victoire. On accepte aussi « cette alarme universelle / Est l'ouvrage d'un Moucheron » (vers 17-18), l'hyperbole « un avorton de Mouche en cent lieux le harcelle » (vers 19), ou « Le malheureux Lion se déchire lui-même » (vers 26), qui montre le Lion défait.`,
+    criteres: [
+      'Le Moucheron est désigné comme dominant le combat',
+      'Trois expressions sont relevées dans le passage indiqué',
+      'Les relevés sont pertinents (ils montrent bien la domination du Moucheron)',
+    ],
+  },
+  {
+    id: 'fr_2022_03',
+    matiere: 'Français',
+    theme: 'Compréhension — analyse d\'une stratégie narrative',
+    annee: 2022,
+    source: 'DNB Métropole 2022 — Compréhension',
+    documents: [
+      {
+        titre: 'Jean de La Fontaine, « Le Lion et le Moucheron » (1668) — vers 12 à 29',
+        type: 'texte',
+        contenu: `Dans l'abord il se met au large ;
+Puis prend son temps, fond sur le cou
+Du Lion, qu'il rend presque fou.
+15 Le quadrupède écume, et son œil étincelle ;
+Il rugit ; on se cache, on tremble à l'environ ;
+Et cette alarme universelle
+Est l'ouvrage d'un Moucheron.
+Un avorton de Mouche en cent lieux le harcelle :
+20 Tantôt pique l'échine, et tantôt le museau,
+Tantôt entre au fond du naseau.
+La rage alors se trouve à son faîte montée.
+L'invisible ennemi triomphe, et rit de voir
+Qu'il n'est griffe ni dent en la bête irritée
+25 Qui de la mettre en sang ne fasse son devoir.
+Le malheureux Lion se déchire lui-même,
+Fait résonner sa queue à l'entour de ses flancs,
+Bat l'air, qui n'en peut mais ; et sa fureur extrême
+Le fatigue, l'abat : le voilà sur les dents.`,
+      },
+    ],
+    question: 'Quelle tactique est utilisée par le Moucheron aux vers 12 à 29 ? Quel en est le résultat ?',
+    corrige: `Tactique : le Moucheron s'éloigne d'abord (« Dans l'abord il se met au large »), prend son temps pour préparer son attaque, puis se précipite pour piquer le cou du Lion (vers 13). Après cette attaque surprise, il pratique le harcèlement : il pique le Lion partout (« l'échine » vers 20, « le museau » vers 20, « le naseau » vers 21), rapidement et sans s'arrêter, de sorte que le Lion n'a ni le temps ni la possibilité de l'attraper. Il utilise sa rapidité et sa petite taille pour se rendre insaisissable et invisible.
+Résultat : le Lion, rendu fou de rage, finit par se blesser lui-même en voulant l'atteindre (vers 24-26) et s'épuise dans un combat où il est impuissant (vers 28-29). La force du Lion est retournée contre lui-même.`,
+    criteres: [
+      "La tactique du harcèlement / des piqûres répétées est identifiée et appuyée sur le texte",
+      "La rapidité ou la petite taille du Moucheron est présentée comme un atout",
+      "Le résultat est donné : le Lion se blesse lui-même et s'épuise",
+    ],
+  },
+  {
+    id: 'fr_2022_04',
+    matiere: 'Français',
+    theme: 'Compréhension — reprises nominales et effet produit',
+    annee: 2022,
+    source: 'DNB Métropole 2022 — Compréhension',
+    documents: [
+      {
+        titre: 'Jean de La Fontaine, « Le Lion et le Moucheron » (1668) — vers 15 à 29',
+        type: 'texte',
+        contenu: `15 Le quadrupède écume, et son œil étincelle ;
+Il rugit ; on se cache, on tremble à l'environ ;
+Et cette alarme universelle
+Est l'ouvrage d'un Moucheron.
+Un avorton de Mouche en cent lieux le harcelle :
+20 Tantôt pique l'échine, et tantôt le museau,
+Tantôt entre au fond du naseau.
+La rage alors se trouve à son faîte montée.
+L'invisible ennemi triomphe, et rit de voir
+Qu'il n'est griffe ni dent en la bête irritée
+25 Qui de la mettre en sang ne fasse son devoir.
+Le malheureux Lion se déchire lui-même,
+Fait résonner sa queue à l'entour de ses flancs,
+Bat l'air, qui n'en peut mais ; et sa fureur extrême
+Le fatigue, l'abat : le voilà sur les dents.`,
+      },
+    ],
+    question: 'Par quels groupes nominaux le Lion est-il désigné dans ce passage ? Quel est l\'effet produit ?',
+    corrige: `Relevé : « Le quadrupède » (vers 15), « la bête irritée » (vers 24), « le malheureux Lion » (vers 26).
+Effet : ces reprises nominales privent le Lion de sa fonction et de son prestige de roi. Les termes « quadrupède » et « bête » le renvoient à l'anonymat de la chaîne animale ; il est rabaissé à l'état de victime impuissante. Les adjectifs « irritée » et « malheureux » soulignent ce qu'il est devenu : un corps d'animal souffrant. La figure royale se dégrade en animal impuissant, victime du Moucheron devenu tout-puissant.`,
+    criteres: [
+      'Les trois groupes nominaux sont relevés',
+      "L'effet de dégradation / de perte du prestige royal est expliqué",
+    ],
+  },
+  {
+    id: 'fr_2022_05',
+    matiere: 'Français',
+    theme: 'Compréhension — retournement de situation',
+    annee: 2022,
+    source: 'DNB Métropole 2022 — Compréhension',
+    documents: [
+      {
+        titre: 'Jean de La Fontaine, « Le Lion et le Moucheron » (1668) — vers 30 à 34',
+        type: 'texte',
+        contenu: `30 L'insecte du combat se retire avec gloire :
+Comme il sonna la charge, il sonne la victoire,
+Va partout l'annoncer, et rencontre en chemin
+L'embuscade d'une araignée ;
+Il y rencontre aussi sa fin.`,
+      },
+    ],
+    question: 'Quel est le retournement de situation raconté par cette fin de fable ?',
+    corrige: `Après avoir été le vainqueur du combat contre le Lion, le Moucheron se retrouve exactement dans la position de celui qu'il vient de vaincre : trop occupé à claironner sa victoire, il ne voit pas le danger et se fait prendre au piège de la toile d'une araignée, qui lui est fatale. Il est donc successivement vainqueur puis vaincu.`,
+    criteres: [
+      "Le double statut du Moucheron (vainqueur puis vaincu) est mentionné",
+      "La cause de sa fin est identifiée : la toile / l'embuscade de l'araignée",
+    ],
+  },
+  {
+    id: 'fr_2022_06',
+    matiere: 'Français',
+    theme: 'Compréhension — la morale de la fable',
+    annee: 2022,
+    source: 'DNB Métropole 2022 — Compréhension',
+    documents: [
+      {
+        titre: 'Jean de La Fontaine, « Le Lion et le Moucheron » (1668) — vers 35 à 39',
+        type: 'texte',
+        contenu: `35 Quelle chose par là nous peut être enseignée ?
+J'en vois deux, dont l'une est qu'entre nos ennemis
+Les plus à craindre sont souvent les plus petits ;
+L'autre, qu'aux grands périls tel a pu se soustraire,
+Qui périt pour la moindre affaire.`,
+      },
+    ],
+    question: 'Comment comprenez-vous les deux enseignements que le fabuliste donne au lecteur ?',
+    corrige: `Premier enseignement : il ne faut pas sous-estimer les plus petits ni les juger insignifiants ; l'apparence physique ne dit rien de la dangerosité réelle d'un adversaire. Le Lion, tout roi qu'il est, est vaincu par un moucheron.
+Second enseignement : celui qui a échappé aux plus grands dangers peut périr d'une cause minuscule. Le Moucheron survit au combat contre le Lion mais meurt dans une simple toile d'araignée. Il faut donc rester prudent et humble, même après un triomphe.`,
+    criteres: [
+      "Le premier enseignement est reformulé : ne pas sous-estimer les plus petits",
+      "Le second enseignement est reformulé : on peut périr d'un péril minuscule après avoir échappé aux grands",
+    ],
+  },
+  {
+    id: 'fr_2022_gram_01',
+    matiere: 'Français',
+    theme: 'Grammaire — fonctions COD / COI et manipulations',
+    annee: 2022,
+    source: 'DNB Métropole 2022 — Grammaire',
+    documents: [
+      {
+        titre: 'Vers 4 de « Le Lion et le Moucheron » (La Fontaine, 1668)',
+        type: 'texte',
+        contenu: '« L\'autre lui déclara la guerre. »\n\n(Rappel du contexte : « l\'autre » désigne le Moucheron ; le pronom « lui » renvoie au Lion.)',
+      },
+    ],
+    question: '1. Donnez la fonction précise de « lui » et de « la guerre ».\n2. Réécrivez la phrase en remplaçant le pronom « lui » par le groupe nominal auquel il renvoie.\n3. Quelles manipulations avez-vous utilisées pour identifier la fonction de « la guerre » ? Citez-en deux.',
+    corrige: `1. « lui » : COI du verbe « déclara » (on accepte « complément d'objet second »). « la guerre » : COD du verbe « déclara ».
+2. « L'autre déclara la guerre au Lion » (ou « au roi »).
+3. Deux manipulations parmi : la pronominalisation (« il la lui déclara ») ; le déplacement ou la suppression, ici impossibles ; l'extraction (« c'est la guerre que l'autre lui déclara »). La seule question « déclara quoi ? » n'est pas acceptée comme manipulation.`,
+    criteres: [
+      '« lui » est identifié comme COI (ou COS) et « la guerre » comme COD',
+      'La réécriture donne « au Lion » (ou « au roi »)',
+      'Deux manipulations valides sont citées (pronominalisation, extraction, déplacement/suppression)',
+    ],
+  },
+  {
+    id: 'fr_2022_gram_02',
+    matiere: 'Français',
+    theme: 'Grammaire — subordination et formation des mots',
+    annee: 2022,
+    source: 'DNB Métropole 2022 — Grammaire',
+    documents: [
+      {
+        titre: 'Vers 16 et 23 de « Le Lion et le Moucheron » (La Fontaine, 1668)',
+        type: 'texte',
+        contenu: 'Vers 16 : « Il rugit ; on se cache »\nVers 23 : « L\'invisible ennemi triomphe »',
+      },
+    ],
+    question: "1. Transformez « Il rugit ; on se cache » en une phrase complexe comportant une proposition subordonnée.\n2. De quels éléments le mot « invisible » est-il composé ? Nommez-les.\n3. Donnez la définition de « invisible » en vous appuyant sur la signification de ces éléments.",
+    corrige: `1. Toute phrase complexe explicitant un lien logique convient, par exemple : « Quand / Tandis qu'il rugit, on se cache » (simultanéité) ; « Il rugit si bien qu'on se cache » ou « à tel point qu'on se cache » (conséquence) ; « On se cache parce qu'il rugit » (cause). Il faut une conjonction de subordination pertinente et une construction cohérente principale/subordonnée.
+2. « invisible » est formé du radical « -vis- », précédé du préfixe « in- » et suivi du suffixe « -ible ».
+3. Le préfixe « in- » exprime le contraire ; le suffixe « -ible » exprime la possibilité, la capacité. « Invisible » signifie donc « qui ne peut pas être vu ».`,
+    criteres: [
+      'La transformation produit bien une subordonnée avec conjonction de subordination pertinente',
+      'Le radical « -vis- », le préfixe « in- » et le suffixe « -ible » sont repérés ET nommés',
+      "La définition s'appuie explicitement sur le sens du préfixe et du suffixe",
+    ],
+  },
+  {
+    id: 'fr_2022_gram_03',
+    matiere: 'Français',
+    theme: 'Grammaire — réécriture au pluriel',
+    annee: 2022,
+    source: 'DNB Métropole 2022 — Réécriture',
+    documents: [
+      {
+        titre: 'Vers 26 à 29 de « Le Lion et le Moucheron » (La Fontaine, 1668)',
+        type: 'texte',
+        contenu: `« Le malheureux Lion se déchire lui-même,
+Fait résonner sa queue à l'entour de ses flancs,
+Bat l'air […] ; et sa fureur extrême
+Le fatigue, l'abat »`,
+      },
+    ],
+    question: 'Réécrivez ce passage en remplaçant « Le malheureux Lion » par « Les malheureux lions ». Faites toutes les modifications nécessaires.',
+    corrige: `« Les malheureux lions se déchirent eux-mêmes,
+Font résonner leur queue à l'entour de leurs flancs,
+Battent l'air […] ; et leur fureur extrême
+Les fatigue, les abat »
+
+(On accepte également « leurs queues » et « leurs fureurs ».)`,
+    criteres: [
+      'Les verbes sont correctement mis au pluriel : se déchirent, Font, Battent',
+      '« eux-mêmes » est correctement accordé',
+      'Les déterminants possessifs sont au pluriel : leur/leurs queue(s), leurs flancs, leur fureur',
+      'Les pronoms COD sont au pluriel : Les fatigue, les abat',
+    ],
+  },
+
+  // ── 2019 · Albert Camus, « Le Premier Homme » ─────────────────────────────
+  {
+    id: 'fr_2019_01',
+    matiere: 'Français',
+    theme: 'Compréhension — repérage de l\'itératif',
+    annee: 2019,
+    source: 'DNB Métropole 2019 — Compréhension',
+    documents: [
+      {
+        titre: 'Albert Camus, Le Premier Homme (1994) — lignes 1 à 12',
+        type: 'texte',
+        contenu: `Dans son roman Le Premier Homme, Albert Camus raconte son enfance en Algérie dans les années 1920. Il s'est représenté dans le personnage de Jacques et évoque ici les jeux qu'il partage avec ses camarades.
+
+Tous les jours, à la saison, un marchand de frites activait son fourneau. La plupart du temps, le petit groupe n'avait même pas l'argent d'un cornet. Si par hasard l'un d'entre eux avait la pièce nécessaire, il achetait son cornet, avançait gravement vers la plage, suivi du cortège respectueux des camarades et, devant la mer, à l'ombre d'une vieille barque démantibulée, plantant ses pieds dans le sable, il se laissait tomber sur les fesses, portant d'une main son cornet bien vertical et le couvrant de l'autre pour ne perdre aucun des gros flocons croustillants. L'usage était alors qu'il offrît une frite à chacun des camarades, qui savourait religieusement l'unique friandise chaude et parfumée d'huile forte qu'il leur laissait. Puis ils regardaient le favorisé qui, gravement, savourait une à une le restant des frites. Au fond du paquet, restaient toujours des débris de frites. On suppliait le repu de bien vouloir les partager. Et la plupart du temps, sauf s'il s'agissait de Jean, il dépliait le papier gras, étalait les miettes de frites et autorisait chacun à se servir, tour à tour, d'une miette.
+
+Note : le repu = celui qui n'a plus faim.`,
+      },
+    ],
+    question: "1. La scène évoquée se répète plusieurs fois. Qu'est-ce qui l'indique précisément ? Deux éléments de réponse sont attendus.\n2. Pourquoi ce moment est-il particulièrement important pour les enfants ? Justifiez en vous appuyant sur le texte.",
+    corrige: `1. Deux éléments parmi : les indications de fréquence « Tous les jours », « La plupart du temps » (répété), « toujours » ; l'emploi systématique de l'imparfait à valeur itérative (« activait », « achetait », « avançait », « regardaient ») ; le terme « L'usage était alors que… », qui désigne une habitude ; la tournure hypothétique « Si par hasard l'un d'entre eux… ».
+2. Ce moment est important parce que les frites sont un luxe rare pour ces enfants pauvres (« le petit groupe n'avait même pas l'argent d'un cornet ») : la friandise devient précieuse. C'est aussi un rituel collectif de partage, presque sacré, qui soude le groupe — le vocabulaire est solennel et quasi religieux (« cortège respectueux », « gravement », « savourait religieusement », « l'unique friandise »). Chacun a droit à sa part, jusqu'aux miettes.`,
+    criteres: [
+      "Deux indices précis de répétition sont relevés (indications de fréquence, imparfait itératif, « L'usage était »)",
+      'La rareté / la pauvreté est mentionnée comme raison de l\'importance du moment',
+      'Le caractère de rituel collectif et de partage est identifié, avec appui sur le texte',
+    ],
+  },
+  {
+    id: 'fr_2019_02',
+    matiere: 'Français',
+    theme: 'Compréhension — expression du bonheur',
+    annee: 2019,
+    source: 'DNB Métropole 2019 — Compréhension',
+    documents: [
+      {
+        titre: 'Albert Camus, Le Premier Homme (1994) — lignes 12 à 24',
+        type: 'texte',
+        contenu: `Le festin terminé, plaisir et frustration aussitôt oubliés, c'était la course vers l'extrémité ouest de la plage, sous le dur soleil, jusqu'à une maçonnerie à demi détruite qui avait dû servir de fondation à un cabanon disparu et derrière laquelle on pouvait se déshabiller. En quelques secondes, ils étaient nus, l'instant d'après dans l'eau, nageant vigoureusement et maladroitement, s'exclamant, bavant et recrachant, se défiant à des plongeons ou à qui resterait le plus longtemps sous l'eau. La mer était douce, tiède, le soleil léger maintenant sur les têtes mouillées, et la gloire de la lumière emplissait ces jeunes corps d'une joie qui les faisait crier sans arrêt. Ils régnaient sur la vie et sur la mer, et ce que le monde peut donner de plus fastueux, ils le recevaient et en usaient sans mesure, comme des seigneurs assurés de leurs richesses irremplaçables.
+
+Note : fastueux = très luxueux.`,
+      },
+    ],
+    question: "1. Comment l'écrivain montre-t-il que les enfants sont heureux au moment de la baignade ? Deux éléments de réponse justifiés par le texte sont attendus.\n2. Pourquoi peut-on dire qu'ils sont transformés par la baignade ?",
+    corrige: `1. Deux éléments parmi : l'accumulation de participes présents et de verbes d'action qui traduit l'énergie et le mouvement (« nageant », « s'exclamant », « bavant et recrachant », « se défiant ») ; la rapidité marquée par « En quelques secondes », « l'instant d'après » ; le lexique explicite de la joie (« une joie qui les faisait crier sans arrêt ») ; la douceur des sensations (« La mer était douce, tiède », « le soleil léger ») ; l'expression « la gloire de la lumière ».
+2. Ils sont transformés parce que le texte les fait passer du statut d'enfants pauvres à celui de souverains : « Ils régnaient sur la vie et sur la mer », « comme des seigneurs assurés de leurs richesses irremplaçables ». Le champ lexical de la royauté et de la richesse (« régnaient », « fastueux », « seigneurs », « richesses ») inverse leur condition réelle : privés d'argent, ils deviennent les plus riches du monde grâce à la mer et à la lumière.`,
+    criteres: [
+      'Deux procédés du bonheur sont relevés et justifiés par des citations',
+      'Le champ lexical de la royauté / richesse est identifié',
+      "L'inversion entre pauvreté réelle et richesse ressentie est expliquée",
+    ],
+  },
+  {
+    id: 'fr_2019_03',
+    matiere: 'Français',
+    theme: 'Compréhension — évolution du texte et chute',
+    annee: 2019,
+    source: 'DNB Métropole 2019 — Compréhension',
+    documents: [
+      {
+        titre: 'Albert Camus, Le Premier Homme (1994) — lignes 24 à 33',
+        type: 'texte',
+        contenu: `Ils en oubliaient même l'heure, courant de la plage à la mer, séchant sur le sable l'eau salée qui les faisait visqueux, puis lavant dans la mer le sable qui les habillait de gris. Ils couraient, et les martinets avec des cris rapides commençaient de voler plus bas au-dessus des fabriques et de la plage. Le ciel, vidé de la touffeur du jour, devenait plus pur puis verdissait, la lumière se détendait et, de l'autre côté du golfe, la courbe des maisons et de la ville, noyée jusque-là dans une sorte de brume, devenait plus distincte. Il faisait encore jour, mais des lampes s'allumaient déjà en prévision du rapide crépuscule d'Afrique. Pierre, généralement, était le premier à donner le signal : « Il est tard », et aussitôt, c'était la débandade, l'adieu rapide. Jacques avec Joseph et Jean couraient vers leurs maisons sans se soucier des autres. Ils galopaient hors de souffle. La mère de Joseph avait la main leste. Quant à la grand-mère de Jacques…
+
+Notes : martinets = oiseaux au vol rapide, qui ressemblent aux hirondelles ; touffeur = chaleur étouffante ; avoir la main leste = donner facilement des gifles, des coups.`,
+      },
+    ],
+    question: 'Quels changements apparaissent à la fin du texte ? Développez trois éléments de réponse en vous appuyant sur des passages précis.',
+    corrige: `Trois changements attendus :
+1. Le changement de moment de la journée / de lumière : le jour décline (« les martinets… commençaient de voler plus bas », « Le ciel, vidé de la touffeur du jour, devenait plus pur puis verdissait », « la lumière se détendait », « des lampes s'allumaient déjà en prévision du rapide crépuscule d'Afrique »). Le paysage devient net là où il était noyé dans la brume.
+2. Le changement de rythme et d'atmosphère : à la joie insouciante succède l'urgence et la dispersion (« c'était la débandade, l'adieu rapide », « Ils galopaient hors de souffle »). Le groupe soudé éclate : chacun court chez soi « sans se soucier des autres ».
+3. Le retour à la réalité et à la peur : la liberté du jeu cède la place à l'autorité familiale et à la crainte de la punition (« La mère de Joseph avait la main leste. Quant à la grand-mère de Jacques… »). La phrase inachevée laisse deviner une sanction pire encore.`,
+    criteres: [
+      'Le changement de lumière / de moment de la journée est développé avec citation',
+      "Le changement de rythme ou l'éclatement du groupe est développé avec citation",
+      "Le retour à la réalité / la crainte de la punition est identifié, avec appui sur la fin du texte",
+    ],
+  },
+  {
+    id: 'fr_2019_gram_01',
+    matiere: 'Français',
+    theme: 'Grammaire — complément d\'objet et expansions du nom',
+    annee: 2019,
+    source: 'DNB Métropole 2019 — Grammaire',
+    documents: [
+      {
+        titre: 'Lignes 7-8 de Le Premier Homme (Albert Camus, 1994)',
+        type: 'texte',
+        contenu: "« L'usage était alors qu'il offrît une frite à chacun des camarades, qui savourait religieusement l'unique friandise chaude et parfumée d'huile forte qu'il leur laissait. »",
+      },
+    ],
+    question: "1. Quel est le groupe complément d'objet de « savourait » ?\n2. Pour vérifier la délimitation de ce groupe, réécrivez la phrase en le remplaçant par un pronom.\n3. Relevez deux expansions du nom « friandise » de nature grammaticale différente et précisez la nature de chacune.",
+    corrige: `1. Le groupe complément d'objet est « l'unique friandise chaude et parfumée d'huile forte qu'il leur laissait ». L'adverbe « religieusement » n'en fait pas partie.
+2. « L'usage était alors qu'il offrît une frite à chacun des camarades, qui la savourait religieusement. »
+3. Deux expansions de nature différente parmi : « unique » ou « chaude » → adjectifs qualificatifs ; « parfumée d'huile forte » → groupe participial (participe passé employé comme adjectif) ; « qu'il leur laissait » → proposition subordonnée relative.`,
+    criteres: [
+      "Le groupe COD complet est relevé, sans y inclure « religieusement »",
+      'La pronominalisation est correcte (« la savourait »)',
+      'Deux expansions de natures différentes sont relevées ET leur nature est nommée',
+    ],
+  },
+  {
+    id: 'fr_2019_gram_02',
+    matiere: 'Français',
+    theme: 'Grammaire — réécriture au pluriel',
+    annee: 2019,
+    source: 'DNB Métropole 2019 — Réécriture',
+    documents: [
+      {
+        titre: 'Lignes 2 à 6 de Le Premier Homme (Albert Camus, 1994)',
+        type: 'texte',
+        contenu: "« Si par hasard l'un d'entre eux avait la pièce nécessaire, il achetait un cornet, avançait gravement vers la plage, suivi du cortège respectueux des camarades et, […], plantant ses pieds dans le sable, il se laissait tomber sur les fesses, portant d'une main son cornet bien vertical et le couvrant de l'autre. »",
+      },
+    ],
+    question: "Réécrivez ce passage en remplaçant « l'un d'entre eux » par « deux d'entre eux ». Faites toutes les modifications nécessaires.",
+    corrige: `« Si par hasard deux d'entre eux avaient la pièce nécessaire, ils achetaient un cornet, avançaient gravement vers la plage, suivis du cortège respectueux des camarades et, […], plantant leurs pieds dans le sable, ils se laissaient tomber sur les fesses, portant d'une main leur cornet bien vertical et le couvrant de l'autre. »
+
+(On accepte aussi « les pièces nécessaires », « deux cornets », « leurs cornets bien verticaux et les couvrant de l'autre ».)`,
+    criteres: [
+      'Les verbes sont au pluriel : avaient, achetaient, avançaient, se laissaient',
+      'Les pronoms sujets sont au pluriel : ils',
+      '« suivi » est accordé au pluriel : suivis',
+      'Les déterminants possessifs sont au pluriel : leurs pieds, leur cornet',
+    ],
+  },
 ]
 
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HISTOIRE-GÉOGRAPHIE / EMC — 22 questions, on pioche 6
+// HISTOIRE-GÉOGRAPHIE / EMC — 32 questions, on pioche 6
 // ─────────────────────────────────────────────────────────────────────────────
 
 const HG_QUESTIONS: FullBankQuestion[] = [
@@ -781,19 +1188,14 @@ const HG_QUESTIONS: FullBankQuestion[] = [
   },
   // ── 2024 · Histoire — Auschwitz ──────────────────────────────────────────
   {
-    id: 'hg_2024_hist_01',
+    id: 'hg_2024_hist_03',
     matiere: 'Histoire-Géographie',
-    theme: 'Deuxième Guerre mondiale — génocide',
+    theme: 'Deuxième Guerre mondiale — critique de source et témoignage',
     annee: 2024,
     source: 'DNB Métropole 2024 — Histoire',
     documents: [
       {
-        titre: "Photographie prise par les SS (mai-juin 1944) — arrivée des Juifs de Hongrie à Auschwitz-Birkenau",
-        type: 'image',
-        contenu: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Bundesarchiv_Bild_183-N0827-318%2C_KZ_Auschwitz%2C_Ankunft_ungarischer_Juden.jpg/800px-Bundesarchiv_Bild_183-N0827-318%2C_KZ_Auschwitz%2C_Ankunft_ungarischer_Juden.jpg',
-      },
-      {
-        titre: "Ginette Kolinka, Retour à Birkenau (2020) — extrait",
+        titre: 'Ginette Kolinka, Retour à Birkenau (2020) — extrait',
         type: 'texte',
         contenu: `Ginette Kolinka est née en 1925 dans une famille juive. Arrêtée par la Gestapo en mars 1944, elle est déportée à Auschwitz-Birkenau.
 
@@ -802,11 +1204,21 @@ Des heures au garde-à-vous, gelées, tremblantes, épuisées. Parfois, il y en 
 Prenez un pain de mie, coupez-le en cinq : une tranche de pain par personne plus une petite plaque de margarine. C'est le repas du soir, de tous les jours.`,
       },
     ],
-    question: 'À partir du document D2, identifiez sa nature et présentez son auteure. Que nous apprend le document D1 sur le lieu évoqué dans ce témoignage ?',
-    corrige: "D2 : témoignage (mémoires). Auteure : Ginette Kolinka, rescapée d'Auschwitz-Birkenau, née en 1925, déportée en 1944. D1 : photographie montrant l'entrée du camp d'Auschwitz-Birkenau (voie ferrée + portail).",
+    question: "1. Identifiez la nature de ce document et présentez son auteure.\n2. Que nous apprend ce témoignage sur les conditions de vie quotidiennes imposées aux déportées à Auschwitz-Birkenau ?",
+    corrige: `1. Nature : il s'agit d'un témoignage, sous forme de mémoires (récit autobiographique publié en 2020). C'est une source directe, écrite par un témoin des faits, mais rédigée longtemps après les événements.
+Auteure : Ginette Kolinka, née en 1925 dans une famille juive française. Arrêtée par la Gestapo en mars 1944, elle est déportée à Auschwitz-Birkenau. Elle a survécu et témoigne de sa déportation.
+
+2. Le témoignage montre plusieurs aspects des conditions imposées aux déportées :
+— l'humiliation et la déshumanisation organisées : le défilé quotidien devant les officiers, rythmé par la musique militaire, qui contraint des femmes épuisées à garder la cadence ;
+— la violence permanente : toute défaillance est immédiatement punie de coups (« Si l'une d'entre nous défaille ou sort du rang, elle est frappée ») ;
+— l'épuisement physique : des heures d'appel debout au garde-à-vous, dans le froid (« gelées, tremblantes, épuisées »), jusqu'à l'effondrement de certaines ;
+— la sous-alimentation systématique : une tranche de pain de mie et un peu de margarine pour tout repas du soir, chaque jour.
+Ces conditions relèvent d'un système concentrationnaire visant à briser les détenues.`,
     criteres: [
-      'D2 est identifié comme témoignage/mémoires et Ginette Kolinka est présentée',
-      "D1 est exploité : entrée du camp d'Auschwitz-Birkenau identifiée",
+      'Le document est identifié comme un témoignage / des mémoires',
+      'Ginette Kolinka est présentée (née en 1925, juive, arrêtée en 1944, déportée à Auschwitz-Birkenau)',
+      'Au moins deux conditions de vie distinctes sont dégagées du texte',
+      'La réponse est appuyée sur des éléments précis du témoignage',
     ],
   },
   {
@@ -853,17 +1265,12 @@ En quoi consiste votre mission ? Il s'agit d'une mission dans les parcs de la co
   },
   // ── 2023 · Histoire — Lettres de poilus ──────────────────────────────────
   {
-    id: 'hg_2023_hist_01',
+    id: 'hg_2023_hist_03',
     matiere: 'Histoire-Géographie',
-    theme: 'Première Guerre mondiale — source historique',
+    theme: 'Première Guerre mondiale — critique de source et contexte',
     annee: 2023,
     source: 'DNB Métropole 2023 — Histoire',
     documents: [
-      {
-        titre: 'Soldats britanniques dans une tranchée, front de la Somme (1916)',
-        type: 'image',
-        contenu: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Cheshire_Regiment_trench_Somme_1916.jpg/800px-Cheshire_Regiment_trench_Somme_1916.jpg',
-      },
       {
         titre: "Lettres de Félix Delaurat — Archives départementales de l'Allier",
         type: 'texte',
@@ -871,14 +1278,21 @@ En quoi consiste votre mission ? Il s'agit d'une mission dans les parcs de la co
 
 Le 4 mai 1916 — Il y a toujours des boches avec des canons. Voilà douze jours que nous sommes là, c'est un vrai enfer. Malgré cela, je suis toujours en bonne santé et on finit par s'habituer à tout.
 
-Le 12 décembre 1916 — La tristesse s'empare de nous tous. Que faisons-nous ici loin de nos familles puisque nos efforts sont nuls ! Nous sommes des martyrs ! Car si la guerre continue dans ces conditions, c'est des assassinats !`,
+Le 12 décembre 1916 — La tristesse s'empare de nous tous. Que faisons-nous ici loin de nos familles puisque nos efforts sont nuls ! Nous sommes des martyrs ! Car si la guerre continue dans ces conditions, c'est des assassinats !
+
+Note : « boches » est un terme péjoratif utilisé par les soldats français pour désigner les Allemands.`,
       },
     ],
-    question: "À partir du document D2, présentez l'auteur de ces lettres. En vous appuyant sur les documents D1 et D2, précisez le contexte historique dans lequel elles ont été rédigées.",
-    corrige: "D2 : Félix Delaurat, cultivateur de l'Allier mobilisé en août 1914, correspondance avec son épouse. D1 + D2 : Première Guerre mondiale (1914-1918), front des tranchées en 1916 (année de Verdun) — soldats dans des conditions très difficiles.",
+    question: "1. Présentez l'auteur de ces lettres et précisez la nature de ce document.\n2. En vous appuyant sur le document, précisez le contexte historique dans lequel ces lettres ont été rédigées.",
+    corrige: `1. Auteur : Félix Delaurat, cultivateur dans le département de l'Allier, mobilisé dès le 2 août 1914, c'est-à-dire dès le début de la guerre. Il combat jusqu'en 1919. Il s'agit donc d'un simple soldat, un « poilu », et non d'un officier ou d'un responsable politique.
+Nature : ce sont des lettres, une correspondance privée adressée à son épouse Angeline, conservée aux Archives départementales de l'Allier. C'est une source directe et personnelle, écrite au moment même des faits.
+
+2. Contexte : la Première Guerre mondiale (1914-1918). Les deux lettres datent de 1916, année de la bataille de Verdun et de la Somme, marquée par des combats d'une violence extrême. Le document évoque la guerre de position : Félix Delaurat est face aux Allemands (« des boches avec des canons »), immobilisé au même endroit depuis douze jours dans des conditions décrites comme « un vrai enfer ». C'est la guerre des tranchées, avec l'omniprésence de l'artillerie, l'éloignement des familles et une durée du conflit qui use le moral des combattants.`,
     criteres: [
-      "L'auteur est correctement présenté (Félix Delaurat, cultivateur, mobilisé 1914)",
-      'Le contexte historique est identifié (1ère Guerre mondiale / 1916)',
+      "Félix Delaurat est présenté (cultivateur de l'Allier, mobilisé en août 1914, simple soldat)",
+      'Le document est identifié comme une correspondance privée / des lettres',
+      'La Première Guerre mondiale est identifiée et située (1914-1918, lettres de 1916)',
+      'Au moins un élément de contexte est tiré du document (guerre de position, artillerie, durée, éloignement)',
     ],
   },
   {
@@ -1097,11 +1511,276 @@ En novembre 1943, mes parents ont été arrêtés sur dénonciation.`,
       "La raison du recours à un enfant est expliquée (n'éveille pas la méfiance)",
     ],
   },
+
+  // ── 2019 · Histoire — Le monde après 1989 ────────────────────────────────
+  {
+    id: 'hg_2019_hist_01',
+    matiere: 'Histoire-Géographie',
+    theme: 'Le monde après 1989 — héritage de la guerre froide',
+    annee: 2019,
+    source: 'DNB Amérique du Nord 2019 — Histoire',
+    documents: [
+      {
+        titre: 'Les conséquences des attentats du 11 septembre 2001 (Le Monde, 20 mars 2005)',
+        type: 'texte',
+        contenu: `En montrant la vulnérabilité de l'hyperpuissance américaine et la nécessité de faire front face à la menace terroriste internationale, les attentats du 11 Septembre ont changé pour un temps l'attitude américaine.
+Rompant avec l'unilatéralisme, les États-Unis ont cherché [...] à former une coalition avec pour objectif la lutte contre le terrorisme érigé en pilier de la politique étrangère. Cette alliance incluait des ennemis d'hier dont la Chine et la Russie, désormais considérées comme des alliés, quitte à passer sous silence les violations des droits de l'homme en Chine ou la guerre en Tchétchénie. Les États-Unis ont également été amenés à s'impliquer davantage dans le conflit israélo-palestinien, et à s'engager militairement dans de nouvelles zones, principalement en Asie centrale et en Asie du sud et de l'est, mais aussi dans le Caucase. […]
+La coalition qui est intervenue en Afghanistan contre le régime des talibans et Oussama Ben Laden était fort réduite. L'effort de guerre a été supporté exclusivement par les Américains. Britanniques et Français ne sont entrés en scène que tardivement dans ce conflit, avec des moyens militaires limités.
+
+Notes : unilatéralisme = attitude qui consiste, pour une puissance, à décider seule de sa politique étrangère, sans tenir compte de l'avis des autres pays ; coalition = union momentanée d'États en vue d'une intervention politique ou militaire ; érigé en pilier = devenu central ; Tchétchénie = région russe située dans le Caucase.`,
+      },
+    ],
+    question: "Expliquez pourquoi l'auteur de ce texte évoque la Russie parmi « les ennemis d'hier » des États-Unis.",
+    corrige: `L'auteur fait référence au contexte de la guerre froide (1947-1991), période durant laquelle l'Union soviétique — dont la Russie est l'État héritier — était l'adversaire militaire, politique, idéologique et économique direct des États-Unis. Le monde était alors divisé en deux blocs rivaux : le bloc de l'Ouest, dirigé par les États-Unis, et le bloc de l'Est, dirigé par l'URSS. Après la disparition de l'URSS en 1991, cette hostilité s'est atténuée, ce qui permet en 2001 de considérer la Russie comme un allié possible dans la lutte antiterroriste.`,
+    criteres: [
+      'La guerre froide est identifiée comme contexte de référence',
+      "L'URSS est présentée comme l'adversaire direct des États-Unis (blocs Est/Ouest)",
+      "Le lien entre l'URSS d'hier et la Russie d'aujourd'hui est établi",
+    ],
+  },
+  {
+    id: 'hg_2019_hist_02',
+    matiere: 'Histoire-Géographie',
+    theme: 'Le monde après 1989 — le 11 septembre 2001',
+    annee: 2019,
+    source: 'DNB Amérique du Nord 2019 — Histoire',
+    documents: [
+      {
+        titre: 'Les conséquences des attentats du 11 septembre 2001 (Le Monde, 20 mars 2005)',
+        type: 'texte',
+        contenu: `En montrant la vulnérabilité de l'hyperpuissance américaine et la nécessité de faire front face à la menace terroriste internationale, les attentats du 11 Septembre ont changé pour un temps l'attitude américaine.
+Rompant avec l'unilatéralisme, les États-Unis ont cherché [...] à former une coalition avec pour objectif la lutte contre le terrorisme érigé en pilier de la politique étrangère. Cette alliance incluait des ennemis d'hier dont la Chine et la Russie, désormais considérées comme des alliés, quitte à passer sous silence les violations des droits de l'homme en Chine ou la guerre en Tchétchénie. Les États-Unis ont également été amenés à s'impliquer davantage dans le conflit israélo-palestinien, et à s'engager militairement dans de nouvelles zones, principalement en Asie centrale et en Asie du sud et de l'est, mais aussi dans le Caucase.
+
+Notes : unilatéralisme = attitude qui consiste, pour une puissance, à décider seule de sa politique étrangère, sans tenir compte de l'avis des autres pays ; coalition = union momentanée d'États en vue d'une intervention politique ou militaire.`,
+      },
+    ],
+    question: "Montrez comment les attentats du 11 septembre 2001 ont bouleversé les relations des États-Unis avec les autres États.",
+    corrige: `Les attentats font sortir les États-Unis de leur politique d'unilatéralisme : jusque-là, ils décidaient seuls de leur politique étrangère. Ils sont désormais obligés de discuter, de tenir compte de l'avis des autres pays et de s'allier avec eux pour obtenir un soutien dans leurs interventions militaires. Cela les conduit à former une coalition antiterroriste incluant d'anciens adversaires comme la Chine et la Russie, au prix du silence sur les violations des droits de l'homme dans ces pays. Ils s'impliquent aussi davantage dans le conflit israélo-palestinien et s'engagent militairement dans de nouvelles zones (Asie centrale, Asie du Sud et de l'Est, Caucase).`,
+    criteres: [
+      "La rupture avec l'unilatéralisme est identifiée",
+      'La formation d\'une coalition avec d\'anciens ennemis (Chine, Russie) est mentionnée',
+      "Au moins une conséquence concrète est citée (silence sur les droits de l'homme, nouveaux engagements militaires, conflit israélo-palestinien)",
+    ],
+  },
+  {
+    id: 'hg_2019_geo_01',
+    matiere: 'Histoire-Géographie',
+    theme: 'Espaces de faible densité — développement construit',
+    annee: 2019,
+    source: 'DNB Amérique du Nord 2019 — Géographie',
+    question: "En vous appuyant sur des exemples vus en classe, rédigez un développement construit d'environ vingt lignes montrant que les espaces français de faible densité disposent d'atouts qu'ils mettent en valeur pour dépasser leurs contraintes.",
+    corrige: `Introduction : les espaces de faible densité sont des espaces éloignés des métropoles, peu peuplés, soumis à des contraintes physiques ou historiques. Ils disposent pourtant d'atouts qu'ils valorisent.
+
+1. Les espaces ruraux (Bourgogne, Auvergne, Dordogne) ont subi un fort exode rural et sont éloignés des grandes métropoles. Mais leur territoire moins dense est aussi moins pollué et moins urbanisé : ils développent un tourisme vert (forêt des Landes), un tourisme culturel (Morvan), et attirent les urbains en quête de calme, de nature et de gastronomie. La Dordogne, surnommée « Dordogneshire », attire de nombreux Britanniques.
+
+2. Les espaces montagnards subissent l'altitude, la pente et le froid. Depuis les années 1960, la construction de stations de ski (Isola 2000 dans les Alpes, Saint-Lary dans les Pyrénées, La Bourboule dans le Massif central) permet un tourisme hivernal important. Un tourisme vert d'été s'y ajoute (randonnée, parapente), et des productions locales spécifiques (fromages, charcuterie) dynamisent l'économie.
+
+3. Les littoraux peu urbanisés (littoral vendéen, aquitain), éloignés de Bordeaux ou Nantes, ont fait de leur isolement un atout : plages, campings, ports de plaisance et festivals y attirent un tourisme estival massif. Capbreton passe ainsi de 9 000 habitants en hiver à 50 000 en été.
+
+Conclusion : ces espaces disposent d'atouts variés qui leur permettent de dépasser leurs contraintes, mais ils doivent rester vigilants face à la désertification et aux excès d'un tourisme de masse mal maîtrisé.`,
+    criteres: [
+      'Le devoir est organisé (introduction, développement structuré, conclusion)',
+      'Au moins deux types d\'espaces de faible densité sont traités (ruraux, montagnards, littoraux)',
+      'Les contraintes sont présentées (éloignement, exode rural, altitude, isolement)',
+      'Des exemples précis et localisés sont mobilisés',
+      'Les atouts mis en valeur sont expliqués (tourisme vert, stations, productions locales)',
+    ],
+  },
+  // ── 2019 · EMC — Impôt et solidarité nationale ───────────────────────────
+  {
+    id: 'hg_2019_emc_01',
+    matiere: 'EMC',
+    theme: 'Solidarité nationale — impôt et progressivité',
+    annee: 2019,
+    source: 'DNB Amérique du Nord 2019 — EMC',
+    documents: [
+      {
+        titre: "Cinq célibataires sans enfant payent en 2018 l'impôt sur leurs revenus de 2017",
+        type: 'tableau',
+        contenu: `Contribuable        | Revenus de 2017 | Impôt à payer en 2018
+Paul Duchemin       |   9 000 €       |        0 €
+Dominique Martin    |  27 000 €       |    2 029 €
+Cristina Viala      |  40 000 €       |    5 093 €
+Sophie Lefranc      |  90 000 €       |   19 515 €
+Ali Abdellatifi     | 160 000 €       |   46 860 €
+
+Source : simulation à partir du site des impôts. Jusqu'en janvier 2019, les Français payaient chaque année leurs impôts sur les revenus de l'année précédente.`,
+      },
+    ],
+    question: "D'après ce document, pour quelle raison les Français ne paient-ils pas tous un même montant d'impôt sur le revenu ? Appuyez votre réponse sur des valeurs chiffrées du tableau.",
+    corrige: `Les Français ne paient pas tous le même montant parce qu'ils ne perçoivent pas les mêmes revenus : le montant de l'impôt dépend du revenu de chacun. Plus le revenu est élevé, plus l'impôt est élevé. Ainsi Paul Duchemin, qui gagne 9 000 €, ne paie aucun impôt, tandis que Cristina Viala, qui gagne 40 000 €, paie 5 093 €, et Ali Abdellatifi, qui gagne 160 000 €, paie 46 860 €. On observe même que l'impôt augmente plus vite que le revenu : c'est un impôt progressif.`,
+    criteres: [
+      "La différence de revenus est identifiée comme cause de la différence d'impôt",
+      'Au moins deux valeurs chiffrées du tableau sont citées',
+    ],
+  },
+  {
+    id: 'hg_2019_emc_02',
+    matiere: 'EMC',
+    theme: 'Solidarité nationale — État-providence',
+    annee: 2019,
+    source: 'DNB Amérique du Nord 2019 — EMC',
+    documents: [
+      {
+        titre: 'La solidarité nationale (Conseil national des politiques de lutte contre la pauvreté et l\'exclusion sociale, 2014)',
+        type: 'texte',
+        contenu: `L'engagement de l'État en matière de solidarité remonte essentiellement au lendemain de la crise économique des années 1930 et de la Seconde Guerre mondiale. Il prend la forme de l'État-providence : l'intervention de l'État dans la vie économique et sociale apparaît nécessaire afin de lutter contre la pauvreté et les inégalités et d'assurer la cohésion nationale.
+Cette prise de conscience est inscrite dans le préambule de la Constitution française de 1946 (repris par celle de 1958) qui garantit le droit au travail, la protection de la santé, l'accès à l'instruction, la sécurité matérielle. [...] Concrètement, elle est à l'origine de la création de plusieurs institutions de protection sanitaire et sociale, reposant sur des systèmes d'assurance obligatoire organisés par l'État : la sécurité sociale est créée dès 1945 ; c'est également dans les années d'après-guerre qu'est mise en place l'assurance-chômage. La solidarité nationale est notamment financée par l'impôt sur le revenu, qui repose sur une redistribution des richesses, chaque citoyen y contribuant en fonction de ses moyens.`,
+      },
+    ],
+    question: "1. Recopiez la phrase du texte qui justifie que les Français ne payent pas tous un même montant d'impôt.\n2. Relevez trois dispositifs pouvant contribuer à lutter contre la pauvreté et les inégalités.",
+    corrige: `1. « La solidarité nationale est notamment financée par l'impôt sur le revenu, qui repose sur une redistribution des richesses, chaque citoyen y contribuant en fonction de ses moyens. »
+2. Trois dispositifs : la sécurité sociale (créée en 1945) ; l'assurance-chômage ; l'impôt sur le revenu. On accepte également le droit au travail, la protection de la santé, l'accès à l'instruction ou la sécurité matérielle garantis par le préambule de la Constitution de 1946.`,
+    criteres: [
+      'La phrase relevée est bien celle sur la contribution « en fonction de ses moyens »',
+      'Trois dispositifs distincts sont relevés dans le texte',
+    ],
+  },
+  {
+    id: 'hg_2019_emc_03',
+    matiere: 'EMC',
+    theme: 'Égalité — impôt et lutte contre les inégalités',
+    annee: 2019,
+    source: 'DNB Amérique du Nord 2019 — EMC',
+    documents: [
+      {
+        titre: "Impôt sur le revenu payé en 2018 par cinq célibataires sans enfant",
+        type: 'tableau',
+        contenu: `Contribuable        | Revenus de 2017 | Impôt à payer en 2018
+Paul Duchemin       |   9 000 €       |        0 €
+Dominique Martin    |  27 000 €       |    2 029 €
+Cristina Viala      |  40 000 €       |    5 093 €
+Sophie Lefranc      |  90 000 €       |   19 515 €
+Ali Abdellatifi     | 160 000 €       |   46 860 €`,
+      },
+      {
+        titre: 'La solidarité nationale (extrait)',
+        type: 'texte',
+        contenu: `L'intervention de l'État dans la vie économique et sociale apparaît nécessaire afin de lutter contre la pauvreté et les inégalités et d'assurer la cohésion nationale. Cette prise de conscience est inscrite dans le préambule de la Constitution française de 1946 (repris par celle de 1958) qui garantit le droit au travail, la protection de la santé, l'accès à l'instruction, la sécurité matérielle. La solidarité nationale est notamment financée par l'impôt sur le revenu, qui repose sur une redistribution des richesses, chaque citoyen y contribuant en fonction de ses moyens.`,
+      },
+    ],
+    question: "Un de vos amis ne comprend pas pourquoi certains paient des impôts et d'autres moins ou pas du tout. Il trouve cela contraire au principe d'égalité. Expliquez-lui pourquoi l'impôt sur le revenu est au contraire un outil permettant de combattre les inégalités.",
+    corrige: `Depuis la fin de la Seconde Guerre mondiale, il existe en France un système de solidarité nationale inscrit dans le préambule de la Constitution de 1946. Cette solidarité s'exerce notamment par l'impôt sur le revenu, qui permet de redistribuer les richesses du pays.
+Le principe est que chacun contribue « en fonction de ses moyens » : plus les revenus sont élevés, plus la participation financière est importante. Ainsi, Cristina Viala, qui perçoit 40 000 €, paie 5 093 €, tandis que Paul Duchemin, qui ne perçoit que 9 000 €, ne paie rien, ses revenus étant trop faibles pour qu'il puisse contribuer sans compromettre ses dépenses essentielles.
+L'égalité républicaine ne consiste donc pas à faire payer à tous la même somme, ce qui pénaliserait lourdement les plus pauvres, mais à demander à chacun un effort proportionné à ses ressources. L'argent collecté finance la sécurité sociale, l'assurance-chômage, l'école, la santé — des services dont bénéficient tous les citoyens, et d'abord les plus démunis. Ce sont les principes d'égalité et de fraternité qui sont ici mis en œuvre pour réduire les inégalités.`,
+    criteres: [
+      'Le principe de contribution selon les moyens est expliqué',
+      'Au moins un exemple chiffré du tableau est mobilisé',
+      "La distinction entre égalité stricte et équité / proportionnalité est faite",
+      "Le lien avec les valeurs de la République (égalité, fraternité, solidarité) est établi",
+    ],
+  },
+  // ── 2021 · Histoire et EMC ───────────────────────────────────────────────
+  {
+    id: 'hg_2021_hist_01',
+    matiere: 'Histoire-Géographie',
+    theme: 'Guerre froide — développement construit',
+    annee: 2021,
+    source: 'DNB Métropole 2021 — Histoire',
+    question: "Rédigez un développement construit d'une vingtaine de lignes pour montrer comment les deux blocs s'affrontent durant la guerre froide. Vous pouvez prendre appui sur des exemples étudiés en classe.",
+    corrige: `Introduction : après 1945, les deux vainqueurs de la Seconde Guerre mondiale, les États-Unis et l'URSS, deviennent rivaux. De 1947 à 1991, le monde se divise en deux blocs qui s'affrontent sans jamais entrer en guerre directe : c'est la guerre froide.
+
+1. Un affrontement idéologique et politique. Le bloc de l'Ouest, dirigé par les États-Unis, défend la démocratie libérale et le capitalisme (doctrine Truman, plan Marshall en 1947). Le bloc de l'Est, dirigé par l'URSS, défend le communisme et l'économie planifiée (doctrine Jdanov, Kominform). Chaque camp cherche à étendre sa zone d'influence.
+
+2. Un affrontement militaire indirect. Les deux blocs constituent des alliances rivales : l'OTAN en 1949, le pacte de Varsovie en 1955. Ils s'affrontent par pays interposés lors de conflits périphériques : guerre de Corée (1950-1953), guerre du Vietnam (1955-1975), guerre d'Afghanistan (1979-1989). La course aux armements nucléaires instaure un « équilibre de la terreur » qui dissuade l'affrontement direct.
+
+3. Des crises et un symbole : Berlin. Berlin, ville divisée, cristallise la rivalité : blocus de Berlin (1948-1949) auquel les Américains répondent par un pont aérien, puis construction du mur de Berlin en 1961, qui matérialise le « rideau de fer ». La crise de Cuba en 1962 amène le monde au bord de la guerre nucléaire.
+
+Conclusion : cet affrontement prend fin avec la chute du mur de Berlin en 1989 puis la disparition de l'URSS en 1991, laissant les États-Unis seule superpuissance.`,
+    criteres: [
+      'Le devoir est organisé (introduction, développement structuré, conclusion)',
+      'Les deux blocs et leurs modèles idéologiques opposés sont présentés',
+      'La nature indirecte de l\'affrontement est expliquée (conflits périphériques, dissuasion nucléaire)',
+      'Au moins deux exemples précis et datés sont mobilisés (Berlin, Corée, Cuba, Vietnam…)',
+      'Les bornes chronologiques de la guerre froide sont correctes (1947-1991)',
+    ],
+  },
+  {
+    id: 'hg_2021_geo_03',
+    matiere: 'Histoire-Géographie',
+    theme: 'Espaces de faible densité — accessibilité',
+    annee: 2021,
+    source: 'DNB Métropole 2021 — Géographie',
+    documents: [
+      {
+        titre: 'Le renouveau des territoires ruraux en France (Magali Reghezza-Zitt, La France dans ses territoires, 2017)',
+        type: 'texte',
+        contenu: `Les territoires ruraux sont désormais considérés comme « espaces de nature et d'authentique », c'est-à-dire où la nature aurait été préservée de l'artificialisation de la civilisation urbaine. Ce renversement des représentations entraîne en particulier le développement du « tourisme vert » et se traduit par la multiplication des résidences secondaires et des hébergements en gîtes ruraux ou à la ferme, par la création d'infrastructures légères (sentiers de randonnée, écomusées, etc.). La mise en tourisme permet aussi le maintien ou le développement d'autres activités : artisanat, productions agricoles, etc.
+Si les territoires situés à proximité des grandes villes ou des villes moyennes bénéficient d'un accès convenable aux services élémentaires, en particulier aux services publics, les territoires les plus isolés souffrent d'un déficit de services de plus en plus préoccupant, notamment lorsque les populations sont âgées et ou en situation de précarité économique et sociale. L'accès aux soins, qui s'exprime à travers l'expression de « désert médical », à l'éducation, à la culture, à l'administration et même aux services du quotidien (alimentation, bureau de poste, etc.) est de plus en plus difficile dans certains territoires peu ou très peu denses situés à l'écart des aires urbaines et des liaisons rapides. Autre enjeu majeur, la « fracture numérique », qui désigne les disparités d'accès aux technologies numériques (Internet, téléphonie mobile, etc.) et aux services qui leur sont associés, renforce l'isolement et donc la fragilité de certains territoires.
+
+Notes : artificialisation = le fait de transformer l'espace en le rendant moins naturel et plus artificiel ; renversement des représentations = changement d'opinion sur les espaces ruraux.`,
+      },
+    ],
+    question: "Relevez dans le texte un passage qui montre que l'accessibilité est un enjeu majeur pour les espaces de faible densité, puis expliquez en quoi cet enjeu fragilise ces territoires.",
+    corrige: `Passage attendu (au choix) : « L'accès aux soins, qui s'exprime à travers l'expression de "désert médical", à l'éducation, à la culture, à l'administration et même aux services du quotidien (alimentation, bureau de poste, etc.) est de plus en plus difficile dans certains territoires peu ou très peu denses situés à l'écart des aires urbaines et des liaisons rapides. » On accepte aussi le passage sur la « fracture numérique ».
+
+Explication : l'éloignement des aires urbaines et des liaisons rapides prive les habitants des services essentiels — santé, école, culture, administration, commerces. Ce déficit touche d'abord les populations âgées ou précaires, les moins mobiles. À cela s'ajoute la fracture numérique, qui empêche de compenser cet isolement par les services en ligne. Ce cumul renforce l'isolement, décourage l'installation de nouveaux habitants et d'activités, et alimente ainsi le déclin démographique de ces territoires.`,
+    criteres: [
+      "Un passage pertinent sur l'accès aux services ou la fracture numérique est relevé",
+      "Le lien entre éloignement et privation de services est expliqué",
+      "Au moins une conséquence sur la fragilité du territoire est développée (isolement, déclin, populations vulnérables)",
+    ],
+  },
+  {
+    id: 'hg_2021_emc_01',
+    matiere: 'EMC',
+    theme: 'La commune — engagement et action sociale',
+    annee: 2021,
+    source: 'DNB Métropole 2021 — EMC',
+    documents: [
+      {
+        titre: 'Des politiques publiques au quotidien (d\'après le site d\'une ville)',
+        type: 'texte',
+        contenu: `— Le Conseil municipal des enfants a été créé en 1993 par le Conseil municipal de la ville pour l'aider en proposant des idées et des projets qui pourront être réalisés avec l'aide des services compétents de la mairie. Des écoles réparties dans des quartiers de la commune sont choisies afin de participer au Conseil municipal des enfants. Ce sont les enfants des CM2 qui participent à ces conseils. Ils élisent tous les ans les Conseillers municipaux enfants qui les représentent auprès de la commune.
+
+— Le Centre communal d'action sociale propose un ensemble de prestations pour remédier aux situations de précarité ou de grande difficulté sociale. Selon les cas, le public y est conseillé, orienté vers les services concernés ou directement pris en charge pour bénéficier immédiatement de ses droits. Pour les personnes âgées, il permet d'accéder aux soins en résidences ou à domicile mais également à un programme de loisirs grâce aux animations qu'il organise. Pour les personnes en situation précaire, il instruit les demandes de RSA, se charge de leur accompagnement social.
+
+Note : le Revenu de Solidarité Active (RSA) assure aux personnes sans ressources un niveau minimum de revenu qui varie selon la composition du foyer.`,
+      },
+    ],
+    question: "1. Quel est l'objectif de la création du Conseil municipal des enfants ?\n2. Citez deux actions mises en place par le Centre communal d'action sociale de la ville.",
+    corrige: `1. Le Conseil municipal des enfants a pour objectif d'aider le Conseil municipal de la ville : les enfants élus y proposent des idées et des projets qui pourront ensuite être réalisés avec l'aide des services de la mairie. Il s'agit aussi d'un apprentissage de la citoyenneté et de la représentation (les élèves de CM2 élisent chaque année leurs représentants).
+2. Deux actions au choix parmi : conseiller les publics en situation de précarité et les orienter vers les services compétents ; prendre directement en charge certaines demandes pour un accès immédiat aux droits ; permettre aux personnes âgées d'accéder aux soins en résidence ou à domicile ; organiser un programme de loisirs et d'animations ; instruire les demandes de RSA ; assurer l'accompagnement social des personnes précaires.`,
+    criteres: [
+      "L'objectif du Conseil municipal des enfants est identifié (proposer des idées/projets à la mairie)",
+      "Deux actions distinctes du CCAS sont citées à partir du document",
+    ],
+  },
+  {
+    id: 'hg_2021_emc_02',
+    matiere: 'EMC',
+    theme: 'Valeurs et principes de la République — République sociale',
+    annee: 2021,
+    source: 'DNB Métropole 2021 — EMC',
+    documents: [
+      {
+        titre: "Missions du Centre communal d'action sociale (extrait)",
+        type: 'texte',
+        contenu: `Le Centre communal d'action sociale propose un ensemble de prestations pour remédier aux situations de précarité ou de grande difficulté sociale. Selon les cas, le public y est conseillé, orienté vers les services concernés ou directement pris en charge pour bénéficier immédiatement de ses droits. Pour les personnes âgées, il permet d'accéder aux soins en résidences ou à domicile mais également à un programme de loisirs grâce aux animations qu'il organise. Pour les personnes en situation précaire, il instruit les demandes de RSA, se charge de leur accompagnement social.`,
+      },
+      {
+        titre: 'La Constitution de la Ve République (extrait)',
+        type: 'texte',
+        contenu: `Article premier. La France est une République indivisible, laïque, démocratique et sociale. Elle assure l'égalité devant la loi de tous les citoyens sans distinction d'origine, de race ou de religion. Elle respecte toutes les croyances.`,
+      },
+    ],
+    question: "Expliquez quelle valeur et quel principe de la République les missions du Centre communal d'action sociale permettent de mettre en application. Justifiez votre réponse à l'aide des deux documents.",
+    corrige: `Deux éléments sont attendus, une valeur ET un principe.
+
+Valeur : l'égalité. L'article premier de la Constitution affirme que la République « assure l'égalité devant la loi de tous les citoyens ». Le CCAS y contribue en réduisant les inégalités qui risqueraient de se transformer en injustices : il fournit des aides aux plus démunis, instruit les demandes de RSA, et propose des loisirs et animations accessibles à tous, y compris aux personnes âgées. On accepte également la fraternité / solidarité.
+
+Principe : celui d'une République sociale, également inscrit à l'article premier (« République indivisible, laïque, démocratique et sociale »). Une République sociale agit en faveur des plus défavorisés : c'est exactement la mission du CCAS, qui prend en charge les situations de précarité et permet de percevoir des aides comme le RSA.`,
+    criteres: [
+      "Une valeur est identifiée et nommée (égalité, ou fraternité/solidarité)",
+      "Le principe de République sociale est identifié à partir de l'article premier",
+      "La justification s'appuie sur des missions concrètes du CCAS",
+    ],
+  },
 ]
 
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SCIENCES — 16 questions (PC + SVT), on pioche 3
+// SCIENCES — 15 questions (PC + SVT), on pioche 3
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SCIENCES_QUESTIONS: FullBankQuestion[] = [
@@ -1327,14 +2006,16 @@ const SCIENCES_QUESTIONS: FullBankQuestion[] = [
       {
         titre: 'Données — Accords de Paris et émissions cumulées de CO2',
         type: 'donnees',
-        contenu: "Quantité totale de CO2 émise entre 1850 et 2018 : 2 400 Gt.\nLimite maximale pour rester sous +2 °C (Accords de Paris) : 3 700 Gt.",
+        contenu: "Quantité totale de CO2 émise entre 1850 et 2018 : 2 400 Gt.\nLimite maximale pour rester sous +2 °C (Accords de Paris) : 3 700 Gt.\nÉmissions annuelles de CO2 en 2018, toutes sources de combustibles réunies : 37 Gt.",
+        // (document enrichi : la prévision d'année nécessite les émissions annuelles)
       },
     ],
-    question: "Calculez la quantité de CO2 que l'humanité peut encore émettre pour rester sous +2 °C.",
-    corrige: '3 700 - 2 400 = 1 300 Gt de CO2 restantes.',
+    question: "1. Calculez la quantité de CO2 que l'humanité peut encore émettre pour rester sous +2 °C.\n2. Prévoyez en quelle année cette limite sera atteinte si les émissions annuelles restent égales à celles de 2018. Détaillez votre démarche.",
+    corrige: "1. Quantité restante = 3 700 - 2 400 = 1 300 Gt de CO2.\n2. Nombre d'années restantes = 1 300 / 37 ≈ 35 ans. La limite serait donc atteinte vers 2018 + 35 = 2053.",
     criteres: [
-      'La réponse est 1 300 Gt',
-      'La soustraction (3 700 - 2 400) est effectuée',
+      'La soustraction est effectuée et donne 1 300 Gt',
+      'La division 1 300 / 37 ≈ 35 est effectuée',
+      "L'année est obtenue en ajoutant 35 à 2018, soit environ 2053",
     ],
   },
   // ── SVT 2022 — IST ────────────────────────────────────────────────────────
@@ -1356,6 +2037,45 @@ const SCIENCES_QUESTIONS: FullBankQuestion[] = [
     criteres: [
       'Au moins deux liquides biologiques corrects sont cités (sperme, sang, sécrétions vaginales)',
       'La salive n\'est pas citée comme mode de transmission du VIH',
+    ],
+  },
+  {
+    id: 'sci_svt_2022_02',
+    matiere: 'Sciences de la vie et de la Terre',
+    theme: 'Santé — dépistage, prévention et traitement des IST',
+    annee: 2022,
+    source: 'DNB Métropole-Antilles septembre 2022 — SVT',
+    documents: [
+      {
+        titre: 'La chlamydiose, une des IST les plus répandues en France (source : ameli.fr)',
+        type: 'tableau',
+        contenu: `Agent pathogène          : bactérie Chlamydia trachomatis
+
+Symptômes                : douleurs en urinant ; douleurs lors des rapports sexuels ;
+                           aucun symptôme dans 60 à 70 % des cas
+
+Conséquences possibles   : à long terme chez la femme — infertilité, infection des trompes
+                           utérines, douleurs chroniques dans le bas ventre, risque de
+                           grossesse extra-utérine
+
+Moyens de prévention     : dépistage (analyse d'urine ou prélèvement vaginal) ;
+et de protection           utilisation du préservatif ; absence de vaccin
+
+Traitement               : efficace par prise d'antibiotiques, en respectant quelques règles
+                           pour éviter la réinfection (dépistage du partenaire, respect de la
+                           durée du traitement, utilisation du préservatif)`,
+      },
+    ],
+    question: "1. À partir du document, expliquez pourquoi la chlamydiose est une infection particulièrement difficile à repérer, et pourquoi cela la rend dangereuse.\n2. Indiquez comment une personne peut s'en protéger et comment elle peut en guérir.",
+    corrige: `1. La chlamydiose est difficile à repérer parce qu'elle ne provoque aucun symptôme dans 60 à 70 % des cas : deux personnes infectées sur trois environ ne se savent pas malades. Elles ne consultent donc pas, continuent de transmettre la bactérie, et l'infection n'est pas traitée. C'est dangereux car, à long terme chez la femme, elle peut provoquer une infertilité, une infection des trompes utérines, des douleurs chroniques dans le bas ventre et un risque de grossesse extra-utérine.
+
+2. Protection : l'utilisation du préservatif lors des rapports sexuels, et le dépistage (analyse d'urine ou prélèvement vaginal), qui permet de détecter l'infection même en l'absence de symptômes. Il n'existe pas de vaccin contre cette IST.
+Guérison : la chlamydiose se traite efficacement par la prise d'antibiotiques, à condition de respecter la durée du traitement, de faire dépister son partenaire et d'utiliser un préservatif, afin d'éviter une réinfection.`,
+    criteres: [
+      "L'absence de symptômes dans 60 à 70 % des cas est identifiée comme cause de la difficulté de repérage",
+      'Au moins une conséquence grave à long terme est citée',
+      'Le préservatif et le dépistage sont cités comme moyens de protection',
+      "Le traitement antibiotique est cité, avec au moins une règle pour éviter la réinfection",
     ],
   },
   // ── SVT 2021 — Séisme ─────────────────────────────────────────────────────
@@ -1399,10 +2119,11 @@ const SCIENCES_QUESTIONS: FullBankQuestion[] = [
       'La justification explique que plus λ est petit, meilleur est l\'isolant',
     ],
   },
+
 ]
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SUJETS DE RÉDACTION — 10 sujets, on pioche 1
+// SUJETS DE RÉDACTION — 12 sujets, on pioche 1
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const REDACTION_SUBJECTS: RedactionSubject[] = [
@@ -1476,6 +2197,21 @@ export const REDACTION_SUBJECTS: RedactionSubject[] = [
     type: 'reflexion',
     consigne: "Aimez-vous découvrir des œuvres littéraires et artistiques dans lesquelles interviennent le surnaturel ou l'étrange ? Vous répondrez à cette question par un développement argumenté en vous appuyant sur les œuvres étudiées en classe, vos lectures personnelles et les œuvres cinématographiques et artistiques que vous connaissez.",
   },
+  {
+    id: 'red_2022_ima',
+    annee: 2022,
+    type: 'imagination',
+    texteSupport: '« Le Lion et le Moucheron » — Jean de La Fontaine (1668)',
+    contexte: "Dans cette fable, un Moucheron, insulté par le Lion qui le traite de « chétif insecte », lui déclare la guerre. Par des piqûres incessantes sur le cou, l'échine, le museau et les naseaux, il rend le Lion fou de rage : le fauve se déchire lui-même et s'épuise. Vainqueur, le Moucheron « sonne la victoire » et « va partout l'annoncer ».",
+    consigne: "Imaginez le récit que fait le Moucheron de son combat victorieux aux autres animaux. Vous mettrez en évidence le caractère, les sentiments et les réflexions du Moucheron et vous pourrez montrer les réactions des autres animaux. Votre récit peut être rédigé à la première ou à la troisième personne du singulier.",
+  },
+  {
+    id: 'red_2019_refl',
+    annee: 2019,
+    type: 'reflexion',
+    texteSupport: 'Le Premier Homme — Albert Camus (1994)',
+    consigne: "La littérature, le cinéma et les autres arts permettent de découvrir la vie de personnages fictifs ou réels. Que peut vous apporter cette découverte ? Vous développerez votre point de vue en prenant appui sur des exemples précis, issus de votre culture personnelle et des œuvres étudiées lors de votre scolarité.",
+  },
 ]
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1517,25 +2253,83 @@ function toStored(q: FullBankQuestion): StoredQuestion {
 }
 
 /**
+ * Historique de ce qu'un élève a déjà vu.
+ * `rank` = 0 pour la session la plus récente, 1 pour la précédente, etc.
+ * Une question absente de la Map n'a jamais été servie à cet élève.
+ */
+export type SeenMap = Map<string, number>
+
+/**
+ * Pioche `n` questions dans `pool` en excluant tout ce que l'élève a déjà vu.
+ * Si le pool de questions fraîches est trop petit, on complète avec les
+ * questions vues il y a le plus longtemps (rank le plus élevé) plutôt qu'au
+ * hasard — l'élève retombe ainsi sur ses questions les plus anciennes en dernier.
+ */
+function pickFresh<T extends { id: string }>(
+  pool: T[],
+  n: number,
+  seen: SeenMap
+): { picked: T[]; reused: number } {
+  const fresh = shuffle(pool.filter(q => !seen.has(q.id)))
+  if (fresh.length >= n) return { picked: fresh.slice(0, n), reused: 0 }
+
+  const manquant = n - fresh.length
+  const recycles = pool
+    .filter(q => seen.has(q.id))
+    .sort((a, b) => seen.get(b.id)! - seen.get(a.id)!)   // les plus anciennes d'abord
+    .slice(0, manquant)
+
+  return { picked: shuffle([...fresh, ...recycles]), reused: recycles.length }
+}
+
+/**
  * Pioche 5 Français + 6 HG/EMC + 3 Maths + 3 Sciences = 17 questions ouvertes
  * + 1 sujet de rédaction.
+ *
+ * Aucune question déjà servie à l'élève n'est reproposée tant que la banque
+ * n'est pas épuisée pour la matière concernée. `reused > 0` dans le retour
+ * signale que la banque a été épuisée et que des questions ont dû être
+ * recyclées (les plus anciennes en priorité).
+ *
  * Les corrigés et critères sont retirés avant le retour.
  */
-export function pickRandomQuestions(): {
+export function pickRandomQuestions(
+  seen: SeenMap = new Map(),
+  seenRedaction: SeenMap = new Map()
+): {
   questions: StoredQuestion[]
   redaction: RedactionSubject
+  reused: number
 } {
-  const fr   = shuffle(FRANCAIS_QUESTIONS).slice(0, 5).map(toStored)
-  const hg   = shuffle(HG_QUESTIONS).slice(0, 6).map(toStored)
-  const math = shuffle(MATHS_QUESTIONS).slice(0, 3).map(toStored)
-  const sci  = shuffle(SCIENCES_QUESTIONS).slice(0, 3).map(toStored)
-  const redaction = shuffle(REDACTION_SUBJECTS)[0]
+  const fr   = pickFresh(FRANCAIS_QUESTIONS, 5, seen)
+  const hg   = pickFresh(HG_QUESTIONS, 6, seen)
+  const math = pickFresh(MATHS_QUESTIONS, 3, seen)
+  const sci  = pickFresh(SCIENCES_QUESTIONS, 3, seen)
+  const red  = pickFresh(REDACTION_SUBJECTS, 1, seenRedaction)
 
   return {
-    questions: [...fr, ...hg, ...math, ...sci],
-    redaction,
+    questions: [...fr.picked, ...hg.picked, ...math.picked, ...sci.picked].map(toStored),
+    redaction: red.picked[0],
+    reused: fr.reused + hg.reused + math.reused + sci.reused + red.reused,
   }
 }
+
+/** Taille de la banque par matière — utile pour le monitoring / l'admin. */
+export const BANK_SIZE = {
+  francais: FRANCAIS_QUESTIONS.length,
+  hgEmc: HG_QUESTIONS.length,
+  maths: MATHS_QUESTIONS.length,
+  sciences: SCIENCES_QUESTIONS.length,
+  redaction: REDACTION_SUBJECTS.length,
+  /** Nombre de brevets 100 % inédits qu'un élève peut enchaîner. */
+  epreuvesInedites: Math.min(
+    Math.floor(FRANCAIS_QUESTIONS.length / 5),
+    Math.floor(HG_QUESTIONS.length / 6),
+    Math.floor(MATHS_QUESTIONS.length / 3),
+    Math.floor(SCIENCES_QUESTIONS.length / 3),
+    REDACTION_SUBJECTS.length
+  ),
+} as const
 
 /** Récupère une question complète (avec corrigé) côté serveur uniquement. */
 export function getFullQuestion(id: string): FullBankQuestion | undefined {

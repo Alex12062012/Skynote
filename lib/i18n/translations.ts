@@ -279,7 +279,6 @@ export const STRINGS: Record<string, string> = {
     'nav.leaderboard': 'Classement',
     'nav.boutique': 'Boutique',
     'nav.courses': 'Cours',
-    'nav.review': 'Révision',
     'nav.payment': 'Paiement',
     'leaderboard.weekly': 'Cette semaine',
     'leaderboard.weeklyChip': 'HEBDO',
