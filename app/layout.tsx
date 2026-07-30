@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Bricolage_Grotesque, DM_Sans, Lexend } from 'next/font/google'
+import { Bricolage_Grotesque, DM_Sans, Lexend, Caveat } from 'next/font/google'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { I18nProvider } from '@/lib/i18n/context'
 import { LiquidGlassFilter } from '@/components/ui/LiquidGlassFilter'
@@ -10,6 +10,11 @@ const bricolage = Bricolage_Grotesque({
 })
 const dmSans = DM_Sans({
   subsets: ['latin'], variable: '--font-dm-sans', display: 'swap', weight: ['400','500','600','700']
+})
+// Manuscrit de la landing : représente le cours de l'élève avant transformation.
+// Purement décoratif — jamais utilisé pour du texte que l'élève doit lire longuement.
+const caveat = Caveat({
+  subsets: ['latin'], variable: '--font-caveat', display: 'swap', weight: ['400','600']
 })
 // Police « dyslexie-friendly » : Lexend est conçue pour réduire la charge
 // visuelle en lecture (formes de lettres distinctes, faible encombrement).
@@ -68,7 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="fr"
-      className={`${bricolage.variable} ${dmSans.variable} ${lexend.variable} dark`}
+      className={`${bricolage.variable} ${dmSans.variable} ${lexend.variable} ${caveat.variable} dark`}
       suppressHydrationWarning
     >
       <head>

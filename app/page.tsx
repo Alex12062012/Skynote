@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createClient as createAdminClient } from "@supabase/supabase-js"
 import { redirect } from "next/navigation"
-import { LandingPage } from "@/components/marketing/LandingPage"
+import { LandingSeyes } from "@/components/marketing/LandingSeyes"
 
 export default async function RootPage() {
   const supabase = await createClient()
@@ -55,5 +55,5 @@ export default async function RootPage() {
     }
   } catch {}
 
-  return <LandingPage isBeta={betaRow?.value === "true"} testimonials={testimonials} />
+  return <LandingSeyes isBeta={betaRow?.value === "true"} testimonials={testimonials} />
 }
