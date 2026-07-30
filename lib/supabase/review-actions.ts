@@ -1,72 +1,13 @@
 'use server'
 
+// La page /review (répétition espacée) a été retirée. Ce module ne sert plus
+// qu'aux sessions d'évaluation (/eval), qui réutilisent la notation SM-2 pour
+// faire progresser les flashcards et attribuer les coins.
+
 import { createClient } from './server'
 import { createAdminClient } from './admin'
 import { applySM2, GRADE_COINS } from '@/lib/sm2'
 import type { SM2Grade } from '@/lib/sm2'
-
-const DUE_CARDS_LIMIT = 20
-
-// ============================================================
-// TYPES
-// ============================================================
-
-export type DueCard = {
-  id: string
-  title: string
-  summary: string
-  course_id: string
-  ease_factor: number
-  interval_days: number
-  repetitions: number
-  next_review_at: string | null
-}
-
-export type ReviewStats = {
-  dueCount: number
-  masteredCount: number
-  totalCount: number
-}
-
-// ============================================================
-// getDueCards — 20 cartes à réviser aujourd'hui
-// ============================================================
-
-export async function getDueCards(): Promise<DueCard[]> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
-
-  const now = new Date().toISOString()
-
-  const { data } = await supabase
-    .from('flashcards')
-    .select('id, title, summary, course_id, ease_factor, interval_days, repetitions, next_review_at')
-    .eq('user_id', user.id)
-    .or(`next_review_at.is.null,next_review_at.lte.${now}`)
-    .order('next_review_at', { ascending: true, nullsFirst: true })
-    .limit(DUE_CARDS_LIMIT)
-
-  return (data as DueCard[]) ?? []
-}
-
-// ============================================================
-// getDueCount — compteur seul (navbar / carte dashboard)
-// ============================================================
-
-export async function getDueCount(): Promise<number> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return 0
-
-  const { count } = await supabase
-    .from('flashcards')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .or(`next_review_at.is.null,next_review_at.lte.${new Date().toISOString()}`)
-
-  return count ?? 0
-}
 
 // ============================================================
 // submitReview — applique SM-2, enregistre, award coins
@@ -137,42 +78,5 @@ export async function submitReview(
     return { ok: true }
   } catch {
     return { ok: false }
-  }
-}
-
-// ============================================================
-// getReviewStats — pour le widget dashboard
-// ============================================================
-
-export async function getReviewStats(): Promise<ReviewStats> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { dueCount: 0, masteredCount: 0, totalCount: 0 }
-
-  const now = new Date().toISOString()
-
-  const [dueRes, masteredRes, totalRes] = await Promise.all([
-    supabase
-      .from('flashcards')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .or(`next_review_at.is.null,next_review_at.lte.${now}`),
-
-    supabase
-      .from('flashcards')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('is_mastered', true),
-
-    supabase
-      .from('flashcards')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id),
-  ])
-
-  return {
-    dueCount: dueRes.count ?? 0,
-    masteredCount: masteredRes.count ?? 0,
-    totalCount: totalRes.count ?? 0,
   }
 }

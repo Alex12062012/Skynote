@@ -10,7 +10,6 @@ import { FeedbackButton } from '@/components/ui/FeedbackButton'
 import { FeedbackTrigger } from '@/components/providers/FeedbackTrigger'
 import { CoinRain } from '@/components/ui/CoinRain'
 import { getNovaBalance } from '@/lib/supabase/nova-actions'
-import { getDueCount } from '@/lib/supabase/review-actions'
 import { NovaUpgradeWidget } from '@/components/ui/NovaUpgradeWidget'
 import type { Profile } from '@/types/database'
 
@@ -19,11 +18,10 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const [{ data: profile }, { data: betaRow }, novaBalance, dueCount] = await Promise.all([
+  const [{ data: profile }, { data: betaRow }, novaBalance] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase.from('admin_settings').select('value').eq('key', 'beta_mode').maybeSingle(),
     getNovaBalance(),
-    getDueCount(),
   ])
 
   // Table user_boosts peut ne pas exister en dev — on protège
@@ -50,7 +48,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
         profile={profile as Profile | null}
         novaBalance={novaBalance}
         userId={user.id}
-        dueCount={dueCount}
       />
       {/* Mise à jour silencieuse du streak de connexion */}
       <StreakTracker userId={user.id} />
