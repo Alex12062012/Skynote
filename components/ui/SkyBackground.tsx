@@ -4,6 +4,10 @@ import { useMemo, useRef } from 'react'
 
 // Thème unique : Skynote est dark-only (pas de toggle, pas de mode clair).
 // On rend toujours le ciel nocturne, plus besoin de détecter le thème.
+//
+// Ce composant est le fond de TOUTE l'app — dashboard, landing, pricing. Il se
+// pose une seule fois à la racine de la page, en `fixed` : les étoiles restent
+// derrière le contenu et ne défilent pas avec lui.
 export function SkyBackground() {
   return <NightSky />
 }

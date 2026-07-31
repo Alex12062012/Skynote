@@ -1,10 +1,14 @@
 'use client'
 
 /**
- * Landing « Seyès » — la réglure du cahier français comme colonne vertébrale.
+ * Landing « Seyès » — la copie manuscrite comme colonne vertébrale.
  *
  * Thèse : le produit transforme le cours manuscrit de l'élève en fiche propre.
  * La page montre cette transformation au lieu de la décrire.
+ *
+ * Fond : le ciel étoilé du dashboard (SkyBackground), pour que le décor de la
+ * landing soit déjà celui de l'app. La réglure Seyès ne subsiste que là où
+ * elle veut dire quelque chose : la feuille de cahier du héros.
  *
  * Budget animation (règles Emil Kowalski / find-animation-opportunities) :
  * chaque mouvement porte un but nommé — explication, continuité spatiale,
@@ -19,10 +23,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { SkyBackground } from '@/components/ui/SkyBackground'
 import { useEffect, useRef, useState } from 'react'
 import {
   animate, motion, useInView, useMotionValue, useReducedMotion,
-  useScroll, useTransform,
 } from 'framer-motion'
 import {
   ArrowRight, Camera, Check, GraduationCap, Mic, MessageCircle,
@@ -78,9 +82,18 @@ function LogoAnimated() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Réglure Seyès                                                       */
+/* Fonds                                                               */
 /* ------------------------------------------------------------------ */
 
+/*
+ * Le ciel étoilé est UNIQUEMENT le fond de page : un seul <SkyBackground />
+ * fixe à la racine, exactement celui du dashboard. Aucune section ni carte ne
+ * pose d'étoiles à elle — sinon elles défilent avec le contenu et le ciel
+ * cesse de se lire comme un fond.
+ *
+ * La réglure Seyès ne subsiste que sur la copie manuscrite du héros, où elle
+ * veut dire quelque chose (c'est une page de cahier).
+ */
 function SeyesSheet({ className = '', fade = true }: { className?: string; fade?: boolean }) {
   return (
     <div
@@ -100,25 +113,6 @@ function SeyesSheet({ className = '', fade = true }: { className?: string; fade?
           : undefined,
       }}
     />
-  )
-}
-
-/**
- * Parallaxe très légère de la réglure : donne de la profondeur au défilement
- * sans que la page « flotte ». Purpose : continuité spatiale. Désactivée en
- * mouvement réduit.
- */
-function SeyesParallax() {
-  const reduce = useReducedMotion()
-  const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
-  const y = useTransform(scrollYProgress, [0, 1], ['-6%', '6%'])
-  return (
-    <div ref={ref} className="pointer-events-none absolute inset-0 overflow-hidden">
-      <motion.div className="absolute inset-[-10%]" style={reduce ? undefined : { y }}>
-        <SeyesSheet />
-      </motion.div>
-    </div>
   )
 }
 
@@ -545,7 +539,6 @@ function Hero({ isBeta }: { isBeta: boolean }) {
   const titre = ['Recopier,', "c'est", 'pas', 'réviser.']
   return (
     <section className="relative overflow-hidden pb-24 pt-6 sm:pt-10">
-      <SeyesParallax />
       <div className="relative z-10 mx-auto max-w-3xl px-4 text-center sm:px-6">
         <motion.p
           className="inline-flex items-center gap-2 rounded-pill border border-night-border bg-night-surface/80 px-4 py-1.5 font-body text-[12px] font-medium text-text-dark-secondary"
@@ -665,7 +658,6 @@ function Brevet() {
     <section className="relative mx-auto max-w-5xl px-4 pb-24 sm:px-6">
       <Reveal>
         <div className="relative overflow-hidden rounded-card border border-night-border bg-night-surface">
-          <SeyesSheet fade={false} className="opacity-40" />
           <div className="relative grid items-center gap-10 p-8 sm:p-10 lg:grid-cols-2">
             <div>
               <SectionTitle eyebrow="Tu passes le brevet cette année ?">
@@ -802,7 +794,6 @@ function FinalCta({ isBeta }: { isBeta: boolean }) {
   return (
     <section className="relative overflow-hidden px-4 pb-28 sm:px-6">
       <div className="relative mx-auto max-w-3xl overflow-hidden rounded-card border border-brand-dark/30 bg-night-surface px-6 py-16 text-center sm:px-10">
-        <SeyesSheet />
         <div className="relative">
           <Reveal>
             <LogoMark size={44} className="mx-auto" />
@@ -901,7 +892,10 @@ export function LandingSeyes({
   const avis = sample ? AVIS_EXEMPLES : testimonials
 
   return (
-    <div className="min-h-dvh bg-night-bg">
+    // Pas de `bg-night-bg` ici : le fond nuit vient déjà du <body>, et le laisser
+    // sur ce conteneur masquerait le ciel (qui se peint en -z-10, sous lui).
+    <div className="min-h-dvh">
+      <SkyBackground />
       <a
         href="#contenu"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-input focus:bg-brand focus:px-4 focus:py-2 focus:font-body focus:text-[14px] focus:text-white"

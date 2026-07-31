@@ -8,7 +8,7 @@
  * publics sont servis : qui a déjà choisi tranche sur les cartes, qui hésite
  * descend au tableau.
  *
- * Direction artistique alignée sur la landing : réglure Seyès, fond night,
+ * Direction artistique alignée sur la landing : ciel étoilé, fond night,
  * une seule famille de teintes. L'ancienne version empilait six palettes sans
  * rapport (violet, indigo, emerald, slate, yellow) : le plan recommandé se
  * signale par la couleur de marque, pas par une teinte inventée par forfait.
@@ -28,6 +28,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Check, Minus, ArrowLeft, ArrowRight, Settings, Calendar } from 'lucide-react'
+import { SkyBackground } from '@/components/ui/SkyBackground'
 import { cn } from '@/lib/utils'
 import { fadeUp, stagger, SPRING, EASE, DUR } from '@/lib/motion'
 import { NOVA_COST_COURSE, NOVA_COST_CHAT, NOVA_COST_QCM_SINGLE, NOVA_COST_OCR } from '@/lib/supabase/nova-constants'
@@ -106,24 +107,11 @@ interface PricingClientProps {
   isLoggedIn: boolean
 }
 
-/** Réglure Seyès — même motif que la landing, c'est la signature du produit. */
-function SeyesSheet({ className = '' }: { className?: string }) {
-  return (
-    <div
-      aria-hidden
-      className={`pointer-events-none absolute inset-0 ${className}`}
-      style={{
-        backgroundImage: [
-          'repeating-linear-gradient(to bottom, rgba(96,165,250,.06) 0 1px, transparent 1px 14px)',
-          'repeating-linear-gradient(to bottom, rgba(96,165,250,.13) 0 1px, transparent 1px 56px)',
-          'repeating-linear-gradient(to right, rgba(96,165,250,.06) 0 1px, transparent 1px 56px)',
-        ].join(','),
-        maskImage: 'radial-gradient(ellipse 85% 60% at 50% 20%, #000 40%, transparent 100%)',
-        WebkitMaskImage: 'radial-gradient(ellipse 85% 60% at 50% 20%, #000 40%, transparent 100%)',
-      }}
-    />
-  )
-}
+/*
+ * Le ciel étoilé est le fond de page et rien d'autre : un seul
+ * <SkyBackground /> fixe à la racine, celui du dashboard. Les sections et les
+ * cartes ne posent pas d'étoiles à elles — elles défileraient avec le contenu.
+ */
 
 export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, isLoggedIn }: PricingClientProps) {
   const router = useRouter()
@@ -167,9 +155,11 @@ export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, i
   )
 
   return (
-    <div className="min-h-dvh bg-sky-bg dark:bg-night-bg">
+    // Pas de fond sur ce conteneur : il vient du <body>, sinon il masquerait le
+    // ciel (peint en -z-10, sous lui).
+    <div className="min-h-dvh">
+      <SkyBackground />
       <div className="relative overflow-hidden px-4 pt-10">
-        <SeyesSheet />
         <div className="relative mx-auto max-w-5xl">
           <Link
             href={isLoggedIn ? '/dashboard' : '/'}
@@ -541,7 +531,6 @@ export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, i
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: DUR.slow, ease: EASE.out }}
           >
-            <SeyesSheet />
             <div className="relative">
               <p className="font-display text-[clamp(20px,3vw,28px)] font-bold leading-snug text-text-main dark:text-text-dark-main">
                 Commence gratuitement, tu décideras après.
