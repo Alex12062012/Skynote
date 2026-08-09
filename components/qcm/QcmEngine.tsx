@@ -1,0 +1,543 @@
+'use client'
+
+import { useState, useTransition, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { CheckCircle, XCircle, Zap, RotateCcw, ArrowLeft, Leaf, Target, Flame, Trophy, Star, BookOpen, Check, X, Lightbulb } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
+import { SkyCoin } from '@/components/ui/SkyCoin'
+import { useCoinReward } from '@/components/providers/CoinRewardProvider'
+import { saveQcmAttempt, type QcmDifficulty } from '@/lib/supabase/qcm-actions'
+import { consumeBoostCharge } from '@/lib/supabase/gamification-actions'
+import { createClient } from '@/lib/supabase/client'
+import { motion } from 'framer-motion'
+import { cn } from '@/lib/utils'
+import { useI18n } from '@/lib/i18n/context'
+import { EASE, DUR, SPRING } from '@/lib/motion'
+import type { QcmQuestion, Flashcard } from '@/types/database'
+import type { RewardBreakdown } from '@/lib/gamification/rewards'
+
+interface QcmEngineProps {
+  flashcard: Flashcard
+  questions: QcmQuestion[]
+  courseId: string
+  difficulty?: QcmDifficulty
+  onRegenerate?: () => void
+  onChangeDifficulty?: () => void
+}
+
+type AnswerState = 'unanswered' | 'correct' | 'incorrect'
+interface UserAnswer { questionIndex: number; chosenIndex: number; correct: boolean }
+
+/** Options d'une question, quelle que soit la forme stockée (array ou JSON). */
+function parseOptions(q: QcmQuestion | undefined): string[] {
+  if (Array.isArray(q?.options)) return q.options as string[]
+  try { return JSON.parse(String(q?.options ?? '[]')) } catch { return [] }
+}
+
+/**
+ * Explication à afficher pour une question.
+ * Le champ `explanation` est généré par l'IA (cf. lib/ai/prompts.ts) et la
+ * génération filtre les questions sans explication — mais d'anciennes lignes
+ * peuvent en être dépourvues. On garantit alors un texte utile plutôt qu'un
+ * bloc vide : l'élève doit TOUJOURS repartir avec une explication.
+ */
+function explanationFor(q: QcmQuestion, options: string[]): string {
+  const raw = String(q.explanation ?? '').trim()
+  if (raw) return raw
+  const correct = options[q.correct_index]
+  return correct
+    ? `La bonne réponse est « ${correct} ». Reprends la fiche correspondante pour revoir ce point en détail.`
+    : 'Reprends la fiche correspondante pour revoir ce point en détail.'
+}
+
+const DIFFICULTY_LABELS: Record<QcmDifficulty, { label: string; Icon: React.ElementType; color: string }> = {
+  peaceful: { label: 'Paisible',          Icon: Leaf,         color: 'text-emerald-600 dark:text-emerald-400' },
+  easy:     { label: 'Normal',            Icon: Target,       color: 'text-brand dark:text-brand-dark' },
+  medium:   { label: 'Hardcore',          Icon: Flame,        color: 'text-orange-600 dark:text-orange-400' },
+  hard:     { label: 'Teste tes parents', Icon: Trophy,       color: 'text-red-600 dark:text-red-400' },
+}
+
+export function QcmEngine({ flashcard, questions, courseId, difficulty = 'medium', onRegenerate, onChangeDifficulty }: QcmEngineProps) {
+  const router = useRouter()
+  const { t } = useI18n()
+  const [isPending, startTransition] = useTransition()
+  const [currentQ, setCurrentQ] = useState(0)
+  const [answers, setAnswers] = useState<UserAnswer[]>([])
+  const [selectedOption, setSelectedOption] = useState<number | null>(null)
+  const [answerState, setAnswerState] = useState<AnswerState>('unanswered')
+  const [showResult, setShowResult] = useState(false)
+  const [coinsEarned, setCoinsEarned] = useState(0)
+  const [rewardBreakdown, setRewardBreakdown] = useState<RewardBreakdown | null>(null)
+  const { showReward } = useCoinReward()
+  const [retryCharges, setRetryCharges] = useState(0)
+  const [retryPending, setRetryPending] = useState(false)
+  const [hintCharges, setHintCharges] = useState(0)
+  const [hintPending, setHintPending] = useState(false)
+  /** Index de l'option éliminée par l'indice (-1 = aucun) */
+  const [eliminatedOption, setEliminatedOption] = useState<number>(-1)
+
+  // Charger les charges retry/hint au montage
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user || cancelled) return
+        const { data } = await supabase
+          .from('user_boosts').select('boost_type, charges')
+          .eq('user_id', user.id)
+          .in('boost_type', ['retry_qcm', 'hint_question'])
+        if (cancelled) return
+        const rows = data ?? []
+        setRetryCharges(rows.filter((r: any) => r.boost_type === 'retry_qcm').reduce((s: number, r: any) => s + (r.charges ?? 1), 0))
+        setHintCharges(rows.filter((r: any) => r.boost_type === 'hint_question').reduce((s: number, r: any) => s + (r.charges ?? 1), 0))
+      } catch { /* table absente */ }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  const question = questions[currentQ]
+  const total = questions.length
+  const options: string[] = parseOptions(question)
+
+  function handleOptionClick(i: number) {
+    if (answerState !== 'unanswered') return
+    if (i === eliminatedOption) return  // option éliminée non cliquable
+    setSelectedOption(i)
+    setAnswerState(i === question.correct_index ? 'correct' : 'incorrect')
+  }
+
+  function handleNext() {
+    if (selectedOption === null) return
+    const newAnswers = [...answers, {
+      questionIndex: currentQ,
+      chosenIndex: selectedOption,
+      correct: selectedOption === question.correct_index,
+    }]
+    setAnswers(newAnswers)
+    // Réinitialiser l'indice pour la prochaine question
+    setEliminatedOption(-1)
+    if (currentQ < total - 1) {
+      setCurrentQ(currentQ + 1)
+      setSelectedOption(null)
+      setAnswerState('unanswered')
+    } else {
+      const finalScore = newAnswers.filter((a) => a.correct).length
+      startTransition(async () => {
+        const { coinsEarned: earned, reward } = await saveQcmAttempt({
+          flashcardId: flashcard.id,
+          score: finalScore,
+          total,
+          answers: newAnswers.map((a) => a.chosenIndex),
+          difficulty,
+        })
+        setCoinsEarned(earned)
+        setRewardBreakdown(reward)
+        if (earned > 0) {
+          // Bonus prestige = ligne "Prestige ×N" dans le breakdown
+          const prestigeLine = reward?.breakdown.find(b => b.label.startsWith('Prestige'))
+          const prestigeBonus = prestigeLine?.value ?? 0
+          const baseAmount = earned - prestigeBonus
+
+          // 1ère animation — coins de base
+          if (baseAmount > 0) {
+            showReward({ amount: baseAmount, reason: `Score parfait — ${DIFFICULTY_LABELS[difficulty].label} !` })
+          }
+          // 2ème animation — bonus prestige (style doré), jouée après la 1ère grâce à la queue
+          if (prestigeBonus > 0) {
+            showReward({ amount: prestigeBonus, reason: prestigeLine!.label, variant: 'prestige' })
+          }
+          // Cas rare : si pas de base (tout vient du prestige, impossible normalement)
+          if (baseAmount <= 0 && prestigeBonus <= 0) {
+            showReward({ amount: earned, reason: `Score parfait — ${DIFFICULTY_LABELS[difficulty].label} !` })
+          }
+        }
+        setShowResult(true)
+        loadBoostCharges()
+      })
+    }
+  }
+
+  function handleRestart() {
+    setCurrentQ(0); setAnswers([]); setSelectedOption(null)
+    setAnswerState('unanswered'); setShowResult(false)
+    setCoinsEarned(0); setRewardBreakdown(null)
+    setEliminatedOption(-1)
+    if (onRegenerate) onRegenerate()
+  }
+
+  async function handleRetryWithCharge() {
+    if (retryPending || retryCharges <= 0) return
+    setRetryPending(true)
+    const { error, remaining } = await consumeBoostCharge('retry_qcm')
+    setRetryPending(false)
+    if (error) return
+    setRetryCharges(remaining)
+    handleRestart()
+  }
+
+  async function loadBoostCharges() {
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data } = await supabase
+        .from('user_boosts').select('boost_type, charges')
+        .eq('user_id', user.id)
+        .in('boost_type', ['retry_qcm', 'hint_question'])
+      const rows = data ?? []
+      setRetryCharges(rows.filter((r: any) => r.boost_type === 'retry_qcm').reduce((s: number, r: any) => s + (r.charges ?? 1), 0))
+      setHintCharges(rows.filter((r: any) => r.boost_type === 'hint_question').reduce((s: number, r: any) => s + (r.charges ?? 1), 0))
+    } catch { /* table absente */ }
+  }
+
+  /**
+   * Indice : élimine aléatoirement une mauvaise réponse (style 50/50).
+   * Consomme 1 charge hint_question.
+   */
+  async function handleHintQuestion() {
+    if (hintPending || hintCharges <= 0 || answerState !== 'unanswered' || eliminatedOption >= 0) return
+    setHintPending(true)
+    const { error, remaining } = await consumeBoostCharge('hint_question')
+    setHintPending(false)
+    if (error) return
+    setHintCharges(remaining)
+
+    // Trouver un mauvais index aléatoire (différent de la bonne réponse)
+    const wrongIndexes = options
+      .map((_, i) => i)
+      .filter((i) => i !== question.correct_index)
+    const randomWrong = wrongIndexes[Math.floor(Math.random() * wrongIndexes.length)]
+    setEliminatedOption(randomWrong)
+  }
+
+  // ── Résultats ──────────────────────────────────────────────
+  if (showResult) {
+    const finalScore = answers.filter((a) => a.correct).length
+    const isPerfect = finalScore === total
+    const pct = Math.round((finalScore / total) * 100)
+    return (
+      <>
+        <div className="flex flex-col items-center gap-6 py-8 text-center animate-fade-in">
+          <div className={cn('flex h-24 w-24 items-center justify-center rounded-full animate-pop-in',
+            isPerfect ? 'bg-success-soft dark:bg-emerald-950/30'
+              : pct >= 60 ? 'bg-brand-soft dark:bg-brand-dark-soft'
+                : 'bg-red-50 dark:bg-red-950/20')}>
+            {isPerfect ? <Trophy className="h-12 w-12 text-amber-500" /> : pct >= 60 ? <Star className="h-12 w-12 text-brand dark:text-brand-dark" /> : <BookOpen className="h-12 w-12 text-text-tertiary dark:text-text-dark-tertiary" />}
+          </div>
+          <div>
+            <h2 className="font-display text-h2 text-text-main dark:text-text-dark-main">
+              {isPerfect ? 'Score parfait !' : pct >= 60 ? 'Bon travail !' : 'Continue à réviser !'}
+            </h2>
+            <p className="mt-1 font-body text-[15px] text-text-secondary dark:text-text-dark-secondary">
+              <strong className="text-text-main dark:text-text-dark-main">{finalScore}/{total}</strong> bonnes réponses · {pct}%
+            </p>
+          </div>
+          <div className="flex gap-2">
+            {answers.map((a, i) => (
+              <div key={i} className={cn('flex h-10 w-10 items-center justify-center rounded-full font-body text-[13px] font-bold',
+                a.correct ? 'bg-success-soft text-success dark:bg-emerald-950/30 dark:text-success-dark' : 'bg-red-50 text-error dark:bg-red-950/20')}>
+                {a.correct ? <CheckCircle className="h-4 w-4 text-success" /> : <XCircle className="h-4 w-4 text-error" />}
+              </div>
+            ))}
+          </div>
+          {coinsEarned > 0 && (
+            <div className="flex items-center gap-2 rounded-pill bg-brand-soft px-5 py-2.5 animate-pop-in dark:bg-brand-dark-soft">
+              <SkyCoin size={24} />
+              <span className="font-body text-[15px] font-bold text-brand dark:text-brand-dark">+{coinsEarned} Sky Coins !</span>
+            </div>
+          )}
+          {!isPerfect && (
+            <p className="max-w-xs font-body text-[14px] text-text-secondary dark:text-text-dark-secondary">
+              {pct < 60 ? 'Relis les fiches puis réessaie !' : 'Encore un effort pour le score parfait !'}
+            </p>
+          )}
+
+          {/* Récap' : toutes les explications, accessibles à tous les plans */}
+          <AnswersRecap questions={questions} answers={answers} />
+
+          <div className="flex flex-col gap-3 w-full max-w-xs">
+            <Button onClick={handleRestart} className="w-full gap-2"><RotateCcw className="h-4 w-4" />Recommencer</Button>
+            {!isPerfect && retryCharges > 0 && (
+              <Button
+                onClick={handleRetryWithCharge}
+                disabled={retryPending}
+                variant="secondary"
+                className="w-full gap-2 border-amber-400/50 bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/20 dark:text-amber-300"
+              >
+                <Zap className="h-4 w-4" />
+                {retryPending ? 'En cours…' : `Retry gratuit (${retryCharges} charge${retryCharges > 1 ? 's' : ''})`}
+              </Button>
+            )}
+            {onChangeDifficulty && (
+              <Button onClick={onChangeDifficulty} variant="secondary" className="w-full gap-2">
+                Changer de niveau
+              </Button>
+            )}
+            <Button onClick={() => router.push(`/courses/${courseId}`)} variant="secondary" className="w-full gap-2">
+              <ArrowLeft className="h-4 w-4" />Retour aux fiches
+            </Button>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  // ── Question en cours ──────────────────────────────────────
+  return (
+    <div className="flex flex-col gap-0 animate-fade-in">
+
+      {/* Zone scrollable */}
+      <div className="flex flex-col gap-4 pb-4">
+
+        {/* Progression */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="font-body text-[13px] text-text-tertiary dark:text-text-dark-tertiary">
+                Question {currentQ + 1} / {total}
+              </span>
+              <span className={cn('font-body text-[11px] font-semibold', DIFFICULTY_LABELS[difficulty].color)}>
+                {DIFFICULTY_LABELS[difficulty].label}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {/* Bouton Indice — disponible si charges > 0, question pas encore répondue, et indice pas déjà utilisé */}
+              {hintCharges > 0 && answerState === 'unanswered' && eliminatedOption < 0 && (
+                <button
+                  onClick={handleHintQuestion}
+                  disabled={hintPending}
+                  className="flex items-center gap-1 rounded-pill bg-violet-100 px-2.5 py-1 font-body text-[11px] font-semibold text-violet-700 transition hover:bg-violet-200 disabled:opacity-50 dark:bg-violet-950/30 dark:text-violet-300"
+                >
+                  <Lightbulb className="h-3 w-3" />
+                  {hintPending ? '…' : `Indice (${hintCharges})`}
+                </button>
+              )}
+              {/* Badge "Indice utilisé" quand l'option est éliminée */}
+              {eliminatedOption >= 0 && answerState === 'unanswered' && (
+                <span className="flex items-center gap-1 rounded-pill bg-violet-50 px-2.5 py-1 font-body text-[11px] font-semibold text-violet-500 dark:bg-violet-950/20 dark:text-violet-400">
+                  <Lightbulb className="h-3 w-3" />
+                  1 réponse éliminée
+                </span>
+              )}
+              <span className="font-body text-[13px] font-semibold text-success dark:text-success-dark">
+                {answers.filter((a) => a.correct).length} correctes
+              </span>
+            </div>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-pill bg-sky-cloud dark:bg-night-border">
+            <div className="h-full rounded-pill transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-500"
+              style={{ width: `${(currentQ / total) * 100}%`, background: 'linear-gradient(90deg,#2563EB,#60A5FA)' }} />
+          </div>
+        </div>
+
+        {/* Question */}
+        <div className="rounded-card border border-sky-border bg-sky-surface p-5 shadow-card dark:border-night-border dark:bg-night-surface dark:shadow-card-dark">
+          <p className="font-body text-label-caps text-text-tertiary dark:text-text-dark-tertiary mb-1.5">
+            {flashcard.title}
+          </p>
+          <h2 className="font-display text-[18px] font-semibold text-text-main dark:text-text-dark-main leading-snug">
+            {question.question}
+          </h2>
+        </div>
+
+        {/* Options — la cascade est rejouee a chaque question (cle = currentQ).
+            Purpose : eviter le changement brutal quand tout le bloc se
+            substitue d'un coup. Pas rejouee apres une reponse : le bloc ne
+            doit pas bouger pendant que l'eleve lit la correction. */}
+        <motion.div
+          key={currentQ}
+          className="flex flex-col gap-2"
+          initial="hidden"
+          animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.035 } } }}
+        >
+          {options.map((option, index) => {
+            const isSelected    = selectedOption === index
+            const isCorrect     = index === question.correct_index
+            const isAnswered    = answerState !== 'unanswered'
+            const isEliminated  = index === eliminatedOption
+
+            let cls = ''
+            if (isEliminated && !isAnswered) {
+              // Option éliminée par l'indice — grisée et non cliquable
+              cls = 'border-dashed border-sky-border opacity-30 cursor-not-allowed dark:border-night-border'
+            } else if (isAnswered) {
+              if (isCorrect)          cls = 'border-success bg-success-soft text-success dark:border-success-dark dark:bg-emerald-950/30 dark:text-success-dark'
+              else if (isSelected)    cls = 'border-error bg-red-50 text-error dark:bg-red-950/20 dark:border-error'
+              else                    cls = 'border-sky-border opacity-40 dark:border-night-border'
+            } else {
+              cls = 'border-sky-border hover:border-brand hover:bg-brand-soft/40 dark:border-night-border dark:hover:border-brand-dark dark:hover:bg-brand-dark-soft/20 cursor-pointer'
+            }
+
+            return (
+              <motion.button
+                key={index}
+                variants={{
+                  hidden: { opacity: 0, y: 8 },
+                  show: { opacity: 1, y: 0, transition: { duration: DUR.fast, ease: EASE.out } },
+                }}
+                whileTap={isAnswered || isEliminated ? undefined : { scale: 0.985 }}
+                transition={SPRING.press}
+                onClick={() => handleOptionClick(index)}
+                disabled={isAnswered || isEliminated}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-card-sm border-[1.5px] px-4 py-3 text-left',
+                  'transition-[background-color,border-color,color,opacity] duration-150',
+                  cls,
+                  // Animations de feedback
+                  isAnswered && isCorrect && isSelected ? 'animate-bounce-in' : '',
+                  isAnswered && isSelected && !isCorrect ? 'animate-shake' : '',
+                )}
+              >
+                <span className={cn('flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full font-body text-[12px] font-bold',
+                  isAnswered && isCorrect       ? 'bg-success text-white dark:bg-success-dark'
+                  : isAnswered && isSelected    ? 'bg-error text-white'
+                  : isEliminated               ? 'bg-sky-cloud text-text-tertiary dark:bg-night-border line-through'
+                  :                              'bg-sky-cloud text-brand dark:bg-night-border dark:text-brand-dark')}>
+                  {String.fromCharCode(65 + index)}
+                </span>
+                <span className={cn('flex-1 font-body text-[14px] leading-snug', isEliminated && 'line-through text-text-tertiary')}>
+                  {option}
+                </span>
+                {isAnswered && isCorrect  && <CheckCircle className="h-4 w-4 flex-shrink-0 text-success dark:text-success-dark" />}
+                {isAnswered && isSelected && !isCorrect && <XCircle className="h-4 w-4 flex-shrink-0 text-error" />}
+                {isEliminated && !isAnswered && <X className="h-3.5 w-3.5 flex-shrink-0 text-text-tertiary" />}
+              </motion.button>
+            )
+          })}
+        </motion.div>
+
+        {/* Explication — affichée SYSTÉMATIQUEMENT après chaque réponse,
+            bonne ou mauvaise, et pour tous les plans (aucune condition premium
+            ici : c'est le moment pédagogique clé, il ne doit jamais être vendu). */}
+        {/* aria-live : la correction apparait apres la reponse. Sans region
+            live, un lecteur d'ecran ne l'annonce jamais — l'eleve aveugle
+            repond sans jamais savoir s'il a eu juste. */}
+        <div className="min-h-[72px]" aria-live="polite" aria-atomic="true">
+          {answerState !== 'unanswered' && (
+            <div className={cn('rounded-input px-4 py-3 animate-slide-in',
+              answerState === 'correct'
+                ? 'bg-success-soft border border-success/20 dark:bg-emerald-950/20 dark:border-emerald-800/30'
+                : 'bg-red-50 border border-error/20 dark:bg-red-950/20 dark:border-red-800/30')}>
+              <p className="flex items-center gap-1 font-body text-[12px] font-semibold mb-0.5 dark:text-text-dark-main">
+                {answerState === 'correct'
+                  ? (<><Check className="h-3.5 w-3.5 text-green-600" /> Bonne réponse !</>)
+                  : (<><X className="h-3.5 w-3.5 text-red-500" /> Pas tout à fait...</>)}
+              </p>
+
+              {/* Rappel de la bonne réponse quand l'élève s'est trompé */}
+              {answerState === 'incorrect' && options[question.correct_index] && (
+                <p className="mb-1 font-body text-[13px] font-medium text-text-main dark:text-text-dark-main">
+                  La bonne réponse était : {options[question.correct_index]}
+                </p>
+              )}
+
+              <p className="flex items-start gap-1.5 font-body text-[13px] text-text-secondary dark:text-text-dark-secondary">
+                <Lightbulb className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-amber-500" />
+                <span>
+                  <span className="font-semibold">Pourquoi&nbsp;? </span>
+                  {explanationFor(question, options)}
+                </span>
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Bouton Suivant */}
+      <div className="sticky bottom-4 z-50 mt-2">
+        <Button
+          onClick={handleNext}
+          loading={isPending}
+          disabled={answerState === 'unanswered'}
+          size="lg"
+          className={cn(
+            'w-full gap-2 transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-200',
+            answerState === 'unanswered' ? 'opacity-40' : 'opacity-100 shadow-btn'
+          )}
+        >
+          {currentQ < total - 1
+            ? 'Question suivante'
+            : <><Zap className="h-5 w-5" />Voir mes résultats</>
+          }
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Récapitulatif de fin de QCM : chaque question avec la réponse donnée, la
+ * bonne réponse et l'explication de l'IA. Ouvert par défaut quand l'élève a
+ * fait au moins une erreur — c'est là qu'il apprend le plus.
+ *
+ * Aucune restriction de plan : un élève Free, qui n'a pas de chat illimité,
+ * doit malgré tout comprendre POURQUOI il s'est trompé.
+ */
+function AnswersRecap({ questions, answers }: { questions: QcmQuestion[]; answers: UserAnswer[] }) {
+  const hasMistake = answers.some(a => !a.correct)
+  const [open, setOpen] = useState(hasMistake)
+
+  if (answers.length === 0) return null
+
+  return (
+    <div className="w-full max-w-md text-left">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex w-full items-center justify-between gap-2 rounded-input border border-sky-border bg-sky-surface px-4 py-2.5 font-body text-[13px] font-semibold text-text-main transition-colors hover:border-brand/40 dark:border-night-border dark:bg-night-surface dark:text-text-dark-main"
+      >
+        <span className="flex items-center gap-2">
+          <Lightbulb className="h-4 w-4 text-amber-500" />
+          Revoir les explications
+        </span>
+        <span className="font-body text-[12px] font-normal text-text-tertiary dark:text-text-dark-tertiary">
+          {open ? 'Masquer' : `${answers.length} question${answers.length > 1 ? 's' : ''}`}
+        </span>
+      </button>
+
+      {open && (
+        <div className="mt-2 flex flex-col gap-2 animate-fade-in">
+          {answers.map((a) => {
+            const q = questions[a.questionIndex]
+            if (!q) return null
+            const options = parseOptions(q)
+            return (
+              <div
+                key={a.questionIndex}
+                className={cn(
+                  'rounded-input border px-4 py-3',
+                  a.correct
+                    ? 'border-success/20 bg-success-soft dark:border-emerald-800/30 dark:bg-emerald-950/20'
+                    : 'border-error/20 bg-red-50 dark:border-red-800/30 dark:bg-red-950/20',
+                )}
+              >
+                <p className="flex items-start gap-1.5 font-body text-[13px] font-semibold text-text-main dark:text-text-dark-main">
+                  {a.correct
+                    ? <CheckCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-success" />
+                    : <XCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-error" />}
+                  {q.question}
+                </p>
+
+                {!a.correct && (
+                  <p className="mt-1.5 font-body text-[12px] text-text-secondary dark:text-text-dark-secondary">
+                    Ta réponse : {options[a.chosenIndex] ?? '—'}
+                    <br />
+                    <span className="font-medium text-text-main dark:text-text-dark-main">
+                      Bonne réponse : {options[q.correct_index] ?? '—'}
+                    </span>
+                  </p>
+                )}
+
+                <p className="mt-1.5 font-body text-[12px] leading-relaxed text-text-secondary dark:text-text-dark-secondary">
+                  {explanationFor(q, options)}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
+}

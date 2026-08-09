@@ -1,0 +1,252 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ─── SYSTÈME DE MOUVEMENT ──────────────────────────────────────────────
+     Jumeau CSS de lib/motion.ts. Toute animation en CSS pur doit puiser
+     ici plutôt que d'écrire sa propre cubic-bezier — c'est ce qui donne au
+     site un rythme unique au lieu de 11 rythmes concurrents. */
+  :root {
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-overshoot: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+    --dur-instant: 100ms;
+    --dur-fast: 160ms;
+    --dur-base: 220ms;
+    --dur-slow: 320ms;
+    --dur-deliberate: 450ms;
+  }
+
+  /* Aucune animation ne doit s'imposer à qui a demandé le calme. Filet de
+     sécurité global : couvre aussi les animations qu'un composant aurait
+     oublié de conditionner. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  body { @apply font-body bg-sky-bg text-text-main antialiased dark:bg-night-bg dark:text-text-dark-main; transition: background-color 0.3s ease, color 0.2s ease; overflow-x: hidden; }
+  ::selection { @apply bg-brand-soft text-brand dark:bg-brand-dark-soft dark:text-brand-dark; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-sky-bg dark:bg-night-bg; }
+  ::-webkit-scrollbar-thumb { @apply rounded-full bg-sky-border dark:bg-night-border; }
+  :focus-visible { @apply outline-none ring-2 ring-brand ring-offset-2 dark:ring-brand-dark dark:ring-offset-night-bg; }
+
+  /* ─── MODE DYSLEXIE-FRIENDLY ────────────────────────────────────────────
+     Activé depuis le profil (toggle) → classe .dyslexia-mode sur <html>.
+     On remplace les deux familles de l'app par Lexend, conçue pour réduire
+     la charge visuelle en lecture, et on aère le texte (interlignage,
+     espacement des lettres et des mots) — ces trois réglages sont ceux qui
+     aident le plus les lecteurs dyslexiques.
+     `!important` est nécessaire : les classes Tailwind font-display /
+     font-body sont appliquées élément par élément dans tout le code. */
+  html.dyslexia-mode body,
+  html.dyslexia-mode .font-display,
+  html.dyslexia-mode .font-body,
+  html.dyslexia-mode input,
+  html.dyslexia-mode textarea,
+  html.dyslexia-mode button {
+    font-family: var(--font-lexend), system-ui, sans-serif !important;
+  }
+
+  html.dyslexia-mode body {
+    line-height: 1.75;
+    letter-spacing: 0.02em;
+    word-spacing: 0.08em;
+  }
+
+  /* Les titres très serrés redeviennent lisibles */
+  html.dyslexia-mode .text-h1,
+  html.dyslexia-mode .text-h2 {
+    letter-spacing: 0 !important;
+  }
+}
+
+@layer components {
+  .text-h1 { @apply font-display text-[48px] font-bold leading-tight tracking-[-0.02em]; }
+  .text-h2 { @apply font-display text-[32px] font-bold leading-tight tracking-[-0.01em]; }
+  .text-h3 { @apply font-display text-[22px] font-semibold leading-snug; }
+  .text-h4 { @apply font-body text-[17px] font-semibold leading-snug; }
+  .text-label-caps { @apply font-body text-[12px] font-medium uppercase tracking-[0.06em]; }
+  /* Toutes les "bulles" partagées sont en Liquid Glass transparent (cf. .lglass-liquid). */
+  .card { @apply lglass-liquid rounded-card; }
+  .badge-primary { @apply lglass-liquid rounded-pill px-3 py-1 font-body text-[12px] font-medium text-text-dark-main; }
+  .skeleton { @apply rounded-input bg-gradient-to-r from-sky-cloud via-sky-border to-sky-cloud bg-[length:200%_100%] animate-shimmer dark:from-night-border dark:via-night-surface dark:to-night-border; }
+}
+
+@layer utilities {
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+  .text-gradient-sky { @apply bg-gradient-to-r from-brand to-brand-dark bg-clip-text text-transparent; }
+  .glass { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+  /* ── Liquid Glass — traduction web des principes iOS 26 ──────────────
+     Réservé à la couche navigation / contrôles flottants, jamais au contenu.
+     `regular` (défaut), `clear` (plus transparent), `tint` (proéminence),
+     `interactive` (illumination au pointeur + press). */
+  /* Reflet spéculaire intégré au fond (pas de ::before ni de position imposée,
+     pour ne jamais écraser le positionnement de l'élément). */
+  .lglass {
+    border: 1px solid rgba(255,255,255,.14);
+    background:
+      radial-gradient(120% 80% at 30% -25%, rgba(255,255,255,.26), transparent 60%),
+      linear-gradient(140deg, rgba(255,255,255,.11), rgba(255,255,255,.035));
+    backdrop-filter: blur(16px) saturate(180%); -webkit-backdrop-filter: blur(16px) saturate(180%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.32), inset 0 -1px 0 rgba(255,255,255,.05), 0 10px 30px -12px rgba(0,0,0,.55);
+  }
+  .lglass-clear {
+    backdrop-filter: blur(9px) saturate(150%); -webkit-backdrop-filter: blur(9px) saturate(150%);
+    background:
+      radial-gradient(120% 80% at 30% -25%, rgba(255,255,255,.18), transparent 60%),
+      linear-gradient(140deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  }
+  .lglass-tint {
+    background:
+      radial-gradient(120% 80% at 30% -25%, rgba(255,255,255,.22), transparent 60%),
+      linear-gradient(140deg, rgba(96,165,250,.20), rgba(37,99,235,.10)),
+      linear-gradient(140deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+    border-color: rgba(96,165,250,.32);
+  }
+  /* Verre bleu teinté et opaque (on ne voit quasiment pas à travers) */
+  .lglass-blue {
+    border: 1px solid rgba(96,165,250,.30);
+    background:
+      radial-gradient(120% 85% at 30% -25%, rgba(255,255,255,.20), transparent 58%),
+      linear-gradient(150deg, rgba(45,104,232,.36), rgba(16,33,61,.85));
+    backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.26), inset 0 -1px 0 rgba(255,255,255,.04), 0 12px 34px -14px rgba(0,0,0,.6);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .lglass-blue { background: rgba(20,40,75,.97); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+  /* Liquid Glass transparent + distorsion réelle (laisse passer les étoiles, qui ondulent).
+     La distorsion vient du filtre SVG #lg-distort branché sur backdrop-filter. */
+  .lglass-liquid {
+    border: 1px solid rgba(255,255,255,.20);
+    background: linear-gradient(140deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
+    backdrop-filter: url(#lg-distort) blur(1px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.34),
+      inset 0 -1px 0 rgba(255,255,255,.07),
+      inset 0 0 16px rgba(255,255,255,.05),
+      0 10px 30px -12px rgba(0,0,0,.5);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .lglass-liquid { background: rgba(13,27,46,.92); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+  /* Bleu semi-opaque + semi liquid glass (distorsion + on devine le fond) */
+  .lglass-blue-liquid {
+    border: 1px solid rgba(96,165,250,.34);
+    background:
+      radial-gradient(120% 85% at 30% -25%, rgba(255,255,255,.18), transparent 58%),
+      linear-gradient(150deg, rgba(45,104,232,.36), rgba(20,44,82,.52));
+    -webkit-backdrop-filter: blur(8px) saturate(160%);
+    backdrop-filter: url(#lg-distort) blur(2px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.30), inset 0 -1px 0 rgba(255,255,255,.06), 0 12px 30px -14px rgba(0,0,0,.55);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .lglass-blue-liquid { background: rgba(22,46,86,.95); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+  .lglass-interactive { transition: transform .18s cubic-bezier(.33,1,.68,1), box-shadow .25s ease; }
+  .lglass-interactive:hover { transform: translateY(-1px); }
+  .lglass-interactive:active { transform: scale(.97); }
+  @media (prefers-reduced-motion: reduce) {
+    .lglass-interactive { transition: none; }
+    .lglass-interactive:hover, .lglass-interactive:active { transform: none; }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .lglass { background: rgba(13,27,46,.94); backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .lglass-tint { background: rgba(20,40,75,.96); }
+  }
+
+  /* Balayage lumineux réutilisable sur les CTA */
+  .cta-sheen { position: absolute; inset: 0; pointer-events: none; transform: translateX(-130%);
+    background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.28) 50%, transparent 65%); }
+  .group:hover .cta-sheen { transform: translateX(130%); transition: transform .75s cubic-bezier(.33,1,.68,1); }
+  @media (prefers-reduced-motion: reduce) { .group:hover .cta-sheen { transform: none; transition: none; } }
+  /* Overflow guard — évite le scroll horizontal causé par des éléments fixed débordants */
+  .overflow-x-hidden-safe { overflow-x: hidden; }
+}
+
+/* ─── Rainbow ARGB title ─────────────────────────────────────── */
+@keyframes rainbow-shift {
+  0%   { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.text-rainbow {
+  background: linear-gradient(90deg,
+    #ff0000, #ff6600, #ffcc00, #00ff88, #00ccff, #6600ff, #ff00cc,
+    #ff0000, #ff6600, #ffcc00, #00ff88, #00ccff, #6600ff, #ff00cc, #ff0000) !important;
+  background-size: 200% 100% !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  color: transparent !important;
+  animation: rainbow-shift 4s linear infinite;
+}
+
+/* ─── Nova delta float ───────────────────────────────────────── */
+@keyframes nova-delta-float {
+  0%   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-24px); }
+}
+
+/* ─── X2 Coin Rain ───────────────────────────────────────────── */
+@keyframes coin-fall {
+  0%   { transform: translateY(-40px) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+/* ─── Hover lift — carte interactive ────────────────────────── */
+.hover-lift {
+  transition: transform 0.18s cubic-bezier(0.34,1.3,0.64,1), box-shadow 0.18s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 8px 28px rgba(37,99,235,0.14);
+}
+.dark .hover-lift:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+}
+
+/* ─── Press effect — boutons primaires ──────────────────────── */
+.press-effect {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  will-change: transform;
+}
+.press-effect:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(37,99,235,0.2);
+}
+
+/* ─── Glow ring — éléments mis en avant ─────────────────────── */
+.glow-ring {
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.2), 0 0 20px rgba(37,99,235,0.15);
+}
+.glow-ring-amber {
+  box-shadow: 0 0 0 3px rgba(251,191,36,0.25), 0 0 20px rgba(251,191,36,0.2);
+}
+.glow-ring-success {
+  box-shadow: 0 0 0 3px rgba(5,150,105,0.2), 0 0 20px rgba(5,150,105,0.15);
+}
+
+/* ─── Stagger helpers ────────────────────────────────────────── */
+.stagger-1 { animation-delay: 60ms !important; }
+.stagger-2 { animation-delay: 120ms !important; }
+.stagger-3 { animation-delay: 180ms !important; }
+.stagger-4 { animation-delay: 240ms !important; }
+.stagger-5 { animation-delay: 300ms !important; }
+.stagger-6 { animation-delay: 360ms !important; }
+
+/* ─── Transition de page (layout) ───────────────────────────── */
+.page-transition {
+  animation: fade-in 0.35s ease-out forwards;
+}

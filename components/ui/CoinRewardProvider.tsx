@@ -1,0 +1,1 @@
+export { CoinRewardProvider, useCoinReward } from '@/components/providers/CoinRewardProvider'

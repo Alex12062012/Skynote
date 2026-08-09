@@ -1,0 +1,88 @@
+import type { Metadata, Viewport } from 'next'
+import { Bricolage_Grotesque, DM_Sans, Lexend, Caveat } from 'next/font/google'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import { I18nProvider } from '@/lib/i18n/context'
+import { LiquidGlassFilter } from '@/components/ui/LiquidGlassFilter'
+import './globals.css'
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ['latin'], variable: '--font-bricolage', display: 'swap', weight: ['400','500','600','700']
+})
+const dmSans = DM_Sans({
+  subsets: ['latin'], variable: '--font-dm-sans', display: 'swap', weight: ['400','500','600','700']
+})
+// Manuscrit de la landing : représente le cours de l'élève avant transformation.
+// Purement décoratif — jamais utilisé pour du texte que l'élève doit lire longuement.
+const caveat = Caveat({
+  subsets: ['latin'], variable: '--font-caveat', display: 'swap', weight: ['400','600']
+})
+// Police « dyslexie-friendly » : Lexend est conçue pour réduire la charge
+// visuelle en lecture (formes de lettres distinctes, faible encombrement).
+// Activée par l'élève depuis son profil → classe .dyslexia-mode sur <html>.
+const lexend = Lexend({
+  subsets: ['latin'], variable: '--font-lexend', display: 'swap', weight: ['400','500','600','700']
+})
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://skynote.app'
+const OG_TITLE = 'Skynote — Révise plus vite, Réussis mieux'
+const OG_DESC  = "Transforme tes cours en fiches de révision et QCM grâce à l'IA. Gamification, répétition espacée et suivi de progression."
+
+export const metadata: Metadata = {
+  title: { default: OG_TITLE, template: '%s | Skynote' },
+  description: OG_DESC,
+  metadataBase: new URL(APP_URL),
+  openGraph: {
+    type:        'website',
+    siteName:    'Skynote',
+    title:       OG_TITLE,
+    description: OG_DESC,
+    url:         APP_URL,
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Skynote' }],
+  },
+  twitter: {
+    card:        'summary_large_image',
+    title:       OG_TITLE,
+    description: OG_DESC,
+    images:      ['/og-image.png'],
+  },
+  icons: {
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon.ico' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width', initialScale: 1,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#EFF6FF' },
+    { media: '(prefers-color-scheme: dark)', color: '#060D1A' },
+  ],
+}
+
+/**
+ * Applique la préférence « police dyslexie-friendly » AVANT le premier rendu,
+ * pour éviter que l'élève voie la page changer de police sous ses yeux.
+ */
+const DYSLEXIA_INIT = `try{if(localStorage.getItem('skynote-dyslexia')==='1'){document.documentElement.classList.add('dyslexia-mode')}}catch(e){}`
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html
+      lang="fr"
+      className={`${bricolage.variable} ${dmSans.variable} ${lexend.variable} ${caveat.variable} dark`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: DYSLEXIA_INIT }} />
+      </head>
+      <body>
+        <LiquidGlassFilter />
+        <ThemeProvider><I18nProvider>{children}</I18nProvider></ThemeProvider>
+      </body>
+    </html>
+  )
+}

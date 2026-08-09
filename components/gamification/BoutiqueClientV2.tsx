@@ -1,0 +1,594 @@
+'use client'
+
+import { useState, useTransition, type ElementType } from 'react'
+import { Lock, ShoppingBag, Palette, Award, Zap, Gift, Sparkles, Brain, Star, Rocket, Crown, Gem, Flame, Check, Frame, Eye } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { cn } from '@/lib/utils'
+import { SPRING, EASE, DUR } from '@/lib/motion'
+import { SkyCoin } from '@/components/ui/SkyCoin'
+import {
+  BADGES, CONSUMABLES, TITLES, SKINS, SKIN_ID_ALIASES, prestigeCost,
+  MASTERY_TIER_LABELS, normalizeMasteryTier,
+} from '@/lib/gamification/config'
+import { buyItem, equip, equipFrame } from '@/lib/supabase/gamification-actions'
+import { MasteryChests, ChestTrack, formatChestTier } from '@/components/boutique/MasteryChests'
+import { PlayerBadge } from './PlayerBadge'
+import { PlayerEmblem } from './PlayerEmblem'
+import { PrestigeButton } from './PrestigeButton'
+import { SkinDecoration } from './SkinDecoration'
+import { RainbowText } from '@/components/ui/RainbowText'
+import { useI18n } from '@/lib/i18n/context'
+
+const ICON_MAP: Record<string, ElementType> = { Brain, Star, Rocket, Crown, Gem, Flame }
+
+type ShopTab = 'badges' | 'consumables' | 'titles' | 'frames'
+
+interface UserStats {
+  total_qcm_perfect: number
+  best_perfect_streak: number
+  chests_claimed: number
+}
+
+interface ConsumableState {
+  x2_active: boolean
+  x2_expires: string | null
+  retry_qcm_charges: number
+  hint_question_charges: number
+}
+
+interface FrameItem {
+  item_id: string
+  data: { name: string; tier?: string; rarity?: string }
+  equipped: boolean
+}
+
+interface Props {
+  initialCoins: number
+  prestigeLevel: number
+  ownedBadges: string[]
+  ownedTitles: string[]
+  activeBadge: string
+  activeTitle: string | null
+  ownedFrames?: FrameItem[]
+  activeFrame?: string | null
+  pseudo?: string
+  recentChests: Array<{ chest_number: number; tier_id: string; reward_type: string; reward_value: number; created_at: string }>
+  /** coffres de maîtrise déjà ouverts */
+  chestsClaimed?: number
+  userStats?: UserStats
+  consumableState?: ConsumableState
+}
+
+// ─── Utilitaire barre de progression ─────────────────────────────────────────
+function parseTitleProgress(unlockRule: string | undefined, stats: UserStats): { current: number; max: number } | null {
+  if (!unlockRule) return null
+  const match = unlockRule.match(/^(\w+)\s*>=\s*(\d+)$/)
+  if (!match) return null
+  const [, metric, rawMax] = match
+  const max = parseInt(rawMax, 10)
+  const metricMap: Record<string, number> = {
+    total_qcm_perfect:   stats.total_qcm_perfect,
+    best_perfect_streak: stats.best_perfect_streak,
+    chests_claimed:      stats.chests_claimed,
+  }
+  const current = metricMap[metric] ?? 0
+  return { current: Math.min(current, max), max }
+}
+
+export function BoutiqueClientV2({
+  initialCoins, prestigeLevel, ownedBadges, ownedTitles, activeBadge, activeTitle,
+  ownedFrames = [], activeFrame: initialActiveFrame = null, pseudo = 'Moi',
+  recentChests, chestsClaimed = 0, userStats, consumableState,
+}: Props) {
+  const { t } = useI18n()
+  const defaultStats: UserStats = { total_qcm_perfect: 0, best_perfect_streak: 0, chests_claimed: 0 }
+  const stats = userStats ?? defaultStats
+  const cs: ConsumableState = consumableState ?? { x2_active: false, x2_expires: null, retry_qcm_charges: 0, hint_question_charges: 0 }
+  const [coins, setCoins] = useState(initialCoins)
+  const [tab, setTab]     = useState<ShopTab>('badges')
+  const [badges, setBadges] = useState(new Set(ownedBadges))
+  const [titles, setTitles] = useState(new Set(ownedTitles))
+  const [equippedBadge, setEquippedBadge] = useState(activeBadge)
+  const [equippedTitle, setEquippedTitle] = useState(activeTitle)
+  const [equippedFrame, setEquippedFrame] = useState<string | null>(initialActiveFrame)
+  const [feedback, setFeedback] = useState<{ msg: string; kind: 'ok' | 'err' } | null>(null)
+  const [pending, start] = useTransition()
+
+  const notify = (msg: string, kind: 'ok' | 'err' = 'ok') => {
+    setFeedback({ msg, kind })
+    setTimeout(() => setFeedback(null), kind === 'err' ? 5000 : 2500)
+  }
+
+  const handleBuy = (cat: 'badge' | 'title' | 'consumable', id: string, price: number) => {
+    if (coins < price) { notify(t('boutique.noCoins'), 'err'); return }
+    start(async () => {
+      const res = await buyItem(cat, id)
+      if (res.error) { notify(res.error, 'err'); return }
+      if (typeof res.newBalance === 'number') setCoins(res.newBalance)
+      if (cat === 'badge') setBadges(new Set([...badges, id]))
+      if (cat === 'title') setTitles(new Set([...titles, id]))
+      notify(t('boutique.bought'))
+    })
+  }
+
+  const handleEquip = (kind: 'badge' | 'title', id: string | null) => {
+    start(async () => {
+      const res = await equip(kind, id)
+      if (res.error) { notify(res.error, 'err'); return }
+      if (kind === 'badge') setEquippedBadge(id ?? 'letter')
+      else setEquippedTitle(id)
+      notify(id ? t('boutique.equippedOk') : t('boutique.removed'))
+    })
+  }
+
+  const handleEquipFrame = (itemId: string | null) => {
+    start(async () => {
+      const res = await equipFrame(itemId)
+      if (res.error) { notify(res.error, 'err'); return }
+      setEquippedFrame(itemId)
+      notify(itemId ? t('boutique.frameEquipped') : t('boutique.frameRemoved'))
+    })
+  }
+
+  const nextPrestigeCost = prestigeCost(prestigeLevel)
+
+  return (
+    <div className="mx-auto max-w-4xl animate-fade-in space-y-10">
+      <header>
+        <h1 className="font-display text-h2 font-black text-text-main dark:text-text-dark-main">{t('boutique.title')}</h1>
+        <p className="mt-1 font-body text-[14px] text-text-secondary dark:text-text-dark-secondary">
+          {t('boutique.subtitle')}
+        </p>
+      </header>
+
+      {/* Balance sticky bar */}
+      <div className="sticky top-4 z-30 flex items-center justify-between rounded-pill border border-sky-border bg-white/80 px-5 py-2.5 shadow-card backdrop-blur dark:border-night-border dark:bg-night-surface/80">
+        <div className="flex items-center gap-2">
+          <SkyCoin size={20} />
+          <span className="font-display text-[18px] font-black tabular-nums">{coins.toLocaleString('fr-FR')}</span>
+        </div>
+        {feedback && (
+          <span className={cn(
+            'rounded-pill px-3 py-1 font-display text-[12px] font-bold animate-pop-in',
+            feedback.kind === 'err'
+              ? 'bg-red-500 text-white'
+              : 'bg-emerald-500 text-white',
+          )}>
+            {feedback.msg}
+          </span>
+        )}
+      </div>
+
+      {/* PRESTIGE */}
+      <section>
+        <SectionHeader icon={Sparkles} title={t('boutique.prestige')}
+          desc={t('boutique.prestigeDesc')} />
+        <div className="mt-5">
+          <PrestigeButton
+            currentLevel={prestigeLevel}
+            currentCoins={coins}
+            nextCost={nextPrestigeCost}
+            badgeId={equippedBadge}
+          />
+        </div>
+      </section>
+
+      {/* COFFRES DE MAÎTRISE (remplace la roue de la fortune) */}
+      <section>
+        <SectionHeader icon={Gift} title={t('boutique.chests')} badge={t('boutique.chestsBadge')}
+          desc={t('boutique.chestsDesc')} />
+        <div className="mt-5 rounded-card border border-sky-border bg-sky-surface p-6 dark:border-night-border dark:bg-night-surface">
+          <div className="flex flex-col items-center gap-8 lg:flex-row lg:items-start lg:gap-12">
+            <div className="w-full flex-shrink-0 lg:w-72">
+              <MasteryChests
+                totalPerfectQcm={stats.total_qcm_perfect}
+                chestsClaimed={chestsClaimed}
+                onCoinsEarned={(amount) => setCoins(c => c + amount)}
+              />
+            </div>
+            <div className="flex w-full flex-col gap-5">
+              <div>
+                <p className="mb-3 font-display text-[13px] font-semibold uppercase tracking-wide text-text-tertiary dark:text-text-dark-tertiary">
+                  {t('boutique.chestTrack')}
+                </p>
+                <ChestTrack chestsClaimed={chestsClaimed} />
+                <p className="mt-2 font-body text-[12px] text-text-secondary dark:text-text-dark-secondary">
+                  {t('boutique.chestTrackHint')}
+                </p>
+              </div>
+              {recentChests.length > 0 && (
+                <div>
+                  <p className="mb-3 font-display text-[13px] font-semibold uppercase tracking-wide text-text-tertiary dark:text-text-dark-tertiary">
+                    {t('boutique.lastChests')}
+                  </p>
+                  <div className="space-y-1.5">
+                    {recentChests.map((chest) => (
+                      <div key={chest.chest_number} className="flex items-center justify-between rounded-input border border-sky-border bg-sky-surface-2 px-3 py-1.5 dark:border-night-border dark:bg-night-surface-2">
+                        <span className="font-body text-[12px]">
+                          Coffre n°{chest.chest_number} — {formatChestTier(chest.tier_id)}
+                        </span>
+                        {chest.reward_value > 0 && (
+                          <span className="font-display text-[13px] font-bold tabular-nums text-emerald-600">
+                            +{chest.reward_value}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BOUTIQUE TABS */}
+      <section>
+        <SectionHeader icon={ShoppingBag} title={t('boutique.customize')}
+          desc={t('boutique.customizeDesc')} />
+
+        <div className="mt-5 flex gap-1 rounded-card border border-sky-border bg-sky-surface-2 p-1 dark:border-night-border dark:bg-night-surface-2">
+          {([
+            { key: 'badges',     icon: Palette, label: t('boutique.badges') },
+            { key: 'consumables', icon: Zap,    label: t('boutique.boosts') },
+            { key: 'titles',     icon: Award,   label: t('boutique.titles') },
+            { key: 'frames',     icon: Frame,   label: `Skins${ownedFrames.length > 0 ? ` (${ownedFrames.length})` : ''}` },
+          ] as { key: ShopTab; icon: ElementType; label: string }[]).map(({ key, icon: Icon, label }) => (
+            <button key={key} onClick={() => setTab(key)}
+              className={cn(
+                'flex flex-1 items-center justify-center gap-2 rounded-input py-2 font-body text-[13px] font-medium transition-[background-color,border-color,color,box-shadow,transform,opacity]',
+                tab === key
+                  ? 'bg-sky-surface text-brand shadow-card dark:bg-night-surface dark:text-brand-dark'
+                  : 'text-text-secondary hover:text-text-main dark:text-text-dark-secondary dark:hover:text-text-dark-main',
+              )}>
+              <Icon className="h-4 w-4" /> {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4">
+          {tab === 'badges' && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+              {BADGES.map(b => {
+                const owned    = badges.has(b.id) || b.unlockedByDefault
+                const equipped = equippedBadge === b.id
+                const Icon     = ICON_MAP[b.icon]
+                return (
+                  <div key={b.id} className="flex flex-col items-center gap-2 rounded-card border-2 border-sky-border bg-sky-surface p-4 text-center dark:border-night-border dark:bg-night-surface">
+                    <PlayerBadge badgeId={b.id} letter="A" size="md" />
+                    <p className="font-display text-[13px] font-bold">{b.label}</p>
+                    {/* Palier de maîtrise — mêmes couleurs qu'avant, vocabulaire de progression */}
+                    <span className={cn(
+                      'rounded-pill px-2 py-0.5 font-body text-[10px] font-bold uppercase',
+                      b.tier === 'maitre'   && 'bg-gradient-to-r from-pink-500 to-orange-500 text-white',
+                      b.tier === 'expert'   && 'bg-purple-200 text-purple-900 dark:bg-purple-950/50 dark:text-purple-300',
+                      b.tier === 'confirme' && 'bg-blue-200 text-blue-900 dark:bg-blue-950/50 dark:text-blue-300',
+                      b.tier === 'debutant' && 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+                      b.tier === 'base'     && 'bg-sky-cloud text-text-secondary',
+                    )}>{MASTERY_TIER_LABELS[b.tier]}</span>
+                    {owned ? (
+                      <button
+                        onClick={() => handleEquip('badge', b.id)}
+                        disabled={equipped || pending}
+                        className={cn(
+                          'w-full rounded-pill py-1.5 font-display text-[12px] font-bold transition',
+                          equipped
+                            ? 'bg-emerald-500 text-white'
+                            : 'bg-brand text-white hover:bg-brand-hover',
+                        )}
+                      >
+                        {equipped ? <><Check className="inline h-3 w-3" /> {t('boutique.equipped')}</> : t('boutique.equip')}
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleBuy('badge', b.id, b.price)}
+                        disabled={coins < b.price || pending}
+                        className={cn(
+                          'flex w-full items-center justify-center gap-1 rounded-pill py-1.5 font-display text-[12px] font-bold transition',
+                          coins >= b.price
+                            ? 'bg-brand text-white hover:bg-brand-hover'
+                            : 'cursor-not-allowed bg-sky-cloud text-text-tertiary dark:bg-night-border',
+                        )}
+                      >
+                        <SkyCoin size={11} /> {b.price}
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {tab === 'consumables' && (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {CONSUMABLES.map(c => {
+                // État actuel de ce consommable
+                const isX2 = c.id === 'x2_coins'
+                const isCharged = c.id === 'retry_qcm' || c.id === 'hint_question'
+                const currentCharges = c.id === 'retry_qcm' ? cs.retry_qcm_charges : c.id === 'hint_question' ? cs.hint_question_charges : 0
+                const maxCharges = (c as any).maxCharges ?? 1
+                const isBlocked = isX2 ? cs.x2_active : isCharged ? currentCharges >= maxCharges : false
+                const canBuy = !isBlocked && coins >= c.price && !pending
+
+                // Temps restant pour x2
+                let x2TimeLeft = ''
+                if (isX2 && cs.x2_active && cs.x2_expires) {
+                  const ms = new Date(cs.x2_expires).getTime() - Date.now()
+                  const min = Math.max(0, Math.round(ms / 60000))
+                  x2TimeLeft = min > 0 ? `${t('boutique.activeBoost')} — ${min} min` : t('boutique.expireSoon')
+                }
+
+                return (
+                  <div key={c.id} className={cn(
+                    'flex flex-col gap-2 rounded-card border-2 p-4',
+                    isBlocked
+                      ? 'border-emerald-400/40 bg-emerald-50 dark:border-emerald-700/40 dark:bg-emerald-950/20'
+                      : 'border-sky-border bg-sky-surface dark:border-night-border dark:bg-night-surface',
+                  )}>
+                    <div className="flex items-start justify-between">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-input bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
+                        <Zap className="h-5 w-5" />
+                      </div>
+                      {/* Badge état */}
+                      {isX2 && cs.x2_active && (
+                        <span className="rounded-pill bg-emerald-500 px-2 py-0.5 font-display text-[10px] font-bold text-white">
+                          {x2TimeLeft}
+                        </span>
+                      )}
+                      {isCharged && (
+                        <span className={cn(
+                          'rounded-pill px-2 py-0.5 font-display text-[11px] font-bold',
+                          currentCharges >= maxCharges
+                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                            : 'bg-sky-cloud text-text-secondary dark:bg-night-border',
+                        )}>
+                          {currentCharges}/{maxCharges}
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-display text-[14px] font-bold">{c.label}</p>
+                    <p className="flex-1 font-body text-[12px] text-text-secondary dark:text-text-dark-secondary">{c.desc}</p>
+                    <button
+                      onClick={() => handleBuy('consumable', c.id, c.price)}
+                      disabled={!canBuy}
+                      className={cn(
+                        'flex items-center justify-center gap-1 rounded-pill py-1.5 font-display text-[12px] font-bold transition',
+                        isBlocked
+                          ? 'cursor-not-allowed bg-emerald-100 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400'
+                          : canBuy
+                            ? 'bg-amber-500 text-white hover:bg-amber-600'
+                            : 'cursor-not-allowed bg-sky-cloud text-text-tertiary dark:bg-night-border',
+                      )}
+                    >
+                      {isBlocked
+                        ? isX2 ? t('boutique.boostActive') : t('boutique.maxReached')
+                        : <><SkyCoin size={11} /> {c.price}</>
+                      }
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {tab === 'titles' && (
+            <div className="space-y-2">
+              {TITLES.map(title => {
+                const owned = titles.has(title.id)
+                const equipped = equippedTitle === title.id
+                const buyable = Boolean(title.price)
+                const progress = !owned && !buyable ? parseTitleProgress(title.unlockRule, stats) : null
+                const pct = progress ? Math.round((progress.current / progress.max) * 100) : 0
+                return (
+                  <div key={title.id} className="rounded-card border border-sky-border bg-sky-surface px-4 py-3 dark:border-night-border dark:bg-night-surface">
+                    <div className="flex items-center justify-between">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-display text-[15px] font-bold text-rainbow">{title.label}</span>
+                          <span className="rounded-pill bg-sky-cloud px-2 py-0.5 font-body text-[10px] font-bold uppercase text-text-tertiary dark:bg-night-border">
+                            {title.category}
+                          </span>
+                        </div>
+                        <p className="truncate font-body text-[12px] text-text-secondary dark:text-text-dark-secondary">{title.desc}</p>
+                      </div>
+                      <div className="ml-3 flex flex-shrink-0 items-center gap-2">
+                        {owned ? (
+                          <motion.button
+                            whileTap={pending ? undefined : { scale: 0.94 }}
+                            transition={SPRING.press}
+                            onClick={() => handleEquip('title', equipped ? null : title.id)}
+                            disabled={pending}
+                            className={cn(
+                              'rounded-pill px-3 py-1 font-display text-[11px] font-bold transition',
+                              equipped ? 'bg-emerald-500 text-white' : 'bg-brand text-white hover:bg-brand-hover',
+                            )}
+                          >
+                            {equipped ? t('boutique.equipped') : t('boutique.equip')}
+                          </motion.button>
+                        ) : buyable ? (
+                          <motion.button
+                            whileTap={coins >= (title.price ?? 0) && !pending ? { scale: 0.92 } : undefined}
+                            transition={SPRING.press}
+                            onClick={() => handleBuy('title', title.id, title.price!)}
+                            disabled={coins < (title.price ?? 0) || pending}
+                            className={cn(
+                              'flex items-center gap-1 rounded-pill px-3 py-1 font-display text-[11px] font-bold transition',
+                              coins >= (title.price ?? 0)
+                                ? 'bg-brand text-white hover:bg-brand-hover'
+                                : 'cursor-not-allowed bg-sky-cloud text-text-tertiary',
+                            )}
+                          >
+                            <SkyCoin size={10} /> {title.price}
+                          </motion.button>
+                        ) : (
+                          <Lock className="h-4 w-4 text-text-tertiary" />
+                        )}
+                      </div>
+                    </div>
+                    {/* Barre de progression pour les titres non-achetables non débloqués */}
+                    {progress && (
+                      <div className="mt-2.5">
+                        <div className="mb-1 flex items-center justify-between">
+                          <span className="font-body text-[10px] text-text-tertiary dark:text-text-dark-tertiary">
+                            {t('boutique.progression')}
+                          </span>
+                          <span className="font-display text-[10px] font-bold tabular-nums text-text-secondary dark:text-text-dark-secondary">
+                            {progress.current.toLocaleString('fr-FR')} / {progress.max.toLocaleString('fr-FR')}
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-sky-cloud dark:bg-night-border">
+                          <motion.div
+                            className="h-full rounded-full bg-brand dark:bg-brand-dark"
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${pct}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: DUR.deliberate, ease: EASE.out }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          {tab === 'frames' && (
+            <div className="space-y-4">
+              {/* Compteur */}
+              <div className="flex items-center justify-between rounded-input border border-sky-border bg-sky-surface-2 px-4 py-2.5 dark:border-night-border dark:bg-night-surface-2">
+                <span className="font-body text-[13px] text-text-secondary dark:text-text-dark-secondary">
+                  {t('boutique.skinCollection')}
+                </span>
+                <span className="font-display text-[20px] font-black tabular-nums text-text-main dark:text-text-dark-main">
+                  {ownedFrames.length}
+                  <span className="font-display text-[14px] font-semibold text-text-tertiary">/10</span>
+                </span>
+              </div>
+
+              {ownedFrames.length === 0 ? (
+                <div className="flex flex-col items-center gap-3 rounded-card border border-dashed border-sky-border py-12 text-center dark:border-night-border">
+                  <Frame className="h-10 w-10 text-text-tertiary dark:text-text-dark-tertiary" />
+                  <p className="font-display text-[15px] font-bold text-text-secondary dark:text-text-dark-secondary">{t('boutique.noSkin')}</p>
+                  <p className="font-body text-[13px] text-text-tertiary dark:text-text-dark-tertiary">
+                    {t('boutique.skinHint')}
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {ownedFrames.map(f => {
+                    // Résoudre via aliases
+                    const resolvedId = SKIN_ID_ALIASES[f.item_id] ?? f.item_id
+                    const skinEntry = SKINS.find(s => s.id === resolvedId)
+                    const isEquipped = equippedFrame === f.item_id
+                    // normalizeMasteryTier accepte aussi l'ancien vocabulaire encore en base
+                    const tier = normalizeMasteryTier(skinEntry?.tier ?? (f.data?.tier as any) ?? (f.data?.rarity as any))
+                    const label = skinEntry?.label ?? f.data?.name ?? 'Skin'
+                    const desc = skinEntry?.desc ?? ''
+                    const cardClass = skinEntry?.cardClass ?? 'border-sky-border bg-sky-surface dark:border-night-border dark:bg-night-surface'
+                    const boxShadow = skinEntry?.boxShadow ?? ''
+
+                    return (
+                      <div key={f.item_id} className={cn(
+                        'flex flex-col gap-3 rounded-card border-2 p-4',
+                        isEquipped ? 'border-emerald-400/60 dark:border-emerald-600/50' : 'border-sky-border dark:border-night-border',
+                      )}>
+                        {/* Aperçu carte — vraies infos */}
+                        {(() => {
+                          const titleLabel = TITLES.find(t => t.id === equippedTitle)?.label ?? null
+                          return (
+                            <div
+                              className={cn('relative overflow-hidden flex items-center gap-3 rounded-card border px-3 py-2', cardClass)}
+                              style={boxShadow ? { boxShadow } : undefined}
+                            >
+                              <SkinDecoration skinId={resolvedId} />
+                              <div className="relative z-10 flex w-full items-center gap-3">
+                                <PlayerEmblem
+                                  prestigeLevel={prestigeLevel}
+                                  badgeId={equippedBadge}
+                                  letter="A"
+                                  size="sm"
+                                />
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate font-display text-[13px] font-bold text-text-main dark:text-text-dark-main">
+                                    {pseudo}
+                                  </p>
+                                  {titleLabel && (
+                                    <RainbowText className="font-body text-[10px] font-bold">{titleLabel}</RainbowText>
+                                  )}
+                                  <p className="font-body text-[10px] text-text-tertiary dark:text-text-dark-tertiary">
+                                    Prestige {prestigeLevel}
+                                  </p>
+                                </div>
+                                <div className="flex flex-shrink-0 items-center gap-1">
+                                  <SkyCoin size={14} />
+                                  <span className="font-display text-[13px] font-black tabular-nums text-text-main dark:text-text-dark-main">
+                                    {coins.toLocaleString('fr-FR')}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })()}
+
+                        {/* Infos */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <p className="font-display text-[14px] font-bold text-text-main dark:text-text-dark-main">{label}</p>
+                            </div>
+                            {desc && <p className="font-body text-[11px] text-text-tertiary dark:text-text-dark-tertiary">{desc}</p>}
+                          </div>
+                          <span className={cn(
+                            'flex-shrink-0 rounded-pill px-2 py-0.5 font-body text-[10px] font-bold uppercase',
+                            tier === 'maitre'
+                              ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
+                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
+                          )}>
+                            {MASTERY_TIER_LABELS[tier]}
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={() => handleEquipFrame(isEquipped ? null : f.item_id)}
+                          disabled={pending}
+                          className={cn(
+                            'w-full rounded-pill py-1.5 font-display text-[12px] font-bold transition',
+                            isEquipped
+                              ? 'bg-emerald-500 text-white'
+                              : 'bg-brand text-white hover:bg-brand-hover',
+                          )}
+                        >
+                          {isEquipped ? <><Check className="inline h-3 w-3 mr-1" />{t('boutique.equippedRemove')}</> : t('boutique.equip')}
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  )
+}
+
+function SectionHeader({ icon: Icon, title, desc, badge }:
+  { icon: ElementType; title: string; desc: string; badge?: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-input bg-brand-soft dark:bg-brand-dark-soft">
+        <Icon className="h-5 w-5 text-brand dark:text-brand-dark" />
+      </div>
+      <div>
+        <div className="flex items-center gap-2">
+          <h2 className="font-display text-h3 font-black text-text-main dark:text-text-dark-main">{title}</h2>
+          {badge && (
+            <span className="rounded-pill bg-brand px-2 py-0.5 font-body text-[10px] font-black uppercase text-white">{badge}</span>
+          )}
+        </div>
+        <p className="font-body text-[13px] text-text-secondary dark:text-text-dark-secondary">{desc}</p>
+      </div>
+    </div>
+  )
+}
