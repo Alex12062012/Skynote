@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { STRIPE_CONFIG } from '@/lib/stripe/config'
+import { STRIPE_CONFIG, PLAN_NOVA_ALLOC } from '@/lib/stripe/config'
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,6 +28,53 @@ export async function POST(request: NextRequest) {
 
     if (!priceId) {
       return NextResponse.json({ error: 'Prix non configuré dans Stripe' }, { status: 400 })
+    }
+
+    // Abonnement déjà actif ? On modifie EN PLACE au lieu de créer un 2e
+    // abonnement — sinon Stripe facture les deux en parallèle.
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('stripe_customer_id, stripe_subscription_id, plan')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.stripe_subscription_id) {
+      const existing = await stripe.subscriptions.retrieve(profile.stripe_subscription_id)
+
+      if (existing.status === 'active' || existing.status === 'trialing') {
+        const currentItemId = existing.items.data[0]?.id
+        if (!currentItemId) {
+          return NextResponse.json({ error: 'Abonnement Stripe invalide' }, { status: 500 })
+        }
+
+        const updated = await stripe.subscriptions.update(profile.stripe_subscription_id, {
+          items: [{ id: currentItemId, price: priceId }],
+          proration_behavior: 'create_prorations',
+          metadata: { userId: user.id, plan, billing },
+        })
+
+        // Le webhook `customer.subscription.updated` mettra à jour `profiles`,
+        // mais on le fait aussi ici pour un retour immédiat côté client
+        // (le webhook peut prendre quelques secondes à arriver).
+        const expiresAt = new Date((updated as any).current_period_end * 1000)
+        await supabase
+          .from('profiles')
+          .update({ plan, plan_expires_at: expiresAt.toISOString() })
+          .eq('id', user.id)
+
+        // Si upgrade vers un plan avec plus de Novas, on complète la différence
+        const previousAlloc = PLAN_NOVA_ALLOC[profile.plan as 'starter' | 'pro'] ?? 0
+        const newAlloc = PLAN_NOVA_ALLOC[plan as 'starter' | 'pro'] ?? 0
+        if (newAlloc > previousAlloc) {
+          await supabase.rpc('add_novas', {
+            p_user_id: user.id,
+            p_amount:  newAlloc - previousAlloc,
+            p_reason:  `Changement vers ${plan} — ${newAlloc - previousAlloc} ✦`,
+          })
+        }
+
+        return NextResponse.json({ updated: true, redirectUrl: STRIPE_CONFIG.successUrl })
+      }
     }
 
     const session = await stripe.checkout.sessions.create({

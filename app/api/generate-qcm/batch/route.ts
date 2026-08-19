@@ -2,16 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { generateQcmQuestions } from '@/lib/ai/generate'
 import type { QcmDifficulty } from '@/lib/ai/prompts'
+import { NOVA_COST_QCM_BATCH, deductNovasForUser, addNovasForUser } from '@/lib/supabase/nova-actions'
 
 export const maxDuration = 60
 
 const ALL_DIFFICULTIES: QcmDifficulty[] = ['peaceful', 'easy', 'medium', 'hard']
 
 export async function POST(request: NextRequest) {
+  let novaDeducted = false
+  let userId: string | null = null
+
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Non autorise' }, { status: 401 })
+    userId = user.id
 
     const body = await request.json()
     const { flashcardId, courseId } = body
@@ -31,6 +36,21 @@ export async function POST(request: NextRequest) {
     if (!flashcard) {
       return NextResponse.json({ error: 'Fiche introuvable' }, { status: 404 })
     }
+
+    // Deduire les Novas AVANT l'appel IA — sinon cette route regenere les 4
+    // niveaux de difficulte gratuitement, a l'infini, sur n'importe quelle fiche.
+    const deductResult = await deductNovasForUser(
+      user.id,
+      NOVA_COST_QCM_BATCH,
+      `QCM regénérés (4 niveaux) — ${flashcard.title}`
+    )
+    if (!deductResult.ok) {
+      return NextResponse.json(
+        { error: deductResult.error ?? 'Novas insuffisantes', code: 'insufficient_novas' },
+        { status: 402 }
+      )
+    }
+    novaDeducted = true
 
     // Supprimer les anciennes questions pour cette fiche (regeneration propre)
     await supabase.from('qcm_questions').delete().eq('flashcard_id', flashcardId)
@@ -79,10 +99,20 @@ export async function POST(request: NextRequest) {
       0
     )
 
-    return NextResponse.json({ ok: true, inserted: totalInserted })
+    // Echec total (les 4 niveaux ont échoué silencieusement via allSettled) :
+    // on rembourse, sinon l'utilisateur paie 88✦ pour 0 QCM généré.
+    if (totalInserted === 0) {
+      await addNovasForUser(user.id, NOVA_COST_QCM_BATCH, 'Remboursement QCM batch échoué').catch(() => {})
+      return NextResponse.json({ error: 'Aucune question générée', code: 'generation_failed' }, { status: 500 })
+    }
+
+    return NextResponse.json({ ok: true, inserted: totalInserted, novaBalance: deductResult.balance })
 
   } catch (error) {
     console.error('[API /generate-qcm/batch] Error:', error)
+    if (novaDeducted && userId) {
+      await addNovasForUser(userId, NOVA_COST_QCM_BATCH, 'Remboursement QCM batch échoué').catch(() => {})
+    }
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 })
   }
 }

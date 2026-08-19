@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { createClient } from '@supabase/supabase-js'
 import { STRIPE_CONFIG, PLAN_NOVA_ALLOC } from '@/lib/stripe/config'
 
@@ -69,6 +70,33 @@ export async function POST(request: NextRequest) {
         amount:  0,
         reason:  `Abonnement ${plan} activé`,
       })
+
+      // Le layout dashboard est en `revalidate = 30` : on force le
+      // rafraîchissement immédiat pour que le nouveau plan s'affiche
+      // (widget Nova, etc.) sans attendre jusqu'à 30s.
+      revalidatePath('/dashboard', 'layout')
+      break
+    }
+
+    case 'customer.subscription.updated': {
+      // Changement de plan (upgrade/downgrade) fait via subscriptions.update
+      const subscription = event.data.object as any
+      const userId = subscription.metadata?.userId
+      const plan   = subscription.metadata?.plan as 'starter' | 'pro' | undefined
+
+      if (!userId || !plan || subscription.status !== 'active') break
+
+      const expiresAt = new Date(subscription.current_period_end * 1000)
+      await supabase
+        .from('profiles')
+        .update({
+          plan,
+          plan_expires_at: expiresAt.toISOString(),
+          stripe_subscription_id: subscription.id,
+        })
+        .eq('id', userId)
+
+      revalidatePath('/dashboard', 'layout')
       break
     }
 
@@ -85,6 +113,8 @@ export async function POST(request: NextRequest) {
           .from('profiles')
           .update({ plan: 'free', plan_expires_at: null })
           .eq('id', profile.id)
+
+        revalidatePath('/dashboard', 'layout')
       }
       break
     }

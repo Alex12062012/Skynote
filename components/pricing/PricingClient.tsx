@@ -131,6 +131,10 @@ export function PricingClient({ currentPlan, planExpiresAt, hasStripeSubscriptio
       })
       const data = await res.json()
       if (data.url) { window.location.href = data.url; return }
+      // Changement de plan sur un abonnement déjà actif : pas de redirection
+      // Stripe, on rafraîchit direct pour que le nouveau plan s'affiche partout
+      // (widget Nova compris) sans attendre le cache de 30s du dashboard.
+      if (data.updated) { router.refresh(); setLoadingPlan(null); return }
     } catch { /* silencieux : l'état de chargement retombe ci-dessous */ }
     setLoadingPlan(null)
   }
