@@ -247,7 +247,7 @@ export async function POST(request: NextRequest) {
     messages.push({ role: 'user', content: question })
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model: 'claude-sonnet-5', // Sonnet 5 : $2/$10 par Mtok vs $3/$15 pour 4.6, ~33% moins cher à qualité égale
       max_tokens: 800,
       system: systemBlocks,
       messages,

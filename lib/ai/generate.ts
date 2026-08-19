@@ -65,7 +65,7 @@ export async function generateFlashcards(
   lang?: string
 ): Promise<GeneratedFlashcard[]> {
   const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
+    model: 'claude-sonnet-5', // Sonnet 5 : $2/$10 par Mtok vs $3/$15 pour 4.6, ~33% moins cher à qualité égale
     // OPTIMISATION: réduit de 2048 à 1200 — 6 fiches courtes ne dépassent jamais 800 tokens
     max_tokens: 1200,
     system: getFlashcardSystemPrompt(lang),
@@ -144,7 +144,7 @@ Réponds avec un JSON structuré ainsi :
 }`
 
   const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
+    model: 'claude-sonnet-5', // Sonnet 5 : $2/$10 par Mtok vs $3/$15 pour 4.6, ~33% moins cher à qualité égale
     // 3 questions × N fiches — budget dynamique, plafonné à 4096
     max_tokens: Math.min(300 * flashcards.length * 3 + 200, 4096),
     system: getQcmSystemPrompt(difficulty),
