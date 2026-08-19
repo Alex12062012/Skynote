@@ -12,19 +12,19 @@ export default async function PricingPage() {
 
   let currentPlan = 'free'
   let planExpiresAt: string | null = null
-  let hasLSSubscription = false
+  let hasStripeSubscription = false
 
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('plan, plan_expires_at, ls_subscription_id')
+      .select('plan, plan_expires_at, stripe_subscription_id')
       .eq('id', user.id)
       .single()
 
     if (profile) {
       currentPlan    = profile.plan || 'free'
       planExpiresAt  = profile.plan_expires_at
-      hasLSSubscription = !!profile.ls_subscription_id
+      hasStripeSubscription = !!profile.stripe_subscription_id
     }
   }
 
@@ -32,7 +32,7 @@ export default async function PricingPage() {
     <PricingClient
       currentPlan={currentPlan}
       planExpiresAt={planExpiresAt}
-      hasLSSubscription={hasLSSubscription}
+      hasStripeSubscription={hasStripeSubscription}
       isLoggedIn={!!user}
     />
   )

@@ -103,7 +103,7 @@ const COMPARATIF: { critere: string; free: string; starter: string; pro: string 
 interface PricingClientProps {
   currentPlan: string
   planExpiresAt: string | null
-  hasLSSubscription: boolean
+  hasStripeSubscription: boolean
   isLoggedIn: boolean
 }
 
@@ -113,7 +113,7 @@ interface PricingClientProps {
  * cartes ne posent pas d'étoiles à elles — elles défileraient avec le contenu.
  */
 
-export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, isLoggedIn }: PricingClientProps) {
+export function PricingClient({ currentPlan, planExpiresAt, hasStripeSubscription, isLoggedIn }: PricingClientProps) {
   const router = useRouter()
   const [billing, setBilling] = useState<Billing>('monthly')
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
@@ -124,7 +124,7 @@ export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, i
   async function handleCheckout(planId: string) {
     setLoadingPlan(planId)
     try {
-      const res = await fetch('/api/lemonsqueezy/create-checkout', {
+      const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ plan: planId, billing }),
@@ -138,7 +138,7 @@ export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, i
   async function handleManageSubscription() {
     setPortalLoading(true)
     try {
-      const res = await fetch('/api/lemonsqueezy/portal', { method: 'POST' })
+      const res = await fetch('/api/stripe/portal', { method: 'POST' })
       const data = await res.json()
       if (data.url) { window.location.href = data.url; return }
     } catch { /* idem */ }
@@ -197,7 +197,7 @@ export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, i
                   </p>
                 )}
               </div>
-              {hasLSSubscription && (
+              {hasStripeSubscription && (
                 <button
                   onClick={handleManageSubscription}
                   disabled={portalLoading}
@@ -511,7 +511,7 @@ export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, i
               ],
               [
                 'Comment annuler ?',
-                'Depuis « Gérer mon abonnement », qui ouvre le portail LemonSqueezy. L\'annulation prend un clic, et ton forfait reste actif jusqu\'à la fin de la période déjà payée.',
+                'Depuis « Gérer mon abonnement », qui ouvre le portail Stripe. L\'annulation prend un clic, et ton forfait reste actif jusqu\'à la fin de la période déjà payée.',
               ],
             ].map(([q, a]) => (
               <div key={q} className="rounded-card border border-sky-border bg-sky-surface p-4 dark:border-night-border dark:bg-night-surface">
@@ -550,7 +550,7 @@ export function PricingClient({ currentPlan, planExpiresAt, hasLSSubscription, i
         )}
 
         <p className="mt-8 text-center font-body text-[12px] text-text-tertiary dark:text-text-dark-tertiary">
-          Paiement sécurisé par LemonSqueezy · Annulation à tout moment ·{' '}
+          Paiement sécurisé par Stripe · Annulation à tout moment ·{' '}
           <Link href="/privacy" className="hover:underline">Politique de confidentialité</Link>
         </p>
       </div>
