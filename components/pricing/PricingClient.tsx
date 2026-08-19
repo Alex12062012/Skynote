@@ -118,11 +118,13 @@ export function PricingClient({ currentPlan, planExpiresAt, hasStripeSubscriptio
   const [billing, setBilling] = useState<Billing>('monthly')
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [portalLoading, setPortalLoading] = useState(false)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
 
   const isPaid = currentPlan === 'starter' || currentPlan === 'pro'
 
   async function handleCheckout(planId: string) {
     setLoadingPlan(planId)
+    setCheckoutError(null)
     try {
       const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
@@ -135,7 +137,12 @@ export function PricingClient({ currentPlan, planExpiresAt, hasStripeSubscriptio
       // Stripe, on rafraîchit direct pour que le nouveau plan s'affiche partout
       // (widget Nova compris) sans attendre le cache de 30s du dashboard.
       if (data.updated) { router.refresh(); setLoadingPlan(null); return }
-    } catch { /* silencieux : l'état de chargement retombe ci-dessous */ }
+      // Ni url ni updated : le serveur a répondu une erreur (402/500/...) —
+      // avant, ce cas retombait en silence sans que l'utilisateur sache pourquoi.
+      setCheckoutError(data.error ?? "Impossible de lancer le paiement. Réessaie dans un instant.")
+    } catch {
+      setCheckoutError("Impossible de contacter le serveur de paiement. Vérifie ta connexion et réessaie.")
+    }
     setLoadingPlan(null)
   }
 
@@ -276,6 +283,12 @@ export function PricingClient({ currentPlan, planExpiresAt, hasStripeSubscriptio
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {checkoutError && (
+          <div className="mb-6 rounded-card border border-error/30 bg-error/10 px-4 py-3 font-body text-[13.5px] text-error">
+            {checkoutError}
           </div>
         )}
 

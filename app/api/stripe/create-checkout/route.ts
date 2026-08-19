@@ -39,9 +39,26 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (profile?.stripe_subscription_id) {
-      const existing = await stripe.subscriptions.retrieve(profile.stripe_subscription_id)
+      let existing: any = null
+      try {
+        existing = await stripe.subscriptions.retrieve(profile.stripe_subscription_id)
+      } catch (err: any) {
+        // L'ID en base n'existe pas dans cet environnement Stripe (ex: ID de
+        // test resté après un passage en Live, ou abonnement supprimé côté
+        // Stripe sans que `profiles` ait été nettoyé). On ne bloque pas le
+        // paiement pour ça : on efface la référence morte et on repart sur
+        // un checkout normal plus bas.
+        if (err?.code === 'resource_missing') {
+          await supabase
+            .from('profiles')
+            .update({ stripe_subscription_id: null })
+            .eq('id', user.id)
+        } else {
+          throw err
+        }
+      }
 
-      if (existing.status === 'active' || existing.status === 'trialing') {
+      if (existing && (existing.status === 'active' || existing.status === 'trialing')) {
         const currentItemId = existing.items.data[0]?.id
         if (!currentItemId) {
           return NextResponse.json({ error: 'Abonnement Stripe invalide' }, { status: 500 })
