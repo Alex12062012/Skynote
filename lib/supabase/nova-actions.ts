@@ -29,6 +29,7 @@ import { createClient as createServiceClient } from '@supabase/supabase-js'
 export {
   NOVA_COST_OCR,
   NOVA_COST_QCM_SINGLE,
+  NOVA_COST_QCM_BATCH,
   NOVA_COST_CHAT,
   NOVA_COST_EVAL_PLAN,
   NOVA_COST_COURSE,
