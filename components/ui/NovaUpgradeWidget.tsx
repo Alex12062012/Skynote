@@ -1,5 +1,7 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { NovaCoin } from '@/components/ui/NovaCoin'
 
@@ -14,6 +16,19 @@ const PLAN_LABELS: Record<string, string> = {
 }
 
 export function NovaUpgradeWidget({ plan }: NovaUpgradeWidgetProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const justPaid = searchParams.get('payment') === 'success'
+
+  useEffect(() => {
+    // Retour de checkout Stripe : le webhook peut prendre quelques secondes à
+    // arriver. On force un refresh serveur pour ne pas laisser la bulle
+    // "Mettre à niveau" affichée le temps que `profiles.plan` se mette à jour
+    // (le layout dashboard est en `revalidate = 30`, donc sans ça elle peut
+    // rester visible jusqu'à 30s après un paiement Pro).
+    if (justPaid) router.refresh()
+  }, [justPaid, router])
+
   if (plan === 'pro') return null
 
   return (

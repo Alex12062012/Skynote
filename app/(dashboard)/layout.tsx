@@ -1,5 +1,6 @@
 export const revalidate = 30
 
+import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
@@ -57,11 +58,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <CoinRain active={boostActive} />
       <FeedbackButton userId={user.id} />
 
-      {/* Widget upgrade Nova */}
+      {/* Widget upgrade Nova — Suspense requis par useSearchParams (détection ?payment=success) */}
       {profile && (
-        <NovaUpgradeWidget
-          plan={(profile as any).plan ?? 'free'}
-        />
+        <Suspense fallback={null}>
+          <NovaUpgradeWidget
+            plan={(profile as any).plan ?? 'free'}
+          />
+        </Suspense>
       )}
 
       <FeedbackTrigger
