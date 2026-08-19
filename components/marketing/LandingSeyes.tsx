@@ -55,7 +55,7 @@ function LogoMark({ size = 28, className = '' }: { size?: number; className?: st
       aria-hidden
       width={size}
       height={size}
-      className={className}
+      className={`shrink-0 ${className}`}
       style={{ width: size, height: size }}
     />
   )
@@ -70,7 +70,7 @@ function LogoAnimated() {
   const reduce = useReducedMotion()
   return (
     <motion.span
-      className="inline-flex"
+      className="inline-flex shrink-0"
       initial={reduce ? false : { opacity: 0, y: -10, rotate: -90, scale: 0.85 }}
       animate={reduce ? undefined : { opacity: 1, y: 0, rotate: 0, scale: 1 }}
       transition={{ type: 'spring', stiffness: 200, damping: 15 }}
@@ -511,24 +511,24 @@ function Transformation() {
 
 function Nav() {
   return (
-    <header className="relative z-30 mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
+    <header className="relative z-30 mx-auto flex max-w-6xl items-center justify-between px-3 py-5 sm:px-6">
       <Link
         href="/"
-        className="flex items-center gap-2.5 rounded-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark"
+        className="flex shrink-0 items-center gap-2 rounded-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark sm:gap-2.5"
       >
         <LogoAnimated />
-        <span className="font-display text-[19px] font-bold tracking-[-0.02em] text-text-dark-main">
+        <span className="font-display text-[17px] font-bold tracking-[-0.02em] text-text-dark-main sm:text-[19px]">
           Skynote
         </span>
       </Link>
-      <nav className="flex items-center gap-1 sm:gap-2">
+      <nav className="flex shrink-0 items-center gap-0.5 sm:gap-2">
         <Link
           href="/login"
-          className="inline-flex min-h-[44px] items-center rounded-pill px-4 font-body text-[14px] font-medium text-text-dark-secondary transition-colors duration-200 hover:text-text-dark-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark motion-reduce:transition-none"
+          className="inline-flex min-h-[44px] items-center whitespace-nowrap rounded-pill px-2.5 font-body text-[13px] font-medium text-text-dark-secondary transition-colors duration-200 hover:text-text-dark-main focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark motion-reduce:transition-none sm:px-4 sm:text-[14px]"
         >
           Se connecter
         </Link>
-        <Cta className="!px-5 !text-[14px]">Commencer</Cta>
+        <Cta className="!px-4 !text-[13px] sm:!px-5 sm:!text-[14px]">Commencer</Cta>
       </nav>
     </header>
   )
