@@ -86,14 +86,22 @@ export async function POST(request: NextRequest) {
 
       if (!userId || !plan || subscription.status !== 'active') break
 
-      const expiresAt = new Date(subscription.current_period_end * 1000)
+      // `current_period_end` n'est pas toujours présent sur cet événement
+      // (ex: update qui ne touche pas la période de facturation) — sans
+      // cette vérif, `new Date(undefined * 1000).toISOString()` plante en
+      // 500 et le webhook ne met jamais à jour `profiles`.
+      const periodEnd = subscription.current_period_end
+      const updateData: Record<string, any> = {
+        plan,
+        stripe_subscription_id: subscription.id,
+      }
+      if (typeof periodEnd === 'number' && Number.isFinite(periodEnd)) {
+        updateData.plan_expires_at = new Date(periodEnd * 1000).toISOString()
+      }
+
       await supabase
         .from('profiles')
-        .update({
-          plan,
-          plan_expires_at: expiresAt.toISOString(),
-          stripe_subscription_id: subscription.id,
-        })
+        .update(updateData)
         .eq('id', userId)
 
       revalidatePath('/dashboard', 'layout')
